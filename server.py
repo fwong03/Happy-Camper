@@ -1,52 +1,66 @@
-"""Models and database functions for Happy Camper project."""
+"""Happy Camper"""
 
-from flask_sqlalchemy import SQLAlchemy
-# from datetime import datetime - DO I NEED THIS?
+from jinja2 import StrictUndefined
 
-# Establish connection to SQLite database
-db = SQLAlchemy()
+from flask import Flask, render_template, redirect, request, flash, session 
+from flask_debugtoolbar import DebugToolbarExtension
 
-#############################################################################
-# Model definitions
+from model import Customer, Category, BestUse, Product, connect_to_db, db
 
 
-class Customer(db.Model):
-    """Customer info"""
+app = Flask(__name__)
 
-    __tablename__ = 'customers'
+# Required to use Flask sessions and the debug toolbar
+app.secret_key = "ABC"
 
-    cust_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    fname = db.Column(db.String(16), nullable=False)
-    lname = db.Column(db.String(16), nullable=False)
-    street = db.Column(db.String(64), nullable=False)
-    city = db.Column(db.String(32), nullable=False)
-    state = db.Column(db.String(2), nullable=False)
-    zipcode = db.Column(db.String(16), nullable=False)
+# Normally, if you use an undefined variable in Jinja2, it fails silently.
+# This is horrible. Fix this so that, instead, it raises an error.
+app.jinja_env.undefined = StrictUndefined
 
 
+@app.route('/')
+def index():
+    """Homepage."""
 
-class Product(db.Model):
-    """Product parent class."""
+    return "This is the homepage"
 
-    __tablename__ = 'products'
 
-    prod_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    cat_id = db.Column(db.Integer, db.ForeignKey('categories.cat_id'),
-                        nullable=False)
-    # Record owner of item.
-    renter_cust_id = db.Column(db.Integer, db.ForeignKey('customers.cust_id'),
-                                nullable=False)
-    brand = db.Column(db.String(16), nullable=False)
-    model = db.Column(db.String(16), nullable=False)
-    condition = db.Column(db.String(128), nullable=False)
-    avail_start_date = db.Column(db.DateTime, nullable=False,
-                        default=datetime.date.utcnow)
-    avail_end_date = db.Column(db.DateTime, nullable=False)
-    price_per_day = db.Column(db.Float, nullable=False)
 
-    # TODO next round: put in constraints. Need to import CheckConstraint
-    # Do these work?
-    # __table_args__ = (CheckConstraint(avail_start_date >= datetime.date.utcnow,
-    #                   {})
-    # __table_args__ = (CheckConstraint(avail_end_date > avail_start_date, {})
+@app.route('/login')
+def user_list():
+    """User login page."""
+
+    return "This will be the user login page"
+
+
+@app.route('/account')
+def show_login():
+    """User account overview page"""
+
+    return "This will be the user account overview page"
+
+
+
+@app.route('/handle-login', methods=['POST'])
+def handle_login():
+    """Process login form"""
+
+    pass
+
+    # username = request.form['username']
+    # password = request.form['password']
+
+    # user = User.query.filter_by(email = username).first()
+    # if user:
+    #     if user.password == password:
+    #         session['user'] = username
+    #         flash("Logged in as %s" % username)
+    #         return redirect('user_info/%s' % user.user_id)
+    #     else: 
+    #         flash("Wrong password!")
+    #         return redirect('/')
+
+    # else:
+    #     flash("Sorry, this username does not exist!")
+    #     return redirect('/')
 
