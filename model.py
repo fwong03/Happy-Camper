@@ -3,7 +3,7 @@
 # October 27, 2015
 
 from flask_sqlalchemy import SQLAlchemy
-#import datetime
+import datetime
 
 db = SQLAlchemy()
 
@@ -31,7 +31,7 @@ class Customer(db.Model):
     password = db.Column(db.String(32), nullable=False)
 
     def __repr__(self):
-        
+
         return "<Customer cust_id=%r, name=%r %r, zipcode=%r, email=%r>" % (
             self.cust_id, self.fname, self.lname, self.zipcode, self.email)
 
@@ -48,7 +48,8 @@ class Category(db.Model):
 
     def __repr__(self):
 
-        return "<Category cat_id=%r, cat_name=%r>" % (self.cat_id, self.cat_name)
+        return "<Category cat_id=%r, cat_name=%r, search_words=%r>" % (
+            self.cat_id, self.cat_name, self.cat_search_words)
 
 
 class BestUse(db.Model):
@@ -77,8 +78,8 @@ class Product(db.Model):
     brand = db.Column(db.String(16), nullable=False)
     model = db.Column(db.String(16), nullable=False)
     condition = db.Column(db.String(128), nullable=False)
-    avail_start_date = db.Column(db.DateTime, nullable=False)
-    avail_end_date = db.Column(db.DateTime, nullable=False)
+    avail_start_date = db.Column(db.DateTime, nullable=False, default=datetime.date.today())
+    avail_end_date = db.Column(db.DateTime, nullable=False, default=datetime.date.today())
     price_per_day = db.Column(db.Float, nullable=False)
 
     # TODO next round: put in constraints. Need to import CheckConstraint
@@ -90,7 +91,7 @@ class Product(db.Model):
     def __repr__(self):
         return "<Product prod_id=%r, cat_id=%r, renter_cust_id=%r, model=%r, condition=%r, avail=%r to %r, price=%r>" % (
             self.prod_id, self.cat_id, self.renter_cust_id, self.model, self.condition,
-            self.avail_start_date, self.avail_end_date, self.price)
+            self.avail_start_date, self.avail_end_date, self.price_per_day)
 
 
 ##############################################################################
