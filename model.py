@@ -82,6 +82,8 @@ class Product(db.Model):
     avail_end_date = db.Column(db.DateTime, nullable=False, default=datetime.date.today())
     price_per_day = db.Column(db.Float, nullable=False)
 
+    tent = db.relationship('Tent', uselist=False, backref='product')
+
     # TODO next round: put in constraints. Need to import CheckConstraint
     # Do these work?
     # __table_args__ = (CheckConstraint(avail_start_date >= datetime.date.utcnow,
@@ -92,6 +94,48 @@ class Product(db.Model):
         return "<Product prod_id=%r, cat_id=%r, renter_cust_id=%r, model=%r, condition=%r, avail=%r to %r, price=%r>" % (
             self.prod_id, self.cat_id, self.renter_cust_id, self.model, self.condition,
             self.avail_start_date, self.avail_end_date, self.price_per_day)
+
+
+class SearchWord(db.Model):
+    """Hold fields to do text search"""
+
+    __tablename__ = "search_words"
+
+    search_id = db.Column(db.Integer, primary_key=True)
+    prod_id = db.Column(db.Integer, db.ForeignKey('products.prod_id'), nullable=False)
+    search_words = db.Column(db.String(256), nullable=False)
+
+    def __repr__(self):
+        return "<Search search_id=%r, prod_id=%r, search_words=%r>" % (
+            self.search_id, self.prod_id, self.search_words)
+
+
+class Tent(db.Model):
+    """Tent is one of the subset tables of Product"""
+
+    __tablename__ = 'tents'
+
+    prod_id = db.Column(db.Integer, db.ForeignKey('products.prod_id'),
+                        primary_key=True)
+    use_id = db.Column(db.Integer, db.ForeignKey('best_uses.use_id'),
+                            nullable=False)
+    search_id = db.Column(db.Integer, db.ForeignKey('search_words.search_id'),
+                            nullable=False)
+    sleep_capacity = db.Column(db.Integer, nullable=False)
+    seasons = db.Column(db.Integer, nullable=False)
+    min_trail_weight = db.Column(db.Integer)
+    floor_width = db.Column(db.Integer)
+    floor_length = db.Column(db.Integer)
+    num_doors = db.Column(db.Integer)
+    num_poles = db.Column(db.Integer)
+
+
+
+    def __repr__(self):
+        return "<Tent prod_id=%r, use_id=%r, search_id=%r, capacity=%r, seasons=%r, weight=%r, length=%r, width=%r, num_doors=%r, num_poles=%r>" % (
+            self.prod_id, self.use_id, self.search_id, self.sleep_capacity,
+            self.seasons, self.min_trail_weight, self.floor_width,
+            self.floor_length, self.num_doors, self.num_poles)
 
 
 ##############################################################################
