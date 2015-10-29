@@ -100,6 +100,9 @@ class Product(db.Model):
     image_url = db.Column(db.String(128))
 
     tent = db.relationship('Tent', uselist=False, backref='product')
+    owner = db.relationship('Customer', backref='products')
+    brand = db.relationship('Brand', backref='products')
+
 
     # TODO next round: put in constraints. Need to import CheckConstraint
     # Do these work?
