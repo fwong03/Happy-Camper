@@ -112,7 +112,7 @@ class Product(db.Model):
 
     def __repr__(self):
         return "<Product prod_id=%r, cat_id=%r, renter_cust_id=%r, model=%r, condition=%r, avail=%r to %r, price=%r>" % (
-            self.prod_id, self.cat_id, self.renter_cust_id, self.model, self.condition,
+            self.prod_id, self.cat_id, self.owner_cust_id, self.model, self.condition,
             self.avail_start_date, self.avail_end_date, self.price_per_day)
 
 
