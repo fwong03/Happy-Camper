@@ -11,12 +11,12 @@ db = SQLAlchemy()
 # Model definitions
 
 
-class Customer(db.Model):
+class User(db.Model):
     """Happy Camper user"""
 
-    __tablename__ = "customers"
+    __tablename__ = "users"
 
-    cust_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     active = db.Column(db.Boolean, default=True)
     fname = db.Column(db.String(32), nullable=False)
     lname = db.Column(db.String(32), nullable=False)
@@ -31,13 +31,13 @@ class Customer(db.Model):
     lng = db.Column(db.Float)
     # TODO: for phone, constraint must be 10 numbers long
     phone = db.Column(db.Integer, nullable=False)
-    email = db.Column(db.String(32), nullable=False)
+    email = db.Column(db.String(32), nullable=False, unique=True)
     password = db.Column(db.String(32), nullable=False)
 
     def __repr__(self):
 
-        return "<Customer cust_id=%r, name=%r %r, zipcode=%r, email=%r>" % (
-            self.cust_id, self.fname, self.lname, self.zipcode, self.email)
+        return "<User user_id=%r, name=%r %r, zipcode=%r, email=%r>" % (
+            self.user_id, self.fname, self.lname, self.zipcode, self.email)
 
 
 class Category(db.Model):
@@ -91,7 +91,7 @@ class Product(db.Model):
     brand_id = db.Column(db.Integer, db.ForeignKey('brands.brand_id'),
                         nullable=False)
     # Record owner of item.
-    owner_cust_id = db.Column(db.Integer, db.ForeignKey('customers.cust_id'),
+    owner_user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'),
                                 nullable=False)
     available = db.Column(db.Boolean, default=True)
     model = db.Column(db.String(16), nullable=False)
@@ -103,7 +103,7 @@ class Product(db.Model):
     image_url = db.Column(db.String(128))
 
     tent = db.relationship('Tent', uselist=False, backref='product')
-    owner = db.relationship('Customer', backref='products')
+    owner = db.relationship('User', backref='products')
     brand = db.relationship('Brand', backref='products')
 
 
@@ -114,8 +114,8 @@ class Product(db.Model):
     # __table_args__ = (CheckConstraint(avail_end_date > avail_start_date, {})
 
     def __repr__(self):
-        return "<Product prod_id=%r, cat_id=%r, renter_cust_id=%r, model=%r, condition=%r, avail=%r to %r, price=%r>" % (
-            self.prod_id, self.cat_id, self.owner_cust_id, self.model, self.condition,
+        return "<Product prod_id=%r, cat_id=%r, owner_id=%r, model=%r, condition=%r, avail=%r to %r, price=%r>" % (
+            self.prod_id, self.cat_id, self.owner_user_id, self.model, self.condition,
             self.avail_start_date, self.avail_end_date, self.price_per_day)
 
 
@@ -165,9 +165,9 @@ class History(db.Model):
     history_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     prod_id = db.Column(db.Integer, db.ForeignKey('products.prod_id'),
                         nullable=False)
-    renter_cust_id = db.Column(db.Integer, db.ForeignKey('customers.cust_id'),
+    renter_user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'),
                         nullable=False)
-    # owner_cust_id = db.Column(db.Integer, db.ForeignKey('customers.cust_id'),
+    # owner_user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'),
     #                     nullable=False)
     start_date = db.Column(db.DateTime, nullable=False)
     end_date = db.Column(db.DateTime, nullable=False)

@@ -2,12 +2,11 @@
 
 from jinja2 import StrictUndefined
 
-from flask import Flask
-# , render_template, redirect, request, flash, session
+from flask import Flask, render_template, redirect, request, flash, session
 from flask_debugtoolbar import DebugToolbarExtension
 
-from model import connect_to_db, db
-# Customer, Category, BestUse, Brand, Product, Tent
+from model import connect_to_db, db, Customer
+# Category, BestUse, Brand, Product, Tent
 
 
 app = Flask(__name__)
@@ -38,30 +37,28 @@ def create_account():
 def login():
     """User login page."""
 
-    return "Where a user with an account logs in."
+    return render_template("login.html")
 
 
 @app.route('/handle-login', methods=['POST'])
 def handle_login():
     """Process login form"""
-    pass
 
-    # username = request.form['username']
-    # password = request.form['password']
+    username = request.form['email']
+    password = request.form['password']
 
-    # user = User.query.filter_by(email = username).first()
-    # if user:
-    #     if user.password == password:
-    #         session['user'] = username
-    #         flash("Logged in as %s" % username)
-    #         return redirect('user_info/%s' % user.user_id)
-    #     else: 
-    #         flash("Wrong password!")
-    #         return redirect('/')
+    user = User.query.filter_by(email==cust_email).one()
 
-    # else:
-    #     flash("Sorry, this username does not exist!")
-    #     return redirect('/')
+    if user:
+        if user.password == password:
+            session['user'] = username
+            # session['account_lat'] = user.lat
+            # session['account_lng'] = user.lng
+            flash("Logged in as %s" % username)
+            return redirect('/success')
+        else:
+            flash("Login failed. Please try again.")
+            return redirect('/')
 
 
 @app.route('/success')
