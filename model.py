@@ -26,6 +26,9 @@ class Customer(db.Model):
     state = db.Column(db.String(2), nullable=False)
     # TODO: for zipcode, constraint must be 5 numbers long
     zipcode = db.Column(db.Integer, nullable=False)
+    # latitude and longitude for geolocation stuff
+    lat = db.Column(db.Float)
+    lng = db.Column(db.Float)
     # TODO: for phone, constraint must be 10 numbers long
     phone = db.Column(db.Integer, nullable=False)
     email = db.Column(db.String(32), nullable=False)
@@ -43,7 +46,7 @@ class Category(db.Model):
     __tablename__ = 'categories'
 
     cat_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    cat_name = db.Column(db.String(8), nullable=False, unique=True)
+    cat_name = db.Column(db.String(16), nullable=False, unique=True)
     # Include category misspellings in search words field
     # cat_search_words = db.Column(db.String(128), nullable=False)
 
@@ -59,7 +62,7 @@ class BestUse(db.Model):
     __tablename__ = "best_uses"
 
     use_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    use_name = db.Column(db.String(8), nullable=False, unique=True)
+    use_name = db.Column(db.String(16), nullable=False, unique=True)
 
     def __repr__(self):
         return "<BestUse use_id=%r, use_name=%r>" % (self.use_id, self.use_name)
@@ -71,7 +74,7 @@ class Brand(db.Model):
     __tablename__ = "brands"
 
     brand_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    brand_name = db.Column(db.String(16), nullable=False, unique=True)
+    brand_name = db.Column(db.String(64), nullable=False, unique=True)
 
     def __repr__(self):
         return "<Brand brand_id=%r, brand_name=%r>" % (self.brand_id, self.brand_name)
@@ -148,8 +151,8 @@ class Tent(db.Model):
     num_poles = db.Column(db.Integer)
 
     def __repr__(self):
-        return "<Tent prod_id=%r, use_id=%r, search_id=%r, capacity=%r, seasons=%r, weight=%r, length=%r, width=%r, num_doors=%r, num_poles=%r>" % (
-            self.prod_id, self.use_id, self.search_id, self.sleep_capacity,
+        return "<Tent prod_id=%r, use_id=%r, capacity=%r, seasons=%r, weight=%r, length=%r, width=%r, num_doors=%r, num_poles=%r>" % (
+            self.prod_id, self.use_id, self.sleep_capacity,
             self.seasons, self.min_trail_weight, self.floor_width,
             self.floor_length, self.num_doors, self.num_poles)
 
