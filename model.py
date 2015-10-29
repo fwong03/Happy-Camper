@@ -17,6 +17,7 @@ class Customer(db.Model):
     __tablename__ = "customers"
 
     cust_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    active = db.Column(db.Boolean, default=True)
     fname = db.Column(db.String(32), nullable=False)
     lname = db.Column(db.String(32), nullable=False)
     street = db.Column(db.String(32), nullable=False)
@@ -44,7 +45,7 @@ class Category(db.Model):
     cat_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     cat_name = db.Column(db.String(8), nullable=False, unique=True)
     # Include category misspellings in search words field
-    cat_search_words = db.Column(db.String(128), nullable=False)
+    # cat_search_words = db.Column(db.String(128), nullable=False)
 
     def __repr__(self):
 
@@ -75,6 +76,7 @@ class Product(db.Model):
     # Record owner of item.
     renter_cust_id = db.Column(db.Integer, db.ForeignKey('customers.cust_id'),
                                 nullable=False)
+    available = db.Column(db.Boolean, default=True)
     brand = db.Column(db.String(16), nullable=False)
     model = db.Column(db.String(16), nullable=False)
     condition = db.Column(db.String(128), nullable=False)
@@ -96,18 +98,18 @@ class Product(db.Model):
             self.avail_start_date, self.avail_end_date, self.price_per_day)
 
 
-class SearchWord(db.Model):
-    """Hold fields to do text search"""
+# class SearchWord(db.Model):
+#     """Hold fields to do text search"""
 
-    __tablename__ = "search_words"
+#     __tablename__ = "search_words"
 
-    search_id = db.Column(db.Integer, primary_key=True)
-    prod_id = db.Column(db.Integer, db.ForeignKey('products.prod_id'), nullable=False)
-    search_words = db.Column(db.String(256), nullable=False)
+#     prod_id = db.Column(db.Integer, db.ForeignKey('products.prod_id'),
+#                         primary_key=True)
+#     search_words = db.Column(db.String(256), nullable=False)
 
-    def __repr__(self):
-        return "<Search search_id=%r, prod_id=%r, search_words=%r>" % (
-            self.search_id, self.prod_id, self.search_words)
+#     def __repr__(self):
+#         return "<Search search_id=%r, prod_id=%r, search_words=%r>" % (
+#             self.search_id, self.prod_id, self.search_words)
 
 
 class Tent(db.Model):
@@ -118,9 +120,7 @@ class Tent(db.Model):
     prod_id = db.Column(db.Integer, db.ForeignKey('products.prod_id'),
                         primary_key=True)
     use_id = db.Column(db.Integer, db.ForeignKey('best_uses.use_id'),
-                            nullable=False)
-    search_id = db.Column(db.Integer, db.ForeignKey('search_words.search_id'),
-                            nullable=False)
+                        nullable=False)
     sleep_capacity = db.Column(db.Integer, nullable=False)
     seasons = db.Column(db.Integer, nullable=False)
     min_trail_weight = db.Column(db.Integer)
@@ -129,14 +129,40 @@ class Tent(db.Model):
     num_doors = db.Column(db.Integer)
     num_poles = db.Column(db.Integer)
 
-
-
     def __repr__(self):
         return "<Tent prod_id=%r, use_id=%r, search_id=%r, capacity=%r, seasons=%r, weight=%r, length=%r, width=%r, num_doors=%r, num_poles=%r>" % (
             self.prod_id, self.use_id, self.search_id, self.sleep_capacity,
             self.seasons, self.min_trail_weight, self.floor_width,
             self.floor_length, self.num_doors, self.num_poles)
 
+
+class History(db.Model):
+    """Rental histories"""
+
+    __tablename__ = 'histories'
+
+    history_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    prod_id = db.Column(db.Integer, db.ForeignKey('products.prod_id'),
+                        nullable=False)
+    renter_cust_id = db.Column(db.Integer, db.ForeignKey('customers.cust_id'),
+                        nullable=False)
+    owner_cust_id = db.Column(db.Integer, db.ForeignKey('customers.cust_id'),
+                        nullable=False)
+    start_date = db.Column(db.DateTime, nullable=False)
+    end_date = db.Column(db.DateTime, nullable=False)
+    owner_rate_id = db.Column(db.Integer, db.ForeignKey('ratings.rate_id'))
+    renter_rate_id = db.Column(db.Integer, db.ForeignKey('ratings.rate_id'))
+    prod_rate_id = db.Column(db.Integer, db.ForeignKey('ratings.rate_id'))
+
+
+class Rating(db.Model):
+    """Renters can rate owner and products, Owners can rate renters."""
+
+    __tablename__ = 'ratings'
+
+    rate_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    stars = db.Column(db.Integer, nullable=False)
+    comments = db.Column(db.String(128))
 
 ##############################################################################
 # Helper functions
@@ -146,6 +172,7 @@ def connect_to_db(app):
 
     # Configure to use our SQLite database
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///camper.db'
+    app.config['SQLALCHEMY_ECHO'] = True
     db.app = app
     db.init_app(app)
 
