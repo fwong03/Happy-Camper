@@ -65,6 +65,18 @@ class BestUse(db.Model):
         return "<BestUse use_id=%r, use_name=%r>" % (self.use_id, self.use_name)
 
 
+class Brand(db.Model):
+    """Brands"""
+
+    __tablename__ = "brands"
+
+    brand_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    brand_name = db.Column(db.String(16), nullable=False, unique=True)
+
+    def __repr__(self):
+        return "<Brand brand_id=%r, brand_name=%r>" % (self.brand_id, self.brand_name)
+
+
 class Product(db.Model):
     """Product parent class."""
 
@@ -73,16 +85,19 @@ class Product(db.Model):
     prod_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     cat_id = db.Column(db.Integer, db.ForeignKey('categories.cat_id'),
                         nullable=False)
+    brand_id = db.Column(db.Integer, db.ForeignKey('brands.brand_id'),
+                        nullable=False)
     # Record owner of item.
-    renter_cust_id = db.Column(db.Integer, db.ForeignKey('customers.cust_id'),
+    owner_cust_id = db.Column(db.Integer, db.ForeignKey('customers.cust_id'),
                                 nullable=False)
     available = db.Column(db.Boolean, default=True)
-    brand = db.Column(db.String(16), nullable=False)
     model = db.Column(db.String(16), nullable=False)
-    condition = db.Column(db.String(128), nullable=False)
+    condition = db.Column(db.String(128))
+    description = db.Column(db.String(128))
     avail_start_date = db.Column(db.DateTime, nullable=False, default=datetime.date.today())
     avail_end_date = db.Column(db.DateTime, nullable=False, default=datetime.date.today())
     price_per_day = db.Column(db.Float, nullable=False)
+    image_url = db.Column(db.String(128))
 
     tent = db.relationship('Tent', uselist=False, backref='product')
 
@@ -146,8 +161,8 @@ class History(db.Model):
                         nullable=False)
     renter_cust_id = db.Column(db.Integer, db.ForeignKey('customers.cust_id'),
                         nullable=False)
-    owner_cust_id = db.Column(db.Integer, db.ForeignKey('customers.cust_id'),
-                        nullable=False)
+    # owner_cust_id = db.Column(db.Integer, db.ForeignKey('customers.cust_id'),
+    #                     nullable=False)
     start_date = db.Column(db.DateTime, nullable=False)
     end_date = db.Column(db.DateTime, nullable=False)
     owner_rate_id = db.Column(db.Integer, db.ForeignKey('ratings.rate_id'))
@@ -163,6 +178,8 @@ class Rating(db.Model):
     rate_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     stars = db.Column(db.Integer, nullable=False)
     comments = db.Column(db.String(128))
+
+
 
 ##############################################################################
 # Helper functions
