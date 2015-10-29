@@ -1,0 +1,45 @@
+Generate 20 fake users
+
+First Names
+
+['Jerrell', 'Tiffany', 'Drusilla', 'Collis', 'Dreama', 'Cross', 'Evonne',
+'Baggs', 'Laurene', 'Wolfenbarger', 'Leeanne', 'Hord', 'Edwardo', 'Puff',
+'Phillip', 'Lemaire', 'Erma', 'Pledger', 'Cruz', 'Wolf']
+ 
+Last Names 
+
+['Nelda', 'Hehn', 'Terrilyn', 'Schneider', 'Dylan', 'Marsala', 'Tambra',
+'Scales', 'Jennell', 'Sudduth', 'Felisa', 'Henson', 'Dede', 'Surita', 'Colene',
+'Delcid', 'Jere', 'Wee', 'Vaughn', 'Zickefoose']  
+
+Street Addresses: Do five different ones for each city
+
+['666 Ashley Court', '304 Mulberry Court ', '812 Madison Court', 
+'851 Main Street North', '891 Church Street North']
+
+City: Five users in each of four cities
+
+['Oakland', 'San Francisco', 'Mountain View', 'Tracy']
+
+State
+
+'CA'
+
+Zipcode
+
+[94612, 94109, 94043, 95376
+
+Phone
+5555555555
+
+Emails: do 'fname@lname.com'
+passwords: 'abc'
+
+
+
+
+
+
+
+
+
