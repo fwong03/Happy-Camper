@@ -5,7 +5,7 @@ from jinja2 import StrictUndefined
 from flask import Flask, render_template, redirect, request, flash, session
 from flask_debugtoolbar import DebugToolbarExtension
 
-from model import connect_to_db, db, Customer
+from model import connect_to_db, db, User
 # Category, BestUse, Brand, Product, Tent
 
 
@@ -23,8 +23,7 @@ app.jinja_env.undefined = StrictUndefined
 def index():
     """Signed out homepage."""
 
-    return "Page you get to if you don't have an account or are not logged in."
-
+    return render_template("signedout.html")
 
 @app.route('/createaccount')
 def create_account():
@@ -44,10 +43,10 @@ def login():
 def handle_login():
     """Process login form"""
 
-    username = request.form['email']
-    password = request.form['password']
+    username = request.form.get('email')
+    password = request.form.get('password')
 
-    user = User.query.filter_by(email==cust_email).one()
+    user = User.query.filter(User.email == username).one()
 
     if user:
         if user.password == password:
@@ -65,7 +64,7 @@ def handle_login():
 def success():
     """Signed in home page."""
 
-    return "Where you get to if you've successfully logged in."
+    render_template("success.html")
 
 
 @app.route('/list_item')
@@ -79,7 +78,7 @@ def list_item():
     return "Where you can list an item to rent out."
 
 @app.route('/product/<int:prod_id>')
-def item_detail():
+def item_detail(prod_id):
     """Item detail page.
 
     Routes either from Search Results page or List Item page.
@@ -89,7 +88,7 @@ def item_detail():
     # If item is not available, show BOROWED version of page.
     # Allows you to borrow only if Available is True.
 
-    return "Where you can view item details."
+    return "Where you can view item details for %d" % prod_id
 
 
 
@@ -105,8 +104,8 @@ def show_results():
     return "This will be the search results."
 
 
-@app.route('/customers/<int:cust_id>')
-def show_account():
+@app.route('/customers/<int:user_id>')
+def show_account(user_id):
     """Where users can check out their account details.
 
     They can also delete listings, rate stuff, get the emails of people

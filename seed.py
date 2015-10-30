@@ -1,15 +1,15 @@
-from model import Customer, BestUse, Category, Brand, Product, Tent
+from model import User, BestUse, Category, Brand, Product, Tent
 from model import connect_to_db, db
 from server import app
 from datetime import datetime
 
 
-def load_customers():
-    """Load fake customer data"""
+def load_users():
+    """Load user data"""
 
-    print "Customers"
+    print "Users"
     # Delete rows of existing table, if any
-    Customer.query.delete()
+    User.query.delete()
 
     for row in open("data/customerdata"):
         row = row.strip()
@@ -32,7 +32,7 @@ def load_customers():
         lontde = float(lontde)
         phn = int(phn)
 
-        a = Customer(fname=firstn, lname=lastn, street=staddress,
+        a = User(fname=firstn, lname=lastn, street=staddress,
                             city=cty, state=sta, zipcode=zcode, lat=latde,
                             lng=lontde, phone=phn, email=login, password=pword)
 
@@ -116,7 +116,7 @@ def load_products():
         date2 = datetime.strptime(date2, "%Y-%m-%d")
 
         a = Product(cat_id=category, brand_id=brand,
-                            owner_cust_id=owner, model=mname, condition=con,
+                            owner_user_id=owner, model=mname, condition=con,
                             description=desc, avail_start_date=date1,
                             avail_end_date=date2, price_per_day=dollarz)
 
@@ -164,7 +164,7 @@ if __name__ == "__main__":
     db.create_all()
 
     # Import different types of data
-    load_customers()
+    load_users()
     load_bestuses()
     load_categories()
     load_brands()

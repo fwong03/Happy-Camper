@@ -31,12 +31,12 @@ class User(db.Model):
     lng = db.Column(db.Float)
     # TODO: for phone, constraint must be 10 numbers long
     phone = db.Column(db.Integer, nullable=False)
-    email = db.Column(db.String(32), nullable=False, unique=True)
+    email = db.Column(db.String(64), nullable=False, unique=True)
     password = db.Column(db.String(32), nullable=False)
 
     def __repr__(self):
 
-        return "<User user_id=%r, name=%r %r, zipcode=%r, email=%r>" % (
+        return "<User user_id=%d, name=%s %s, zipcode=%d, email=%s>" % (
             self.user_id, self.fname, self.lname, self.zipcode, self.email)
 
 
@@ -49,11 +49,10 @@ class Category(db.Model):
     cat_name = db.Column(db.String(16), nullable=False, unique=True)
     # Include category misspellings in search words field
     # cat_search_words = db.Column(db.String(128), nullable=False)
-
+    
     def __repr__(self):
 
-        return "<Category cat_id=%r, cat_name=%r, search_words=%r>" % (
-            self.cat_id, self.cat_name, self.cat_search_words)
+        return "<Category cat_id=%d, cat_name=%s>" % (self.cat_id, self.cat_name)
 
 
 class BestUse(db.Model):
@@ -65,7 +64,7 @@ class BestUse(db.Model):
     use_name = db.Column(db.String(16), nullable=False, unique=True)
 
     def __repr__(self):
-        return "<BestUse use_id=%r, use_name=%r>" % (self.use_id, self.use_name)
+        return "<BestUse use_id=%d, use_name=%s>" % (self.use_id, self.use_name)
 
 
 class Brand(db.Model):
@@ -77,7 +76,7 @@ class Brand(db.Model):
     brand_name = db.Column(db.String(64), nullable=False, unique=True)
 
     def __repr__(self):
-        return "<Brand brand_id=%r, brand_name=%r>" % (self.brand_id, self.brand_name)
+        return "<Brand brand_id=%d, brand_name=%s>" % (self.brand_id, self.brand_name)
 
 
 class Product(db.Model):
@@ -87,12 +86,12 @@ class Product(db.Model):
 
     prod_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     cat_id = db.Column(db.Integer, db.ForeignKey('categories.cat_id'),
-                        nullable=False)
+                       nullable=False)
     brand_id = db.Column(db.Integer, db.ForeignKey('brands.brand_id'),
-                        nullable=False)
+                         nullable=False)
     # Record owner of item.
     owner_user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'),
-                                nullable=False)
+                              nullable=False)
     available = db.Column(db.Boolean, default=True)
     model = db.Column(db.String(16), nullable=False)
     condition = db.Column(db.String(128))
@@ -105,16 +104,15 @@ class Product(db.Model):
     tent = db.relationship('Tent', uselist=False, backref='product')
     owner = db.relationship('User', backref='products')
     brand = db.relationship('Brand', backref='products')
-
+    category = db.relationship('Category', backref='products')
 
     # TODO next round: put in constraints. Need to import CheckConstraint
     # Do these work?
     # __table_args__ = (CheckConstraint(avail_start_date >= datetime.date.utcnow,
     #                   {})
     # __table_args__ = (CheckConstraint(avail_end_date > avail_start_date, {})
-
     def __repr__(self):
-        return "<Product prod_id=%r, cat_id=%r, owner_id=%r, model=%r, condition=%r, avail=%r to %r, price=%r>" % (
+        return "<Product prod_id=%d, cat_id=%d, owner_id=%d, model=%s, condition=%s, avail=%r to %r, price=%r>" % (
             self.prod_id, self.cat_id, self.owner_user_id, self.model, self.condition,
             self.avail_start_date, self.avail_end_date, self.price_per_day)
 
@@ -141,7 +139,7 @@ class Tent(db.Model):
     prod_id = db.Column(db.Integer, db.ForeignKey('products.prod_id'),
                         primary_key=True)
     use_id = db.Column(db.Integer, db.ForeignKey('best_uses.use_id'),
-                        nullable=False)
+                       nullable=False)
     sleep_capacity = db.Column(db.Integer, nullable=False)
     seasons = db.Column(db.Integer, nullable=False)
     min_trail_weight = db.Column(db.Integer)
@@ -151,7 +149,7 @@ class Tent(db.Model):
     num_poles = db.Column(db.Integer)
 
     def __repr__(self):
-        return "<Tent prod_id=%r, use_id=%r, capacity=%r, seasons=%r, weight=%r, length=%r, width=%r, num_doors=%r, num_poles=%r>" % (
+        return "<Tent prod_id=%d, use_id=%d, capacity=%d, seasons=%d, weight=%d, length=%d, width=%d, num_doors=%d, num_poles=%d>" % (
             self.prod_id, self.use_id, self.sleep_capacity,
             self.seasons, self.min_trail_weight, self.floor_width,
             self.floor_length, self.num_doors, self.num_poles)
