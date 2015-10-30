@@ -22,8 +22,10 @@ app.jinja_env.undefined = StrictUndefined
 @app.route('/')
 def index():
     """Signed out homepage."""
+    # Is there a way to deal with login with if/else Get vs Post request?
 
     return render_template("signedout.html")
+
 
 @app.route('/createaccount')
 def create_account():
@@ -51,6 +53,7 @@ def handle_login():
     if user:
         if user.password == password:
             session['user'] = username
+            # Use below to set default location in search form
             # session['account_lat'] = user.lat
             # session['account_lng'] = user.lng
             flash("Logged in as %s" % username)
@@ -69,7 +72,7 @@ def success():
 
 @app.route('/list_item')
 def list_item():
-    """List an item page. 
+    """List an item page.
 
     Routes from signed in homepage, which has a button to List an Item.
     Routes to item detail page.
@@ -84,9 +87,10 @@ def item_detail(prod_id):
     Routes either from Search Results page or List Item page.
     If click on Borrow This, routes to Borrowed version of this page.
     """
-    # If item is available, show regular product detail page.
-    # If item is not available, show BOROWED version of page.
-    # Allows you to borrow only if Available is True.
+    # If item available = True, show regular product detail page.
+    # If item available = False, show BOROWED version of page, which
+    # doesn't allow you to borrow the item.
+    # Show this BORROWED version after a user clicks "borrow this"
 
     return "Where you can view item details for %d" % prod_id
 
