@@ -17,6 +17,7 @@ class Region(db.Model):
 
     region_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     region_abbr = db.Column(db.String(2), nullable=False)
+    region_full = db.Column(db.String(16), nullable=False)
 
 
 class User(db.Model):

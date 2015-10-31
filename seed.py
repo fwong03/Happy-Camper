@@ -1,7 +1,24 @@
-from model import User, BestUse, Category, Brand, Product, Tent
+from model import Region, User, BestUse, Category, Brand, Product, Tent
 from model import connect_to_db, db
 from server import app
 from datetime import datetime
+
+
+def load_regions():
+    """Load regions, i.e. states, for user addresses"""
+
+    print "Regions"
+    Region.query.delete()
+
+    for row in open("data/regionsdata"):
+        row = row.strip()
+        abbr, full = row.split("|")
+
+        a = Region(region_abbr=abbr, region_full=full)
+
+        db.session.add(a)
+
+    db.session.commit()
 
 
 def load_users():
@@ -13,13 +30,13 @@ def load_users():
 
     for row in open("data/customerdata"):
         row = row.strip()
-        row= row.split("|")
+        row = row.split("|")
 
         firstn = row[0]
         lastn = row[1]
         staddress = row[2]
         cty = row[3]
-        sta = row[4]
+        region = row[4]
         zcode = row[5]
         latde = row[6]
         lontde = row[7]
@@ -27,14 +44,13 @@ def load_users():
         login = row[9]
         pword = row[10]
 
-        zcode = int(zcode)
         latde = float(latde)
         lontde = float(lontde)
         phn = int(phn)
 
         a = User(fname=firstn, lname=lastn, street=staddress,
-                            city=cty, state=sta, zipcode=zcode, lat=latde,
-                            lng=lontde, phone=phn, email=login, password=pword)
+                 city=cty, region_id=region, postalcode=zcode, lat=latde,
+                 lng=lontde, phone=phn, email=login, password=pword)
 
         db.session.add(a)
 
@@ -111,14 +127,13 @@ def load_products():
         date2 = row[7]
         dollarz = float(row[8])
 
-
         date1 = datetime.strptime(date1, "%Y-%m-%d")
         date2 = datetime.strptime(date2, "%Y-%m-%d")
 
-        a = Product(cat_id=category, brand_id=brand,
-                            owner_user_id=owner, model=mname, condition=con,
-                            description=desc, avail_start_date=date1,
-                            avail_end_date=date2, price_per_day=dollarz)
+        a = Product(cat_id=category, brand_id=brand, owner_user_id=owner,
+                    model=mname, condition=con, description=desc,
+                    avail_start_date=date1, avail_end_date=date2,
+                    price_per_day=dollarz)
 
         db.session.add(a)
 
@@ -145,16 +160,13 @@ def load_tents():
         doors = int(row[7])
         poles = int(row[8])
 
-        a = Tent(prod_id=product, use_id=use,
-                            sleep_capacity=capacity, seasons=num_sea,
-                            min_trail_weight=weight, floor_width=width,
-                            floor_length=length, num_doors=doors,
-                            num_poles=poles)
+        a = Tent(prod_id=product, use_id=use, sleep_capacity=capacity,
+                 seasons=num_sea, min_trail_weight=weight, floor_width=width,
+                 floor_length=length, num_doors=doors, num_poles=poles)
 
         db.session.add(a)
 
     db.session.commit()
-
 
 
 if __name__ == "__main__":
@@ -163,7 +175,8 @@ if __name__ == "__main__":
     # In case tables haven't been created, create them
     db.create_all()
 
-    # Import different types of data
+    # Seed data
+    load_regions()
     load_users()
     load_bestuses()
     load_categories()
