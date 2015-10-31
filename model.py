@@ -10,6 +10,15 @@ db = SQLAlchemy()
 ##############################################################
 
 
+class Region(db.Model):
+    """Regions (i.e., states) for user addresses."""
+
+    __tablename__ = "regions"
+
+    region_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    region_abbr = db.Column(db.String(2), nullable=False)
+
+
 class User(db.Model):
     """Happy Camper user"""
 
@@ -17,29 +26,40 @@ class User(db.Model):
 
     user_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
 
-    # Make active false when user deactivates account
+    # Per Bert rec: give user option to deactivate account.
+    # Make active false when user deactivates.
     active = db.Column(db.Boolean, default=True)
-
     fname = db.Column(db.String(32), nullable=False)
     lname = db.Column(db.String(32), nullable=False)
     street = db.Column(db.String(32), nullable=False)
     city = db.Column(db.String(32), nullable=False)
-    state = db.Column(db.String(2), nullable=False)
-    zipcode = db.Column(db.Integer, nullable=False)
 
-    # TO DO: Find way to look this up when user registers
+    # Made this region_id instead of state per Drew recommendation.
+    # ENUM would also work but less flexible.
+    region_id = db.Column(db.Integer, db.ForeignKey('regions.region_id'),
+                          nullable=False)
+
+    # Changed from INT to string per Drew recommendation. If integer would
+    # have to deal with zip codes starting with zeroes. Make 10 long so have
+    # option to accept nine-digit zip codes.
+    postalcode = db.Column(db.String(10), nullable=False)
+
+    # Use pyzipcode to convert zip code to lat lngs?
+    # With pyzip can find zipcodes within a radius of a given zipcode.
+    # Make this non nullable once figure out how you're going to do this.
+    # Index these since will likely use to search for nearby items.
     lat = db.Column(db.Float)
     lng = db.Column(db.Float)
 
+    # Drew: phone presents another INT problem.
+    # Store as user inputs and then clean up when pull out to use?
+    # When make form strongly suggest input format with "()" and "-".
+    # Google JS phone checks.
     phone = db.Column(db.Integer, nullable=False)
+
+    # Also check online for JS email check.
     email = db.Column(db.String(64), nullable=False, unique=True)
     password = db.Column(db.String(32), nullable=False)
-
-    # TO DO: Constraints
-    # STATE must be in list of two letter state abbreviations
-    # ZIPCODE must be five digits long
-    # PHONE must be ten digits (after you clean it up)
-    # EMAIL must have "@" sign
 
     def __repr__(self):
 
@@ -89,30 +109,31 @@ class Product(db.Model):
 
     __tablename__ = 'products'
 
-    # This prod_id primary key is shared with subset tables (e.g., tents) so make
-    # subset table entries at same time make product entry so you don't mess up!
+    # Subset tables (e.g., tents) use this same PK so make subset table entry at
+    # same time as product entry!  Note PKs automatically get an index.
     prod_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     cat_id = db.Column(db.Integer, db.ForeignKey('categories.cat_id'),
                        nullable=False)
 
-    # Put brand name in separate table. But will this make search more complicated?
+    # Per Bert recommendation put brand name in separate table for more
+    # flexibility.
     brand_id = db.Column(db.Integer, db.ForeignKey('brands.brand_id'),
                          nullable=False)
 
-    # Record owner of item.
+    # Customer ID of item's owner.
     owner_user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'),
                               nullable=False)
 
-    # Make available false when item is borrowed or when user deactivates account
+    # Per Bert rec: make available false when item is borrowed or when owner
+    # deactivates account.
     available = db.Column(db.Boolean, default=True)
     model = db.Column(db.String(16), nullable=False)
     condition = db.Column(db.String(128))
     description = db.Column(db.String(128))
 
-    # TO DO: Constraints
-    # avail_end_date must be later than avail_start_date
-    # At time of entry, avail_start_date must be today or later.
-    # When show on front end, avail_start_date must be today, not this date.
+    # When user inputs check avail end date is after start date.
+    # When show product info, avail start date is later of today and user-inputted
+    # start date.
     avail_start_date = db.Column(db.DateTime, nullable=False, default=datetime.date.today())
     avail_end_date = db.Column(db.DateTime, nullable=False, default=datetime.date.today())
     price_per_day = db.Column(db.Float, nullable=False)
@@ -120,7 +141,7 @@ class Product(db.Model):
     # Do image url now since image upload sounds like it will be complicated.
     image_url = db.Column(db.String(128))
 
-    # Subset tables
+    # Put subset table backrefs here
     tent = db.relationship('Tent', uselist=False, backref='product')
 
     # Other backrefs
@@ -168,14 +189,15 @@ class History(db.Model):
     __tablename__ = 'histories'
 
     history_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+
+    # Make this index if think will use a lot for search. Check, may already get
+    # index since it's a FK.
     prod_id = db.Column(db.Integer, db.ForeignKey('products.prod_id'),
                         nullable=False)
     renter_user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'),
                         nullable=False)
 
-    # Bert recommends putting owner_user_id in here as well. Redundant (since
-    # this info is already in Products), but then won't have to join when
-    # search for owner ratings.
+    # Bert rec: put this in to make search faster since wouldn't have to join.
     # owner_user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'),
     #                     nullable=False)
     start_date = db.Column(db.DateTime, nullable=False)
