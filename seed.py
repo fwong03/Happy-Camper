@@ -1,4 +1,5 @@
 from model import Region, User, BestUse, Category, Brand, Product, Tent
+from model import FillType, SleepingBag
 from model import connect_to_db, db
 from server import app
 from datetime import datetime
@@ -106,7 +107,7 @@ def load_brands():
 
 
 def load_products():
-    """Load fake products data"""
+    """Load products data"""
 
     print "Products"
     Product.query.delete()
@@ -141,7 +142,7 @@ def load_products():
 
 
 def load_tents():
-    """Load fake tents data"""
+    """Load tents data"""
 
     print "Tents"
     Tent.query.delete()
@@ -169,6 +170,48 @@ def load_tents():
     db.session.commit()
 
 
+def load_filltypes():
+    """Load sleeping bag fill types"""
+
+    print "Fill Types"
+    FillType.query.delete()
+
+    for row in open("data/filltypesdata"):
+        row = row.strip()
+        code, name = row.split("|")
+
+        a = FillType(fill_code=code, fill_name=name)
+
+        db.session.add(a)
+
+    db.session.commit()
+
+
+def load_sleepingbags():
+    """Load sleeping bags data"""
+
+    print "Sleeping Bags"
+    SleepingBag.query.delete()
+
+    for row in open("data/sleepingbagsdata"):
+        row = row.strip()
+        row = row.split("|")
+
+        product = int(row[0])
+        fill = row[1]
+        temp = int(row[2])
+        wt = int(row[3])
+        lgth = int(row[4])
+        ger = row[5]
+
+        a = SleepingBag(prod_id=product, fill_code=fill, temp_rating=temp,
+                        weight=wt, length=lgth, gender=ger)
+
+        db.session.add(a)
+
+    db.session.commit()
+
+
 if __name__ == "__main__":
     connect_to_db(app)
 
@@ -183,3 +226,5 @@ if __name__ == "__main__":
     load_brands()
     load_products()
     load_tents()
+    load_filltypes()
+    load_sleepingbags()

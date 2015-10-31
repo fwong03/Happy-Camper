@@ -64,8 +64,8 @@ class User(db.Model):
 
     def __repr__(self):
 
-        return "<User user_id=%d, name=%s %s, zipcode=%d, email=%s>" % (
-            self.user_id, self.fname, self.lname, self.zipcode, self.email)
+        return "<User user_id=%d, name=%s %s, postalcode=%s, email=%s>" % (
+            self.user_id, self.fname, self.lname, self.postalcode, self.email)
 
 
 class Category(db.Model):
@@ -144,6 +144,7 @@ class Product(db.Model):
 
     # Put subset table backrefs here
     tent = db.relationship('Tent', uselist=False, backref='product')
+    sleepingbag = db.relationship('SleepingBag', uselist=False, backref='product')
 
     # Other backrefs
     owner = db.relationship('User', backref='products')
@@ -182,6 +183,40 @@ class Tent(db.Model):
             self.prod_id, self.use_id, self.sleep_capacity,
             self.seasons, self.min_trail_weight, self.floor_width,
             self.floor_length, self.num_doors, self.num_poles)
+
+
+class FillType(db.Model):
+    """Fill types for sleeping bags."""
+
+    __tablename__ = 'filltypes'
+
+    # D for down, S for synthetic
+    fill_code = db.Column(db.String(1), primary_key=True)
+    fill_name = db.Column(db.String(16), unique=True)
+
+
+class SleepingBag(db.Model):
+    """Sleeping bags is one of the subset tables of Product"""
+
+    __tablename__ = 'sleepingbags'
+
+    prod_id = db.Column(db.Integer, db.ForeignKey('products.prod_id'),
+                        primary_key=True)
+    fill_code = db.Column(db.String(1), db.ForeignKey('filltypes.fill_code'),
+                          nullable=False)
+    temp_rating = db.Column(db.Integer, nullable=False)
+
+    # These are optional.
+    weight = db.Column(db.Integer)
+    length = db.Column(db.Integer)
+    # F, M, or U for female, male, unisex
+    # SQLite doesn't have ENUMs
+    gender = db.Column(db.String(1))
+
+    def __repr__(self):
+        return "<Sleeping Bag prod_id=%d, fill_code=%s, temp_rating=%d, weight=%d, length=%d, gender=%s>" % (
+            self.prod_id, self.fill_code, self.temp_rating, self.weight,
+            self.length, self.gender)
 
 
 class History(db.Model):
