@@ -119,8 +119,17 @@ def handle_login():
             return redirect('/')
 
 
+@app.route('/logout')
+def handle_logout():
+    """Process logout"""
+
+    session.pop('user', None)
+    flash("Successfully logged out")
+    return redirect('/')
+
+
 @app.route('/success')
-def success():
+def enter_site():
     """Signed in home page."""
 
     return render_template("success.html")
