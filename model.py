@@ -199,8 +199,21 @@ class FillType(db.Model):
     fill_name = db.Column(db.String(16), unique=True)
 
 
+class Gender(db.Model):
+    """Pull gender out so future tables can reference and have option to find all womens stuff"""
+    __tablename__ = 'genders'
+    gender_code = db.Column(db.String(1), primary_key=True)
+    gender_name = db.Column(db.String(8), nullable=False, unique=True)
+
+    def __repr__(self):
+        return "<Gender gender_code=%s gender_name=%s>" % (self.gender_code,
+                                                           self.gender_name)
+
+    #TO DO: Make gender seed table, change sleepingbagdata
+
+
 class SleepingBag(db.Model):
-    """Sleeping bags is one of the subset tables of Product"""
+    """Slpeping bags is one of the subset tables of Product"""
 
     __tablename__ = 'sleepingbags'
 
@@ -214,8 +227,7 @@ class SleepingBag(db.Model):
     weight = db.Column(db.Integer)
     length = db.Column(db.Integer)
     # F, M, or U for female, male, unisex
-    # SQLite doesn't have ENUMs
-    gender = db.Column(db.String(1))
+    gender_code = db.Column(db.String(1), db.ForeignKey('genders.gender_code'))
 
     def __repr__(self):
         return "<Sleeping Bag prod_id=%d, fill_code=%s, temp_rating=%d, weight=%d, length=%d, gender=%s>" % (

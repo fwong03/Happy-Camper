@@ -1,5 +1,5 @@
 from model import Region, User, BestUse, Category, Brand, Product, Tent
-from model import FillType, SleepingBag
+from model import FillType, Gender, SleepingBag
 from model import connect_to_db, db
 from server import app
 from datetime import datetime
@@ -187,6 +187,23 @@ def load_filltypes():
     db.session.commit()
 
 
+def load_gendertypes():
+    """Load gender types"""
+
+    print "Gender Types"
+    Gender.query.delete()
+
+    for row in open("data/gendersdata"):
+        row = row.strip()
+        code, name = row.split("|")
+
+        a = Gender(gender_code=code, gender_name=name)
+
+        db.session.add(a)
+
+    db.session.commit()
+
+
 def load_sleepingbags():
     """Load sleeping bags data"""
 
@@ -205,7 +222,7 @@ def load_sleepingbags():
         ger = row[5]
 
         a = SleepingBag(prod_id=product, fill_code=fill, temp_rating=temp,
-                        weight=wt, length=lgth, gender=ger)
+                        weight=wt, length=lgth, gender_code=ger)
 
         db.session.add(a)
 
@@ -227,4 +244,5 @@ if __name__ == "__main__":
     load_products()
     load_tents()
     load_filltypes()
+    load_gendertypes()
     load_sleepingbags()
