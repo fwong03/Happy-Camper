@@ -16,8 +16,12 @@ class Region(db.Model):
     __tablename__ = "regions"
 
     region_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    region_abbr = db.Column(db.String(2), nullable=False)
-    region_full = db.Column(db.String(16), nullable=False)
+    abbr = db.Column(db.String(2), nullable=False)
+    full = db.Column(db.String(16), nullable=False)
+
+    def __repr__(self):
+        return "<Region region_id=%d, abbreviation=%s, fullname=%s>" % (
+            self.region_id, self.abbr, self.full)
 
 
 class User(db.Model):

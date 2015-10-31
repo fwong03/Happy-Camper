@@ -5,7 +5,7 @@ from jinja2 import StrictUndefined
 from flask import Flask, render_template, redirect, request, flash, session
 from flask_debugtoolbar import DebugToolbarExtension
 
-from model import connect_to_db, db, User
+from model import connect_to_db, db, User, Region
 # Category, BestUse, Brand, Product, Tent
 
 
@@ -31,7 +31,63 @@ def index():
 def create_account():
     """Where new users create an account"""
 
-    return "New users will create an account here."
+    return render_template("createaccount.html")
+
+
+@app.route('/handle-createaccount', methods=['POST'])
+def handle_createaccount():
+    """Process create account form"""
+    # TO DO: Put in checks.
+    # Use dictionary for now to look up lat lngs. Meeting with
+    # Heather Monday to discuss geolocation options.
+
+    lat_lngs = {'94612': (37.806238, -122.268918),
+                '94109': (37.791434, -122.420053),
+                '95376': (37.739651, -121.425224),
+                }
+
+    password = request.form.get('pword')
+    confirm_pword = request.form.get('confirm_pword')
+
+    if password != confirm_pword:
+        flash("Passwords don't match. Try again.")
+        return redirect('/createaccount')
+    else:
+        firstname = request.form.get('firstname')
+        lastname = request.form.get('lastname')
+        staddress = request.form.get('staddress')
+        cty = request.form.get('cty')
+        state = request.form.get('state')
+        zipcode = request.form.get('zipcode')
+        phonenumber = request.form.get('phonenumber')
+        username = request.form.get('username')
+
+        region = Region.query.filter(Region.abbr == state).one()
+        state_id = region.region_id
+        lat_lng = lat_lngs[zipcode]
+        latitude = lat_lng[0]
+        longitude = lat_lng[1]
+
+        phonenumber = int(phonenumber)
+
+        # return "User: %s %s, Address: %s, %s %s %s, Region_id: %d, Phone: %d, email: %s, password: %s, lat: %r, lng: %r" % (
+        #     firstname, lastname, staddress, cty, state, zipcode, state_id, phonenumber,
+        #     username, password, latitude, longitude)
+
+        user = User(fname=firstname, lname=lastname, street=staddress,
+                    city=cty, region_id=state_id, postalcode=zipcode,
+                    lat=latitude, lng=longitude, phone=phonenumber,
+                    email=username, password=password)
+
+        # return "User: %s %s" % (user.fname, user.lname)
+        db.session.add(user)
+        db.session.commit()
+
+        session['user'] = username
+        session['account_lat'] = user.lat
+        session['account_lng'] = user.lng
+        flash("Logged in as %s" % username)
+        return redirect('/success')
 
 
 @app.route('/login')
@@ -67,7 +123,7 @@ def handle_login():
 def success():
     """Signed in home page."""
 
-    render_template("success.html")
+    return render_template("success.html")
 
 
 @app.route('/list_item')
@@ -79,6 +135,7 @@ def list_item():
     """
 
     return "Where you can list an item to rent out."
+
 
 @app.route('/product/<int:prod_id>')
 def item_detail(prod_id):
@@ -93,7 +150,6 @@ def item_detail(prod_id):
     # Show this BORROWED version after a user clicks "borrow this"
 
     return "Where you can view item details for %d" % prod_id
-
 
 
 @app.route('/searchresults')

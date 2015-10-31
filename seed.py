@@ -15,7 +15,7 @@ def load_regions():
         row = row.strip()
         abbr, full = row.split("|")
 
-        a = Region(region_abbr=abbr, region_full=full)
+        a = Region(abbr=abbr, full=full)
 
         db.session.add(a)
 
