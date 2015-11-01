@@ -4,4 +4,33 @@
 
 {% block content %}
 
-{% endblock %}
+<h3>Tent Specs</h3>
+
+    Best Use: 
+    <select name="bestuse">
+        <option value="backpacking">Backpacking</option>
+        <option value="car camping">Car Camping</option>
+        <option value="mountaineering">Mountaineering</option>
+    </select><br>
+      <br>
+    Sleep Capacity: <input type="text" size="2" maxlength="2"><br>
+    <br>
+    Season Category: 
+    <select name="seasons">
+        <option value="2">2-season</option>
+        <option value="3">3-season</option>
+        <option value="4">4-season</option>
+        <option value="5">5-season</option>
+    </select><br>
+    <br>
+    Minimum trail weight (in ounces): <input type="text" name="weight" size="4" maxlength="3" placeholder = "optional"><br>
+    <br>
+    Floor width (in inches): <input type="text" size="4" maxlength="3" name="length" placeholder="optional"><br>
+    <br>
+    Floor length (in inches): <input type="text" size="4" maxlength="3" name="width" placeholder="optional"><br>
+    <br>
+    Number of doors: <input type="text" size="3" maxlength="1" name="doors" placeholder="optional"><br>
+    <br>
+    Number of poles: <input type="text" size="3" maxlength="2" name="poles" placeholder="optional"<br>
+<br>
+{% endblock %} 
