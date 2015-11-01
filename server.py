@@ -4,9 +4,9 @@ from jinja2 import StrictUndefined
 
 from flask import Flask, render_template, redirect, request, flash, session
 from flask_debugtoolbar import DebugToolbarExtension
-
-from model import connect_to_db, db, User, Region
+from model import connect_to_db, db, User, Region, calc_dates
 # Category, BestUse, Brand, Product, Tent
+
 
 
 app = Flask(__name__)
@@ -121,8 +121,9 @@ def handle_login():
 def handle_logout():
     """Process logout"""
 
-    session.pop('user', None)
-    flash("Successfully logged out")
+    username = session['user']
+    print username
+    session.pop('user')
     return redirect('/')
 
 
@@ -133,21 +134,38 @@ def enter_site():
     return render_template("success.html")
 
 
-@app.route('/list_item')
+@app.route('/list-item')
 def list_item():
     """List an item page.
 
     Routes from signed in homepage, which has a button to List an Item.
     Routes to item detail page.
     """
-    return render_template("listitem.html")
+    return render_template("list-item.html")
 
 
-# Make sure all these are form action POST. 
+# Make sure all these are form action POST.
+
 
 @app.route('/list-tent')
 def list_tent():
-    return "This is where you'll list a tent."
+    dates = calc_dates()
+
+    date1 = dates['today']
+    date2 = dates['thirty']
+    p_date1 = dates['today_print']
+    p_date2 = dates['thirty_print']
+
+
+    return render_template("list-tent.html",
+                           submit_route='/handle-tent',
+                           today=date1, p_today=p_date1,
+                           month=date2, p_month=p_date2)
+
+@app.route('/handle-tent', methods=['POST'])
+def handle_tent_listing():
+    
+    return "Tent item listing will be processed here."
 
 
 @app.route('/list-sleepingbag')

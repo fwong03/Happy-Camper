@@ -3,7 +3,7 @@
 # October 27, 2015
 
 from flask_sqlalchemy import SQLAlchemy
-import datetime
+from datetime import datetime, timedelta
 
 db = SQLAlchemy()
 
@@ -139,8 +139,8 @@ class Product(db.Model):
     # When user inputs check avail end date is after start date.
     # When show product info, avail start date is later of today and user-inputted
     # start date.
-    avail_start_date = db.Column(db.DateTime, nullable=False, default=datetime.date.today())
-    avail_end_date = db.Column(db.DateTime, nullable=False, default=datetime.date.today())
+    avail_start_date = db.Column(db.DateTime, nullable=False)
+    avail_end_date = db.Column(db.DateTime, nullable=False)
     price_per_day = db.Column(db.Float, nullable=False)
 
     # Do image url now since image upload sounds like it will be complicated.
@@ -272,6 +272,29 @@ class Rating(db.Model):
     rate_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     stars = db.Column(db.Integer, nullable=False)
     comments = db.Column(db.String(128))
+
+def calc_dates():
+    """Takes no arguments, returns dictionary of following values:
+        'today': datetime object of today
+        'today_print': string version of 'today' in isoformat and of date
+                       only ('yyyy-mm-dd')
+        'thirty': datetime object of thirty days from 'today'
+        'thirty_print': string version of 'thirty', isoformat and date only
+
+    """
+    dates = {}
+    today = datetime.today()
+    thirty = today + timedelta(days=30)
+
+    today_print = today.date().isoformat()
+    thirty_print = thirty.date().isoformat()
+
+    dates['today'] = today
+    dates['today_print'] = today_print
+    dates['thirty'] = thirty
+    dates['thirty_print'] = thirty_print
+
+    return dates
 
 
 
