@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}Account Info{% endblock %}
+
+{% block content %}
+<h1>Your Account</h1>
+
+    <p><b>Name</b>
+        <p>{{ firstname }} {{ lastname }}</p>
+    <br> 
+    <p><b>Address</b></p>
+        <p>{{ street }}</p>
+        <p>{{ city }}, {{ state }} {{ zipcode }}</p>
+    <br>
+    <p><b>Contact info</b></p>
+        <p><b>Phone: </b> {{ phone }}</p>
+        <p><b>email: </b> {{ email }}</p>
+
+<h3> To add: edit info, deactivate account, items listed, items rented</h3>
+
+
+{% endblock %}

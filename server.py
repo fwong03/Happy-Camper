@@ -117,6 +117,28 @@ def handle_login():
             return redirect('/')
 
 
+@app.route('/account-info')
+def show_account():
+    """Where users can check out their account details.
+
+    They can also delete listings, rate stuff, get the emails of people
+    renting to or renting from.
+    """
+    user = User.query.filter(User.email == session['user']).one()
+    fname = user.fname
+    lname = user.lname
+    staddress = user.street
+    cty = user.city
+    state_id = user.region_id
+    st = Region.query.get(state_id).full
+    zcode = user.postalcode
+    phonenumber = user.phone
+
+    return render_template("accountinfo.html", firstname=fname, lastname=lname,
+                           street=staddress, city=cty, state=st, zipcode=zcode,
+                           phone=phonenumber, email=session['user'])
+
+
 @app.route('/logout')
 def handle_logout():
     """Process logout"""
@@ -156,15 +178,15 @@ def list_tent():
     p_date1 = dates['today_print']
     p_date2 = dates['thirty_print']
 
-
     return render_template("list-tent.html",
                            submit_route='/handle-tent',
                            today=date1, p_today=p_date1,
                            month=date2, p_month=p_date2)
 
+
 @app.route('/handle-tent', methods=['POST'])
 def handle_tent_listing():
-    
+
     return "Tent item listing will be processed here."
 
 
@@ -223,19 +245,6 @@ def show_results():
     """
 
     return "This will be the search results."
-
-
-@app.route('/customers/<int:user_id>')
-def show_account(user_id):
-    """Where users can check out their account details.
-
-    They can also delete listings, rate stuff, get the emails of people
-    renting to or renting from.
-
-    Routes from account link in nav bar. Always accessible.
-    """
-
-    return "This will be the users account detail page."
 
 
 @app.route('/renter_rate')
