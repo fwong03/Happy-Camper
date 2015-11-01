@@ -84,8 +84,6 @@ def handle_createaccount():
         db.session.commit()
 
         session['user'] = username
-        session['account_lat'] = user.lat
-        session['account_lng'] = user.lng
         flash("Logged in as %s" % username)
         return redirect('/success')
 
@@ -142,8 +140,44 @@ def list_item():
     Routes from signed in homepage, which has a button to List an Item.
     Routes to item detail page.
     """
+    return render_template("listitem.html")
 
-    return "Where you can list an item to rent out."
+
+# Make sure all these are form action POST. 
+
+@app.route('/list-tent')
+def list_tent():
+    return "This is where you'll list a tent."
+
+
+@app.route('/list-sleepingbag')
+def list_sleepingbag():
+    return "This is where you'll list a sleeping bag."
+
+
+@app.route('/list-sleepingpad')
+def list_sleepingpad():
+    return "This is where you'll list a sleeping pad."
+
+
+@app.route('/list-pack')
+def list_pack():
+    return "This is where you'll list a pack."
+
+
+@app.route('/list-stove')
+def list_stove():
+    return "This is where you'll list a stove."
+
+
+@app.route('/list-waterfilter')
+def list_waterfilter():
+    return "This is where you'll list a water filter."
+
+
+@app.route('/handle-listing', methods=['POST'])
+def handle_listing():
+    pass
 
 
 @app.route('/product/<int:prod_id>')

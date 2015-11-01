@@ -16,8 +16,8 @@ class Region(db.Model):
     __tablename__ = "regions"
 
     region_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    abbr = db.Column(db.String(2), nullable=False)
-    full = db.Column(db.String(16), nullable=False)
+    abbr = db.Column(db.String(2), nullable=False, unique=True)
+    full = db.Column(db.String(16), nullable=False, unique=True)
 
     def __repr__(self):
         return "<Region region_id=%d, abbreviation=%s, fullname=%s>" % (
@@ -190,7 +190,7 @@ class Tent(db.Model):
 
 
 class FillType(db.Model):
-    """Fill types for sleeping bags."""
+    """Fill types for sleeping bags and sleeping pads."""
 
     __tablename__ = 'filltypes'
 
@@ -200,7 +200,10 @@ class FillType(db.Model):
 
 
 class Gender(db.Model):
-    """Pull gender out so future tables can reference and have option to find all womens stuff"""
+    """Pull gender out so future tables can reference and have option to easily
+    find all women's stuff.
+
+    """
     __tablename__ = 'genders'
     gender_code = db.Column(db.String(1), primary_key=True)
     gender_name = db.Column(db.String(8), nullable=False, unique=True)
