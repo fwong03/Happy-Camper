@@ -4,7 +4,8 @@ from jinja2 import StrictUndefined
 
 from flask import Flask, render_template, redirect, request, flash, session
 from flask_debugtoolbar import DebugToolbarExtension
-from model import connect_to_db, db, User, Region, calc_dates
+from model import connect_to_db, db, User, Region, Product, Tent
+from model import calc_dates, get_brands, make_brand, get_brand_id
 # Category, BestUse, Brand, Product, Tent
 
 
@@ -144,7 +145,6 @@ def handle_logout():
     """Process logout"""
 
     username = session['user']
-    print username
     session.pop('user')
     return redirect('/')
 
@@ -171,23 +171,28 @@ def list_item():
 
 @app.route('/list-tent')
 def list_tent():
+    allbrands = get_brands()
     dates = calc_dates()
 
-    date1 = dates['today']
-    date2 = dates['thirty']
-    p_date1 = dates['today_print']
-    p_date2 = dates['thirty_print']
-
-    return render_template("list-tent.html",
+    return render_template("list-tent.html", brands=allbrands,
                            submit_route='/handle-tent',
-                           today=date1, p_today=p_date1,
-                           month=date2, p_month=p_date2)
+                           today=dates['today'], p_today=dates['today_print'],
+                           month=dates['thirty'], p_month=dates['thirty_print'])
 
 
 @app.route('/handle-tent', methods=['POST'])
 def handle_tent_listing():
 
-    return "Tent item listing will be processed here."
+    brand = request.form.get("brand")
+
+    if brand == "addbrand":
+        newbrandname = request.form.get("newbrandname")
+        make_brand(newbrandname)
+        brand = newbrandname
+
+    brand_id = get_brand_id(brand)
+
+    return "Tent: brand=%s, brand_id=%d" % (brand, brand_id)
 
 
 @app.route('/list-sleepingbag')

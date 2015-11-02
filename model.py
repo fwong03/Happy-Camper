@@ -296,6 +296,47 @@ def calc_dates():
 
     return dates
 
+def get_brands():
+    brands = Brand.query.all()
+    names = []
+
+    for brand in brands:
+        names.append(brand.brand_name)
+
+    return names
+
+
+def make_brand(brandname):
+    """Addes a new brand to the Brands table."""
+
+    brand = Brand(brand_name=brandname)
+
+    db.session.add(brand)
+    db.session.commit()
+
+
+def get_brand_id(brandname):
+    """Takes brand name as a string and return brand id as an integer"""
+
+    brand = Brand.query.filter(Brand.brand_name == brandname).one()
+    return brand.brand_id
+
+
+def make_product(cat_id, brandname, owner_id, model, condition, description,
+                 avail_start, avail_end, price, image):
+
+    brand_id = get_brand_id(brandname)
+
+
+    
+    a = Product(cat_id=category, brand_id=brand, owner_user_id=owner,
+            model=mname, condition=con, description=desc,
+            avail_start_date=date1, avail_end_date=date2,
+            price_per_day=dollarz)
+
+    db.session.add(a)
+
+    db.session.commit()
 
 
 ##############################################################################

@@ -16,14 +16,27 @@
       <form action="{{ submit_route }}" method="POST">
 
     <h3>Product Info</h3>
-      Brand: <input type="text" size="50" name="brand" placeholder = "REPLACE THIS WITH DROPDOWN"><br>
-      <br>
-      Model Name: <input type="text" size="50" name="modelname" placeholder = "e.g. Passage 2"><br>
-      <br>
-      Description: <textarea rows="4" cols="50" name="desc" placeholder = "Tell others avout this item's awesome features."></textarea><br>
-      <br>
-      Condition: <textarea rows="4" cols="50" name="cond" placeholder = "Give an honest description of how lovingly worn (or not worn) this item is."></textarea><br>
-      <br>
+    Brand:
+    <select name="brand">
+      {% for brand in brands %}
+        <option value="{{ brand }}">{{ brand }}</option>
+      {% endfor %}
+      <option value="addbrand">Add new brand</option>
+    </select><br>
+    <br>
+    (Show this only if adding new brand) Add new brand: 
+    <input type="text" size="50" name="newbrandname"><br>
+    <br>
+    Model Name: <input type="text" size="50" name="modelname" placeholder =
+                "e.g. Passage 2"><br>
+    <br>
+    Description: <textarea rows="4" cols="50" name="desc" placeholder = 
+                  "Tell others avout this item's awesome features."></textarea><br>
+    <br>
+    Condition: <textarea rows="4" cols="50" name="cond" placeholder =
+                "Give an honest description of how lovingly worn (or not worn)
+                this item is."></textarea><br>
+    <br>
 
     <h3>Product Availability and Pricing</h3>
       Available Start Date: <input type="text" size="10" value = {{ today }} placeholder = "e.g., {{ p_today }}" name="avail_start"><br>
