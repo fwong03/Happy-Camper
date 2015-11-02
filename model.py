@@ -173,9 +173,8 @@ class Tent(db.Model):
                        nullable=False)
     sleep_capacity = db.Column(db.Integer, nullable=False)
     seasons = db.Column(db.Integer, nullable=False)
-
-    # These are optional.
-    min_trail_weight = db.Column(db.Integer)
+    min_trail_weight = db.Column(db.Integer, nullable=False)
+    # These are optional
     floor_width = db.Column(db.Integer)
     floor_length = db.Column(db.Integer)
     num_doors = db.Column(db.Integer)
