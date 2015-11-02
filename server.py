@@ -4,10 +4,9 @@ from jinja2 import StrictUndefined
 
 from flask import Flask, render_template, redirect, request, flash, session
 from flask_debugtoolbar import DebugToolbarExtension
-from model import connect_to_db, db, User, Region, Product, Tent
-from model import calc_dates, get_brands, make_brand, get_brand_id
+from model import connect_to_db, db, User, Region, Category, Brand, Product
 # Category, BestUse, Brand, Product, Tent
-
+from datetime import datetime, timedelta
 
 
 app = Flask(__name__)
@@ -144,7 +143,6 @@ def show_account():
 def handle_logout():
     """Process logout"""
 
-    username = session['user']
     session.pop('user')
     return redirect('/')
 
@@ -176,23 +174,24 @@ def list_tent():
 
     return render_template("list-tent.html", brands=allbrands,
                            submit_route='/handle-tent',
-                           today=dates['today'], p_today=dates['today_print'],
-                           month=dates['thirty'], p_month=dates['thirty_print'])
+                           p_today=dates['today_print'],
+                           p_month=dates['thirty_print'])
 
 
 @app.route('/handle-tent', methods=['POST'])
 def handle_tent_listing():
+    # For now have made product, now have to make associated tent object
+    # and then commit both at same time so have same PK.
 
-    brand = request.form.get("brand")
+    product = make_product()
 
-    if brand == "addbrand":
-        newbrandname = request.form.get("newbrandname")
-        make_brand(newbrandname)
-        brand = newbrandname
+    brand_id = product.brand_id
+    brand = Brand.query.get(brand_id)
+    brandname = brand.brand_name
 
-    brand_id = get_brand_id(brand)
-
-    return "Tent: brand=%s, brand_id=%d" % (brand, brand_id)
+    return "Product: brand=%s, model=%s, description=%s, start=%r, price=%r" % (
+        brandname, product.model, product.description, product.avail_start_date,
+        product.price_per_day)
 
 
 @app.route('/list-sleepingbag')
@@ -271,6 +270,91 @@ def owner_rate():
     this routes to the account page with a flashed message thanking them."""
 
     return "Here owners can rate renters."
+
+
+def calc_dates():
+    """Takes no arguments, returns dictionary of following values:
+        'today': datetime object of today
+        'today_print': string version of 'today' in isoformat and of date
+                       only ('yyyy-mm-dd')
+        'thirty': datetime object of thirty days from 'today'
+        'thirty_print': string version of 'thirty', isoformat and date only
+
+    """
+    dates = {}
+    today = datetime.today()
+    thirty = today + timedelta(days=30)
+
+    today_print = today.date().isoformat()
+    thirty_print = thirty.date().isoformat()
+
+    dates['today'] = today
+    dates['today_print'] = today_print
+    dates['thirty'] = thirty
+    dates['thirty_print'] = thirty_print
+
+    return dates
+
+
+def get_brands():
+    brands = Brand.query.all()
+    names = []
+
+    for brand in brands:
+        names.append(brand.brand_name)
+
+    return names
+
+
+def make_brand(brandname):
+    """Addes a new brand to the Brands table."""
+
+    brand = Brand(brand_name=brandname)
+
+    db.session.add(brand)
+    db.session.commit()
+
+
+def get_brand_id(brandname):
+    """Takes brand name as a string and return brand id as an integer"""
+
+    brand = Brand.query.filter(Brand.brand_name == brandname).one()
+    return brand.brand_id
+
+
+def make_product():
+
+    brandname = request.form.get("brand")
+    modelname = request.form.get("modelname")
+    desc = request.form.get("desc")
+    cond = request.form.get("cond")
+    avail_start = request.form.get("avail_start")
+    avail_end = request.form.get("avail_end")
+    pricing = float(request.form.get("pricing"))
+    image = request.form.get("image")
+
+    avail_start = datetime.strptime(avail_start, "%Y-%m-%d")
+    avail_end = datetime.strptime(avail_end, "%Y-%m-%d")
+
+    if brandname == "addbrand":
+        newbrandname = request.form.get("newbrandname")
+        make_brand(newbrandname)
+        brandname = newbrandname
+
+    user = User.query.filter(User.email == session['user']).one()
+    category = Category.query.filter(Category.cat_name == 'tents').one()
+    brand = Brand.query.filter(Brand.brand_name == brandname).one()
+
+    product = Product(cat_id=category.cat_id, brand_id=brand.brand_id,
+                      owner_user_id=user.user_id, model=modelname,
+                      description=desc, condition=cond,
+                      avail_start_date=avail_start, avail_end_date=avail_end,
+                      price_per_day=pricing, image_url=image)
+
+    # db.session.add(product)
+    # db.session.commit()
+
+    return product
 
 
 if __name__ == "__main__":

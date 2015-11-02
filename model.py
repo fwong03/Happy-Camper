@@ -3,7 +3,6 @@
 # October 27, 2015
 
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime, timedelta
 
 db = SQLAlchemy()
 
@@ -156,9 +155,9 @@ class Product(db.Model):
     category = db.relationship('Category', backref='products')
 
     def __repr__(self):
-        return "<Product prod_id=%d, cat_id=%d, owner_id=%d, model=%s, condition=%s, avail=%r to %r, price=%r>" % (
-            self.prod_id, self.cat_id, self.owner_user_id, self.model, self.condition,
-            self.avail_start_date, self.avail_end_date, self.price_per_day)
+        return "<Product prod_id=%d, cat_id=%d, owner_id=%d, model=%s, description=%s, condition=%s, avail=%r to %r, price=%r>" % (
+            self.prod_id, self.cat_id, self.owner_user_id, self.model,
+            self.description, self.condition, self.avail_start_date, self.avail_end_date, self.price_per_day)
 
 
 class Tent(db.Model):
@@ -250,7 +249,7 @@ class History(db.Model):
     prod_id = db.Column(db.Integer, db.ForeignKey('products.prod_id'),
                         nullable=False)
     renter_user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'),
-                        nullable=False)
+                               nullable=False)
 
     # Bert rec: put this in to make search faster since wouldn't have to join.
     # owner_user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'),
@@ -272,71 +271,6 @@ class Rating(db.Model):
     rate_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     stars = db.Column(db.Integer, nullable=False)
     comments = db.Column(db.String(128))
-
-def calc_dates():
-    """Takes no arguments, returns dictionary of following values:
-        'today': datetime object of today
-        'today_print': string version of 'today' in isoformat and of date
-                       only ('yyyy-mm-dd')
-        'thirty': datetime object of thirty days from 'today'
-        'thirty_print': string version of 'thirty', isoformat and date only
-
-    """
-    dates = {}
-    today = datetime.today()
-    thirty = today + timedelta(days=30)
-
-    today_print = today.date().isoformat()
-    thirty_print = thirty.date().isoformat()
-
-    dates['today'] = today
-    dates['today_print'] = today_print
-    dates['thirty'] = thirty
-    dates['thirty_print'] = thirty_print
-
-    return dates
-
-def get_brands():
-    brands = Brand.query.all()
-    names = []
-
-    for brand in brands:
-        names.append(brand.brand_name)
-
-    return names
-
-
-def make_brand(brandname):
-    """Addes a new brand to the Brands table."""
-
-    brand = Brand(brand_name=brandname)
-
-    db.session.add(brand)
-    db.session.commit()
-
-
-def get_brand_id(brandname):
-    """Takes brand name as a string and return brand id as an integer"""
-
-    brand = Brand.query.filter(Brand.brand_name == brandname).one()
-    return brand.brand_id
-
-
-def make_product(cat_id, brandname, owner_id, model, condition, description,
-                 avail_start, avail_end, price, image):
-
-    brand_id = get_brand_id(brandname)
-
-
-    
-    a = Product(cat_id=category, brand_id=brand, owner_user_id=owner,
-            model=mname, condition=con, description=desc,
-            avail_start_date=date1, avail_end_date=date2,
-            price_per_day=dollarz)
-
-    db.session.add(a)
-
-    db.session.commit()
 
 
 ##############################################################################
