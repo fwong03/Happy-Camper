@@ -177,46 +177,63 @@ def list_tent():
 
 @app.route('/handle-tent', methods=['POST'])
 def handle_tent_listing():
-    # For now have made product, now have to make associated tent object
-    # and then commit both at same time so have same PK.
-
+    """Handle tent listing. Makes a parent Product object, adds it to the database
+    so you have a PK, then make the assoicated Tent object.
+    """
     # Make associated parent Product object.
     product = make_product()
-    # db.session.add(product)
-    # db.session.commit()
+    # Add and commit product to database so you can use its PK to make a tent.
+    db.session.add(product)
+    db.session.commit()
 
-    # Grab info to make tent object.
+    print product
+
+    # Grab info to make a tent.
     bestuse = request.form.get("bestuse")
     sleep = int(request.form.get("sleep"))
     seasoncat = request.form.get("seasoncat")
     weight = int(request.form.get("weight"))
 
-    width = int(request.form.get("width"))
-    length = int(request.form.get("length"))
-    doors = int(request.form.get("doors"))
-    poles = int(request.form.get("poles"))
-
+    # Get use_id from the BestUses table. This is required to make a tent.
     best_use = BestUse.query.filter(BestUse.use_name == bestuse).one()
 
-    # tent = Tent(prod_id=product.prod_id, use_id=best_use.use_id,
-    #             sleep_capacity=sleep, seasons=seasoncat,
-    #             min_trail_weight=weight, floor_width=width,
-    #             floor_length=length, num_doors=doors, num_poles=poles)
+    # Set optional values, if any
+    width = None
+    length = None
+    doors = None
+    poles = None
 
+    temp_width = request.form.get("width")
+    temp_length = request.form.get("length")
+    temp_doors = request.form.get("doors")
+    temp_poles = request.form.get("poles")
 
+    if temp_width:
+        width = temp_width
+    if temp_length:
+        width = temp_length
+    if temp_doors:
+        doors = temp_doors
+    if temp_poles:
+        poles = temp_poles
 
-    # db.session.add(tent)
-    # db.session.commit()
+    tent = Tent(prod_id=product.prod_id, use_id=best_use.use_id,
+                sleep_capacity=sleep, seasons=3, min_trail_weight=weight,
+                floor_width=width, floor_length=length, num_doors=doors,
+                num_poles=poles)
 
-    # print tent
+    db.session.add(tent)
+    db.session.commit()
 
+    print tent
+
+    # Below is just to make the return html more readable
     brand_id = product.brand_id
     brand = Brand.query.get(brand_id)
     brandname = brand.brand_name
 
-    return "Product: brand=%s, model=%s, description=%s, start=%r, price=%r, seasons=%s" % (
-        brandname, product.model, product.description, product.avail_start_date,
-        product.price_per_day, seasoncat)
+    return "Product: prod_id=%d, brand=%s, model=%s; Tent: prod_id=%d, capacity=%d, seasons=%d, weight=%d" % (
+        product.prod_id, brandname, product.model, tent.prod_id, tent.sleep_capacity, tent.sleep_capacity, tent.min_trail_weight)
 
 
 @app.route('/list-sleepingbag')

@@ -181,7 +181,7 @@ class Tent(db.Model):
     num_poles = db.Column(db.Integer)
 
     def __repr__(self):
-        return "<Tent prod_id=%d, use_id=%d, capacity=%d, seasons=%d, weight=%d, length=%d, width=%d, num_doors=%d, num_poles=%d>" % (
+        return "<Tent prod_id=%d, use_id=%d, capacity=%d, seasons=%d, weight=%d, length=%r, width=%r, num_doors=%r, num_poles=%r>" % (
             self.prod_id, self.use_id, self.sleep_capacity,
             self.seasons, self.min_trail_weight, self.floor_width,
             self.floor_length, self.num_doors, self.num_poles)
