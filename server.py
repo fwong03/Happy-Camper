@@ -10,7 +10,7 @@ from model import User, Region, Brand, Product, BestUse, Tent
 from helpers import make_product, get_brands, calc_dates
 # get_brand_id, make_brand
 from flask_sqlalchemy import SQLAlchemy
-
+from sqlalchemy import update
 
 app = Flask(__name__)
 
@@ -228,12 +228,6 @@ def handle_tent_listing():
     db.session.add(tent)
     db.session.commit()
 
-    # print tent
-
-    # Below is just to make the return html more readable
-    # brand_id = product.brand_id
-    # brand = Brand.query.get(brand_id)
-    # brandname = brand.brand_name
     flash("Listing successfully posted!")
     return redirect('/product-detail/%d' % product.prod_id)
 
@@ -262,10 +256,6 @@ def list_waterfilter():
     return "This is where you'll list a water filter."
 
 
-@app.route('/handle-listing', methods=['POST'])
-def handle_listing():
-    pass
-
 
 @app.route('/product-detail/<int:prod_id>')
 def show_item(prod_id):
@@ -284,16 +274,20 @@ def show_item(prod_id):
     if item.available:
         return render_template("product-detail.html", product=item)
     else:
-        return "This item is not available"
+        return "Sorry! The %s %s is no longer available for rent." % (
+            item.brand.brand_name, item.model)
+
 
 @app.route('/rent/<int:prod_id>')
 def rent_item(prod_id):
-    item = Product.query.get(prod_id)
-    # How update value?
 
-    return "This handles a renting"
+    product = Product.query.get(prod_id)
+    product.available = False
+    db.session.commit()
 
-    
+    flash("You've succcessfully rented %s %s!" % (product.brand.brand_name, product.model))
+
+    return "Prod_id=%d, available=%r" % (product.prod_id, product.available)
 
 
 @app.route('/searchresults')
