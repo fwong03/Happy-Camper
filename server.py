@@ -87,7 +87,7 @@ def handle_createaccount():
         db.session.commit()
 
         session['user'] = username
-        flash("Logged in as %s" % username)
+        flash("Successfully created account! Logged in as %s" % username)
         return redirect('/success')
 
 
@@ -110,7 +110,7 @@ def handle_login():
     if user:
         if user.password == password:
             session['user'] = username
-            flash("Logged in as %s" % username)
+            flash("Welcome! Logged in as %s" % username)
             return redirect('/success')
         else:
             flash("Login failed. Please try again.")
@@ -234,7 +234,7 @@ def handle_tent_listing():
     # brand_id = product.brand_id
     # brand = Brand.query.get(brand_id)
     # brandname = brand.brand_name
-
+    flash("Listing successfully posted!")
     return redirect('/product-detail/%d' % product.prod_id)
 
 @app.route('/list-sleepingbag')
@@ -285,6 +285,15 @@ def show_item(prod_id):
         return render_template("product-detail.html", product=item)
     else:
         return "This item is not available"
+
+@app.route('/rent/<int:prod_id>')
+def rent_item(prod_id):
+    item = Product.query.get(prod_id)
+    # How update value?
+
+    return "This handles a renting"
+
+    
 
 
 @app.route('/searchresults')
