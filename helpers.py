@@ -8,8 +8,8 @@ import os
 
 
 def get_lat_lngs(street, zipcode):
-    """Takes street and zipcode as string, returns latitude and longitude as
-        float.
+    """Takes street and zipcode as string, returns a list of latitude and
+        longitude as floats.
     """
     address = street + " " + zipcode
 

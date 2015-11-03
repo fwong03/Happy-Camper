@@ -3,6 +3,9 @@ from model import FillType, Gender, SleepingBag
 from model import connect_to_db, db
 from server import app
 from datetime import datetime
+from helpers import get_lat_lngs
+# from geolocation.google_maps import GoogleMaps
+import os
 
 
 def load_regions():
@@ -41,13 +44,13 @@ def load_users():
         zcode = row[5]
         latde = row[6]
         lontde = row[7]
-        phn = row[8]
+        phn = int(row[8])
         login = row[9]
         pword = row[10]
 
-        latde = float(latde)
-        lontde = float(lontde)
-        phn = int(phn)
+        lat_lngs = get_lat_lngs(staddress, zcode)
+        latde = lat_lngs[0]
+        lontde = lat_lngs[1]
 
         a = User(fname=firstn, lname=lastn, street=staddress,
                  city=cty, region_id=region, postalcode=zcode, lat=latde,

@@ -5,12 +5,10 @@ from jinja2 import StrictUndefined
 from flask import Flask, render_template, redirect, request, flash, session
 from flask_debugtoolbar import DebugToolbarExtension
 from model import connect_to_db, db
-from model import User, Region, Brand, Product, BestUse, Tent
+from model import User, Region, Product, BestUse, Tent
 # Category
-from helpers import make_product, get_brands, calc_dates
-# get_brand_id, make_brand
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import update
+from helpers import get_lat_lngs, make_product, get_brands, calc_dates
+
 
 app = Flask(__name__)
 
@@ -40,14 +38,11 @@ def create_account():
 @app.route('/handle-createaccount', methods=['POST'])
 def handle_createaccount():
     """Process create account form"""
-    # TO DO: Put in checks.
-    # Use dictionary for now to look up lat lngs. Meeting with
-    # Heather Monday to discuss geolocation options.
 
-    lat_lngs = {'94612': (37.806238, -122.268918),
-                '94109': (37.791434, -122.420053),
-                '95376': (37.739651, -121.425224),
-                }
+    # lat_lngs = {'94612': (37.806238, -122.268918),
+    #             '94109': (37.791434, -122.420053),
+    #             '95376': (37.739651, -121.425224),
+    #             }
 
     password = request.form.get('pword')
     confirm_pword = request.form.get('confirm_pword')
@@ -65,9 +60,12 @@ def handle_createaccount():
         phonenumber = int(request.form.get('phonenumber'))
         username = request.form.get('username')
 
+        # Get region id from the Regions table
         region = Region.query.filter(Region.abbr == state).one()
         state_id = region.region_id
-        lat_lng = lat_lngs[zipcode]
+
+        # Get latitude and longitude from helper function
+        lat_lng = get_lat_lngs(staddress, zipcode)
         latitude = lat_lng[0]
         longitude = lat_lng[1]
 
