@@ -134,9 +134,12 @@ def show_account():
     zcode = user.postalcode
     phonenumber = user.phone
 
+    inventory = Product.query.filter(Product.owner_user_id == user.user_id).all()
+
     return render_template("accountinfo.html", firstname=fname, lastname=lname,
                            street=staddress, city=cty, state=st, zipcode=zcode,
-                           phone=phonenumber, email=session['user'])
+                           phone=phonenumber, email=session['user'],
+                           products=inventory)
 
 
 @app.route('/logout')

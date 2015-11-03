@@ -5,20 +5,40 @@
 {% block content %}
 <h1>Your Account</h1>
 
-    <p><b>Name</b>
-        <p>{{ firstname }} {{ lastname }}</p>
-    <br> 
-    <p><b>Address</b></p>
-        <p>{{ street }}</p>
-        <p>{{ city }}, {{ state }} {{ zipcode }}</p>
-    <br>
-    <p><b>Contact info</b></p>
-        <p><b>Phone: </b> {{ phone }}</p>
-        <p><b>email: </b> {{ email }}</p>
-    <br>
-    <p><a href="/logout">Log out</a></p>
+<h3>Contact Info</h3>
+    <p><b>Name: </b>{{ firstname }} {{ lastname }}</p>
+    <p><b>Address: </b> {{ street }}, {{ city }}, {{ state }} {{ zipcode }}</p>
+    <p><b>Phone: </b> {{ phone }}</p>
+    <p><b>email: </b> {{ email }}</p>
+<br>
 
-<h3> To add: edit info, deactivate account, items listed, items rented</h3>
+<h3>Items You Have Available for Rent</h3>
+    <table style="100%">
+        <tr>
+            <th>Category</th>
+            <th>Brand</th>
+            <th>Model</th>
+            <th>Availability</th>
+            <th>Price</th>
+        </tr>
+        {% for product in products %}
+            <tr>
+                <td>{{ product.category.cat_name }}</td>
+                <td>{{ product.brand.brand_name }}</td>
+                <td>{{ product.model }}</td>
+                <td>{{ product.avail_start_date }} to {{ product.avail_end_date }}</td>
+                <td>{{ product.price_per_day }}</td>
+        {% endfor %}
+    </table>
+<br>
+
+<h3>Items You Have Rented</h3>
+    <p> Not yet implemented </p>
+
+
+<p><a href="/logout">Log out</a></p>
+
+<p> To add: edit info, deactivate account, unlist items for rent, items rented</p>
 
 
 {% endblock %}
