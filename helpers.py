@@ -3,6 +3,27 @@ from flask import request, session
 from model import User, Brand, Category, Product
 from model import db
 from datetime import datetime, timedelta
+from geolocation.google_maps import GoogleMaps
+import os
+
+
+def get_lat_lngs(street, zipcode):
+    """Takes street and zipcode as string, returns latitude and longitude as
+        float.
+    """
+    address = street + " " + zipcode
+
+    google_maps = GoogleMaps(api_key=os.environ['GOOGLE_API_KEY'])
+
+    location = google_maps.search(location=address)
+
+    user_location = location.first()
+    
+    latitude = user_location.lat
+    longitude = user_location.lng
+
+    return [latitude, longitude]
+
 
 
 def calc_dates(deltadays):
