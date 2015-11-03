@@ -189,7 +189,7 @@ def handle_tent_listing():
     db.session.add(product)
     db.session.commit()
 
-    print product
+    # print product
 
     # Grab info to make a tent.
     bestuse = request.form.get("bestuse")
@@ -228,16 +228,14 @@ def handle_tent_listing():
     db.session.add(tent)
     db.session.commit()
 
-    print tent
+    # print tent
 
     # Below is just to make the return html more readable
-    brand_id = product.brand_id
-    brand = Brand.query.get(brand_id)
-    brandname = brand.brand_name
+    # brand_id = product.brand_id
+    # brand = Brand.query.get(brand_id)
+    # brandname = brand.brand_name
 
-    return "Product: prod_id=%d, brand=%s, model=%s; Tent: prod_id=%d, capacity=%d, seasons=%d, weight=%d" % (
-        product.prod_id, brandname, product.model, tent.prod_id, tent.sleep_capacity, tent.sleep_capacity, tent.min_trail_weight)
-
+    return redirect('/product-detail/%d' % product.prod_id)
 
 @app.route('/list-sleepingbag')
 def list_sleepingbag():
@@ -269,9 +267,9 @@ def handle_listing():
     pass
 
 
-@app.route('/product/<int:prod_id>')
-def item_detail(prod_id):
-    """Item detail page.
+@app.route('/product-detail/<int:prod_id>')
+def show_item(prod_id):
+    """Product detail page.
 
     Routes either from Search Results page or List Item page.
     If click on Borrow This, routes to Borrowed version of this page.
@@ -281,7 +279,12 @@ def item_detail(prod_id):
     # doesn't allow you to borrow the item.
     # Show this BORROWED version after a user clicks "borrow this"
 
-    return "Where you can view item details for %d" % prod_id
+    item = Product.query.get(prod_id)
+
+    if item.available:
+        return render_template("product-detail.html", product=item)
+    else:
+        return "This item is not available"
 
 
 @app.route('/searchresults')

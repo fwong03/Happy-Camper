@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Product Details{% endblock %}
+
+{% block content %}
+
+    <h2> Product Detail: {{ product.brand.brand_name }} {{ product.model }} </h2>
+    <h3> Category: {{ product.category.cat_name }} </h3>
+    <ul>
+        <li>Owner: {{ product.owner.fname }} {{ product.owner.lname }}</li>
+        <li>Owner location: {{ product.owner.city }}, {{ product.owner.region.full }}</li>
+        <li>Available start date: {{ product.avail_start_date }}</li>
+        <li>Available end date: {{ product.avail_end_date }}</li>
+        <li>Price per day: ${{ product.price_per_day }}</li>
+        <li>Description: {{ product.description }}</li>
+        <li>Condition: {{ product.condition }}</li>
+    </ul>
+
+
+{% endblock %}

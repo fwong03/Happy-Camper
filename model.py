@@ -18,6 +18,8 @@ class Region(db.Model):
     abbr = db.Column(db.String(2), nullable=False, unique=True)
     full = db.Column(db.String(16), nullable=False, unique=True)
 
+    user = db.relationship('User', backref='region')
+
     def __repr__(self):
         return "<Region region_id=%d, abbreviation=%s, fullname=%s>" % (
             self.region_id, self.abbr, self.full)
