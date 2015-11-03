@@ -7,23 +7,21 @@ from geolocation.google_maps import GoogleMaps
 import os
 
 
-def get_lat_lngs(street, zipcode):
-    """Takes street and zipcode as string, returns a list of latitude and
+def get_lat_lngs(address):
+    """Takes address as string, returns a list of latitude and
         longitude as floats.
     """
-    address = street + " " + zipcode
 
     google_maps = GoogleMaps(api_key=os.environ['GOOGLE_API_KEY'])
 
     location = google_maps.search(location=address)
 
     user_location = location.first()
-    
+
     latitude = user_location.lat
     longitude = user_location.lng
 
     return [latitude, longitude]
-
 
 
 def calc_dates(deltadays):

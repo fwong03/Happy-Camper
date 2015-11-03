@@ -28,6 +28,40 @@ def index():
     return render_template("signedout.html")
 
 
+@app.route('/login')
+def login():
+    """User login page."""
+
+    return render_template("login.html")
+
+
+@app.route('/logout')
+def handle_logout():
+    """Process logout"""
+
+    session.pop('user')
+    return redirect('/')
+
+
+@app.route('/handle-login', methods=['POST'])
+def handle_login():
+    """Process login form"""
+
+    username = request.form.get('email')
+    password = request.form.get('password')
+
+    user = User.query.filter(User.email == username).one()
+
+    if user:
+        if user.password == password:
+            session['user'] = username
+            flash("Welcome! Logged in as %s" % username)
+            return redirect('/success')
+        else:
+            flash("Login failed. Please try again.")
+            return redirect('/')
+
+
 @app.route('/createaccount')
 def create_account():
     """Where new users create an account"""
@@ -35,14 +69,15 @@ def create_account():
     return render_template("createaccount.html")
 
 
+
 @app.route('/handle-createaccount', methods=['POST'])
 def handle_createaccount():
-    """Process create account form"""
+    """Process create account form.
 
-    # lat_lngs = {'94612': (37.806238, -122.268918),
-    #             '94109': (37.791434, -122.420053),
-    #             '95376': (37.739651, -121.425224),
-    #             }
+    To create the user, this function calls the
+    get_lat_lngs function from helpers.py.
+
+    """
 
     password = request.form.get('pword')
     confirm_pword = request.form.get('confirm_pword')
@@ -65,7 +100,7 @@ def handle_createaccount():
         state_id = region.region_id
 
         # Get latitude and longitude from helper function
-        lat_lng = get_lat_lngs(staddress, zipcode)
+        lat_lng = get_lat_lngs(staddress + " " + zipcode)
         latitude = lat_lng[0]
         longitude = lat_lng[1]
 
@@ -74,39 +109,28 @@ def handle_createaccount():
                     lat=latitude, lng=longitude, phone=phonenumber,
                     email=username, password=password)
 
-        # return "User: %s %s" % (user.fname, user.lname)
         db.session.add(user)
         db.session.commit()
 
         session['user'] = username
         flash("Successfully created account! Logged in as %s" % username)
+
         return redirect('/success')
 
 
-@app.route('/login')
-def login():
-    """User login page."""
 
-    return render_template("login.html")
+@app.route('/success')
+def enter_site():
+    """Signed in home page."""
+
+    customer = User.query.filter(User.email == session['user']).one()
+    dates = calc_dates(30)
+
+    return render_template("success.html", user=customer,
+                            p_today=dates['today_string'],
+                            p_month=dates['future_string'])
 
 
-@app.route('/handle-login', methods=['POST'])
-def handle_login():
-    """Process login form"""
-
-    username = request.form.get('email')
-    password = request.form.get('password')
-
-    user = User.query.filter(User.email == username).one()
-
-    if user:
-        if user.password == password:
-            session['user'] = username
-            flash("Welcome! Logged in as %s" % username)
-            return redirect('/success')
-        else:
-            flash("Login failed. Please try again.")
-            return redirect('/')
 
 
 @app.route('/account-info')
@@ -132,21 +156,6 @@ def show_account():
                            street=staddress, city=cty, state=st, zipcode=zcode,
                            phone=phonenumber, email=session['user'],
                            products=inventory)
-
-
-@app.route('/logout')
-def handle_logout():
-    """Process logout"""
-
-    session.pop('user')
-    return redirect('/')
-
-
-@app.route('/success')
-def enter_site():
-    """Signed in home page."""
-
-    return render_template("success.html")
 
 
 @app.route('/list-item')
@@ -297,6 +306,16 @@ def show_results():
     Routes to Item Detail page.
 
     """
+    address = request.args.get("search_location")
+    date1 = request.args.get("date1")
+    date2 = request.args.get("date2")
+
+    date1 = datetime.strptime(date1, "%Y-%m-%d")
+    date2 = datetime.strptime(date2, "%Y-%m-%d")
+
+
+    # Test with just zipcode for now
+    users_in_area = User.query.filter(postalcode == address)
 
     return "This will be the search results."
 

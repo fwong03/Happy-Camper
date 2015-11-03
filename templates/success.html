@@ -4,11 +4,26 @@
 
 {% block content %}
 
-    <h2>Signed In! Your Options:</h2>
+    <h2>Welcome {{ user.fname }}! You're signed in. Your options are the following:</h2>
+    <ul>
+        <li><a href="/list-item">List an item to rent out</a></li>
 
-    <p><a href="/list-item">List an item to rent out</a></p>
-    <p><a href="/searchresults">Get some search results when this is implemented</a></p>
-    <p><a href="/account-info">Check out your account</a></p>
-    <p><a href="/logout">Log out</a></p>
+        <form action="/searchresults">
+        <li>Search for an item:</li>
+            <ul>
+                <li>First, tell us your location and dates of interest. We've prefilled dates and your search location with your account zipcode but feel free to change them.</li>
+
+                        Enter search city and state and/or zipcode here: <input type="text" size="32" value = {{ user.postalcode }} name="search_location">
+                    
+                </li>
+                <li>Now tell us your dates of interest in format YYYY-mm-dd:</li>
+                        Start Date: <input type="text" size="32" value ={{ p_today }} name="date1">
+                        <br>
+                        End Date: <input type="text" size="32" value ={{ p_month }} name="date2">
+                </ul>
+                <input type="submit" value="Search for Gear">
+
+        <li><a href="/account-info">Check out your account</a></li>
+    </ul>
 
 {% endblock %}

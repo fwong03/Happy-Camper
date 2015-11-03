@@ -13,7 +13,7 @@
 <br>
 
 <h3>Items You Have Available for Rent</h3>
-    <table style="100%">
+    <table>
         <tr>
             <th>Category</th>
             <th>Brand</th>
@@ -27,9 +27,9 @@
                 <td>{{ product.category.cat_name }}</td>
                 <td>{{ product.brand.brand_name }}</td>
                 <td>{{ product.model }}</td>
-                <td>{{ product.avail_start_date }}</td>
-                <td>{{ product.avail_end_date }}</td>
-                <td>{{ product.price_per_day }}</td>
+                <td>{{ product.avail_start_date.date().isoformat() }}</td>
+                <td>{{ product.avail_end_date.date().isoformat() }}</td>
+                <td>${{ '{:,.2f}'.format(product.price_per_day) }}</td>
         {% endfor %}
     </table>
 <br>
