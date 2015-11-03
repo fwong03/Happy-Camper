@@ -257,11 +257,17 @@ class History(db.Model):
     #                     nullable=False)
     start_date = db.Column(db.DateTime, nullable=False)
     end_date = db.Column(db.DateTime, nullable=False)
+    total_cost = db.Column(db.Float, nullable=False)
 
     # Ratings are optional
     owner_rate_id = db.Column(db.Integer, db.ForeignKey('ratings.rate_id'))
     renter_rate_id = db.Column(db.Integer, db.ForeignKey('ratings.rate_id'))
     prod_rate_id = db.Column(db.Integer, db.ForeignKey('ratings.rate_id'))
+
+    def __repr__(self):
+        return "<prod_id=%d, renter_user_id=%d, start_date=%r, end_date=%r, total_cost=%r>" % (
+            self.prod_id, self.renter_user_id, self.start_date, self.end_date,
+            self.total_cost)
 
 
 class Rating(db.Model):

@@ -62,7 +62,7 @@ def handle_createaccount():
         cty = request.form.get('cty')
         state = request.form.get('state')
         zipcode = request.form.get('zipcode')
-        phonenumber = request.form.get('phonenumber')
+        phonenumber = int(request.form.get('phonenumber'))
         username = request.form.get('username')
 
         region = Region.query.filter(Region.abbr == state).one()
@@ -70,12 +70,6 @@ def handle_createaccount():
         lat_lng = lat_lngs[zipcode]
         latitude = lat_lng[0]
         longitude = lat_lng[1]
-
-        phonenumber = int(phonenumber)
-
-        # return "User: %s %s, Address: %s, %s %s %s, Region_id: %d, Phone: %d, email: %s, password: %s, lat: %r, lng: %r" % (
-        #     firstname, lastname, staddress, cty, state, zipcode, state_id, phonenumber,
-        #     username, password, latitude, longitude)
 
         user = User(fname=firstname, lname=lastname, street=staddress,
                     city=cty, region_id=state_id, postalcode=zipcode,
@@ -201,24 +195,26 @@ def handle_tent_listing():
     best_use = BestUse.query.filter(BestUse.use_name == bestuse).one()
 
     # Set optional values, if any
-    width = None
-    length = None
-    doors = None
-    poles = None
 
-    temp_width = request.form.get("width")
-    temp_length = request.form.get("length")
-    temp_doors = request.form.get("doors")
-    temp_poles = request.form.get("poles")
+    try:
+        width = int(request.form.get("width"))
+    except ValueError:
+        width = None
 
-    if temp_width:
-        width = temp_width
-    if temp_length:
-        width = temp_length
-    if temp_doors:
-        doors = temp_doors
-    if temp_poles:
-        poles = temp_poles
+    try:
+        length = int(request.form.get("length"))
+    except ValueError:
+        length = None
+
+    try:
+        doors = int(request.form.get("doors"))
+    except ValueError:
+        doors = None
+
+    try:
+        poles = int(request.form.get("poles"))
+    except ValueError:
+        poles = None
 
     tent = Tent(prod_id=product.prod_id, use_id=best_use.use_id,
                 sleep_capacity=sleep, seasons=3, min_trail_weight=weight,
@@ -268,6 +264,7 @@ def show_item(prod_id):
     # If item available = False, show BOROWED version of page, which
     # doesn't allow you to borrow the item.
     # Show this BORROWED version after a user clicks "borrow this"
+    # SHOW TOTAL COST given the date range the user gave in search
 
     item = Product.query.get(prod_id)
 
@@ -281,9 +278,13 @@ def show_item(prod_id):
 @app.route('/rent/<int:prod_id>')
 def rent_item(prod_id):
 
+    # Make rental confirmation page inbetween product detail and this one.
+    # Create History object
+
     product = Product.query.get(prod_id)
     product.available = False
     db.session.commit()
+
 
     flash("You've succcessfully rented %s %s!" % (product.brand.brand_name, product.model))
 
