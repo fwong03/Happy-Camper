@@ -8,6 +8,7 @@ from model import connect_to_db, db
 from model import User, Region, Product, BestUse, Tent
 # Category
 from helpers import get_lat_lngs, make_product, get_brands, calc_dates
+from datetime import datetime
 
 
 app = Flask(__name__)
@@ -306,7 +307,11 @@ def show_results():
     Routes to Item Detail page.
 
     """
-    address = request.args.get("search_location")
+    # For now find users in same zipcode
+    # Then find products in same zipcode
+    # Then find products in same zip code available within search dates.
+    # Then expand to zipcode within radius
+    search_area = request.args.get("search_area")
     date1 = request.args.get("date1")
     date2 = request.args.get("date2")
 
@@ -315,9 +320,10 @@ def show_results():
 
 
     # Test with just zipcode for now
-    users_in_area = User.query.filter(postalcode == address)
+    users_in_area = User.query.filter(User.postalcode == search_area).all()
 
-    return "This will be the search results."
+    return render_template("searchresults.html", location=search_area,
+        start_date=date1, end_date=date2, users=users_in_area)
 
 
 @app.route('/renter_rate')
