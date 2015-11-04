@@ -29,11 +29,11 @@ def get_distances(search_center, postalcodes, radius):
     """Takes in search center as a string, postalcodes as a list of tuples,
         and search radius in miles as an int. The function returns the list of
         postal codes in the given list that are within the given radius.
- 
+
     """
 
     google_maps = GoogleMaps(api_key=os.environ['GOOGLE_API_KEY'])
-    
+
     # Put search center in a list because that is how the the geolocation
     # distance module takes it as a parameter
     search_center = [search_center]
@@ -43,16 +43,45 @@ def get_distances(search_center, postalcodes, radius):
     for postalcode in postalcodes:
         distinct_postalcodes.append(postalcode[0])
 
-    # Now we can calculate distances. This returns a list of distance matrix
-    # object thingies.
+    # Now we can calculate distances.
     items = google_maps.distance(search_center, distinct_postalcodes).all()
+
+    # Items is list of distance matrix object thingies. Each has an origin (here,
+    # the search area), destination (here, the user zipcode), and distance
+    # between them. First we'll take out the matrix thingies within the search
+    # radius of the given search center.
 
     matrixthingies = []
     for item in items:
-        print "Processing", item.destination, item.distance.miles
+        # print "Processing", item.destination, item.distance.miles
         if (item.distance.miles <= radius):
-            print "adding %r" % item.destination
+            # print "adding %r" % item.destination
             matrixthingies.append(item)
+
+    # Now we pull out the user location info from the matrixthingies. This info
+    # has the city, state, zipcode and country.
+    destinations = []
+    for thingy in matrixthingies:
+        destinations.append(thingy.destination)
+
+    # print "destinations: ", destinations
+
+    # Now we pull out the zipcode from the list of destinations.
+    postalcodes = []
+    for destination in destinations:
+        line = destination.split()
+        postalcode = line[-2].replace(",", "")
+        postalcodes.append(postalcode)
+    #     print line
+
+    # print "postal codes: ", postalcodes
+
+
+    # We return this list of postal codes.
+    return postalcodes
+
+
+
 
     return matrixthingies
 
