@@ -7,7 +7,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 from model import connect_to_db, db
 from model import User, Region, Product, BestUse, Tent
 # Category
-from helpers import get_lat_lngs, make_product, get_brands, calc_dates
+from helpers import get_lat_lngs, get_distances, make_product, get_brands, calc_dates
 from datetime import datetime
 
 
@@ -312,15 +312,39 @@ def show_results():
     # Then find products in same zip code available within search dates.
     # Then expand to zipcode within radius
     search_area = request.args.get("search_area")
+    search_radius = request.args.get("search_radius")
     date1 = request.args.get("date1")
     date2 = request.args.get("date2")
 
     date1 = datetime.strptime(date1, "%Y-%m-%d")
     date2 = datetime.strptime(date2, "%Y-%m-%d")
 
+    # Find distinct postal codes in the database. This returns a list of
+    # postalcode tuples
+    query = db.session.query(User.postalcode).distinct()
+    postalcodes = query.all()
+
+    # Convert the list of tuples to a list of strings. You can send this to
+    # the helper getdistance function
+    distinct_postalcodes = []
+    for postalcode in postalcodes:
+        distinct_postalcodes.append(postalcode[0])
+
 
     # Test with just zipcode for now
-    users_in_area = User.query.filter(User.postalcode == search_area).all()
+    users_in_area = []
+
+    users = User.query.all()
+
+    for user in users:
+        items = get_distance(search_area, user.zipcode)
+        if items[0] <= search_radius:
+            users_in_area.append(user)
+
+    return users_in_area 
+
+
+
 
     return render_template("searchresults.html", location=search_area,
         start_date=date1, end_date=date2, users=users_in_area)

@@ -4,6 +4,7 @@ from model import User, Brand, Category, Product
 from model import db
 from datetime import datetime, timedelta
 from geolocation.google_maps import GoogleMaps
+from geolocation.distance_matrix import const
 import os
 
 
@@ -22,6 +23,38 @@ def get_lat_lngs(address):
     longitude = user_location.lng
 
     return [latitude, longitude]
+
+
+def get_distances(search_center, postalcodes, radius):
+    """Takes in search center as a string, postalcodes as a list of tuples,
+        and search radius in miles as an int. The function returns the list of
+        postal codes in the given list that are within the given radius.
+ 
+    """
+
+    google_maps = GoogleMaps(api_key=os.environ['GOOGLE_API_KEY'])
+    
+    # Put search center in a list because that is how the the geolocation
+    # distance module takes it as a parameter
+    search_center = [search_center]
+
+    # Convert the list of tuples to a list of strings.
+    distinct_postalcodes = []
+    for postalcode in postalcodes:
+        distinct_postalcodes.append(postalcode[0])
+
+    # Now we can calculate distances. This returns a list of distance matrix
+    # object thingies.
+    items = google_maps.distance(search_center, distinct_postalcodes).all()
+
+    matrixthingies = []
+    for item in items:
+        print "Processing", item.destination, item.distance.miles
+        if (item.distance.miles <= radius):
+            print "adding %r" % item.destination
+            matrixthingies.append(item)
+
+    return matrixthingies
 
 
 def calc_dates(deltadays):

@@ -9,9 +9,9 @@
     <ul>
         <li>Owner: {{ product.owner.fname }} {{ product.owner.lname }}</li>
         <li>Owner location: {{ product.owner.city }}, {{ product.owner.region.full }}</li>
-        <li>Available start date: {{ product.avail_start_date }}</li>
-        <li>Available end date: {{ product.avail_end_date }}</li>
-        <li>Price per day: ${{ product.price_per_day }}</li>
+        <li>Available start date: {{ product.avail_start_date.date().isoformat() }}</li>
+        <li>Available end date: {{ product.avail_end_date.date().isoformat() }}</li>
+        <li>Price per day: ${{ '{:,.2f}'.format(product.price_per_day) }}</li>
         <li>Description: {{ product.description }}</li>
         <li>Condition: {{ product.condition }}</li>
     </ul>
