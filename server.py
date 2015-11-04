@@ -307,10 +307,7 @@ def show_results():
     Routes to Item Detail page.
 
     """
-    # For now find users in same zipcode
-    # Then find products in same zipcode
-    # Then find products in same zip code available within search dates.
-    # Then expand to zipcode within radius
+    # Now list products of users found.
     search_area = request.args.get("search_area")
     search_radius = request.args.get("search_radius")
     date1 = request.args.get("date1")
@@ -335,7 +332,8 @@ def show_results():
     users_in_area = User.query.filter(User.postalcode.in_(postal_codes)).all()
 
     return render_template("searchresults.html", location=search_area,
-        start_date=date1, end_date=date2, users=users_in_area)
+                           miles=search_radius, start_date=date1, end_date=date2,
+                           users=users_in_area)
 
 
 @app.route('/renter_rate')
