@@ -319,32 +319,20 @@ def show_results():
     date1 = datetime.strptime(date1, "%Y-%m-%d")
     date2 = datetime.strptime(date2, "%Y-%m-%d")
 
+    try:
+        search_radius = int(search_radius)
+    except ValueError:
+        flash("Search radius must be an integer. Please try again.")
+        return redirect('/success')
+
     # Find distinct postal codes in the database. This returns a list of
     # postalcode tuples
     query = db.session.query(User.postalcode).distinct()
     postalcodes = query.all()
 
-    # Convert the list of tuples to a list of strings. You can send this to
-    # the helper getdistance function
-    distinct_postalcodes = []
-    for postalcode in postalcodes:
-        distinct_postalcodes.append(postalcode[0])
+    postal_codes = get_distances(search_area, postalcodes, search_radius)
 
-
-    # Test with just zipcode for now
-    users_in_area = []
-
-    users = User.query.all()
-
-    for user in users:
-        items = get_distance(search_area, user.zipcode)
-        if items[0] <= search_radius:
-            users_in_area.append(user)
-
-    return users_in_area 
-
-
-
+    users_in_area = User.query.filter(User.postalcode.in_(postal_codes)).all()
 
     return render_template("searchresults.html", location=search_area,
         start_date=date1, end_date=date2, users=users_in_area)

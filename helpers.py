@@ -73,17 +73,10 @@ def get_distances(search_center, postalcodes, radius):
         postalcode = line[-2].replace(",", "")
         postalcodes.append(postalcode)
     #     print line
-
     # print "postal codes: ", postalcodes
-
 
     # We return this list of postal codes.
     return postalcodes
-
-
-
-
-    return matrixthingies
 
 
 def calc_dates(deltadays):
