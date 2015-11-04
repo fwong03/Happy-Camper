@@ -25,7 +25,7 @@ def get_lat_lngs(address):
     return [latitude, longitude]
 
 
-def get_distances(search_center, postalcodes, radius):
+def search_radius(search_center, postalcodes, radius):
     """Takes in search center as a string, postalcodes as a list of tuples,
         and search radius in miles as an int. The function returns the list of
         postal codes in the given list that are within the given radius.

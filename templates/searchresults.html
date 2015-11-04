@@ -8,16 +8,15 @@
     <p>Search radius: {{ miles }} miles</p>
     <p>Dates: {{ start_date.date().isoformat() }} to {{ end_date.date().isoformat() }} </p>
 
-<h3>Test: Users in Area</h3>
     <table>
         <tr>
             <th>user_id</th>
             <th>fname</th>
             <th>lname</th>
-            <th>zip code</th>
+            <th>postal code</th>
             <th>city</th>
             <th>email</th>
-            <th>products for rent and dates available</th>
+            <th>products for rent, dates available, link to detail page</th>
         </tr>
         {% for user in users %}
             <tr>
@@ -29,7 +28,7 @@
                 <td>{{ user.email }}</td>
                 <td> <ul>
                     {% for product in user.products %}
-                        <li>item: {{ product.brand.brand_name }} {{ product.model }}, cateogry: {{ product.category.cat_name }}, available dates: {{ product.avail_start_date.date().isoformat() }} to {{product.avail_end_date.date().isoformat() }}
+                        <li><a href="/product-detail/{{ product.prod_id }}">item: {{ product.brand.brand_name }} {{ product.model }}, cateogry: {{ product.category.cat_name }}, available dates: {{ product.avail_start_date.date().isoformat() }} to {{product.avail_end_date.date().isoformat() }}</a>
                         </li>
                      {% endfor %}
                  </ul>
@@ -37,6 +36,8 @@
         {% endfor %}
     </table>
 <br>
+
+<a href="/success">Return to homepage</a>
 
 
 {% endblock %}

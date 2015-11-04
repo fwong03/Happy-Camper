@@ -7,7 +7,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 from model import connect_to_db, db
 from model import User, Region, Product, BestUse, Tent
 # Category
-from helpers import get_lat_lngs, get_distances, make_product, get_brands, calc_dates
+from helpers import get_lat_lngs, search_radius, make_product, get_brands, calc_dates
 from datetime import datetime
 
 
@@ -287,7 +287,7 @@ def show_item(prod_id):
 def rent_item(prod_id):
 
     # Make rental confirmation page inbetween product detail and this one.
-    # Create History object
+    # TO DO: Create associated History object.
 
     product = Product.query.get(prod_id)
     product.available = False
@@ -307,9 +307,9 @@ def show_results():
     Routes to Item Detail page.
 
     """
-    # Now list products of users found.
+    # TO DO: Return products available within dates given
     search_area = request.args.get("search_area")
-    search_radius = request.args.get("search_radius")
+    search_miles = request.args.get("search_miles")
     date1 = request.args.get("date1")
     date2 = request.args.get("date2")
 
@@ -317,22 +317,25 @@ def show_results():
     date2 = datetime.strptime(date2, "%Y-%m-%d")
 
     try:
-        search_radius = int(search_radius)
+        search_miles = int(search_miles)
     except ValueError:
         flash("Search radius must be an integer. Please try again.")
         return redirect('/success')
 
-    # Find distinct postal codes in the database. This returns a list of
-    # postalcode tuples
+    # Find distinct postal codes in the database. This query returns a list of
+    # tuples.
     query = db.session.query(User.postalcode).distinct()
     postalcodes = query.all()
 
-    postal_codes = get_distances(search_area, postalcodes, search_radius)
+    # Call helper function that returns postal codes within the given
+    # search radius.
+    postal_codes = search_radius(search_area, postalcodes, search_miles)
 
+    # Now we get the users within the postal codes returned by searcg_radius.
     users_in_area = User.query.filter(User.postalcode.in_(postal_codes)).all()
 
     return render_template("searchresults.html", location=search_area,
-                           miles=search_radius, start_date=date1, end_date=date2,
+                           miles=search_miles, start_date=date1, end_date=date2,
                            users=users_in_area)
 
 
