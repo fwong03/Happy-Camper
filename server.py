@@ -7,7 +7,8 @@ from flask_debugtoolbar import DebugToolbarExtension
 from model import connect_to_db, db
 from model import User, Region, Product, BestUse, Tent
 # Category
-from helpers import get_lat_lngs, search_radius, make_product, get_brands, calc_dates
+from helpers import get_lat_lngs, search_radius, make_product, get_brands
+from helpers import calc_dates, calc_num_days
 from datetime import datetime
 
 
@@ -70,7 +71,6 @@ def create_account():
     return render_template("createaccount.html")
 
 
-
 @app.route('/handle-createaccount', methods=['POST'])
 def handle_createaccount():
     """Process create account form.
@@ -130,8 +130,6 @@ def enter_site():
     return render_template("success.html", user=customer,
                             p_today=dates['today_string'],
                             p_month=dates['future_string'])
-
-
 
 
 @app.route('/account-info')
@@ -235,69 +233,6 @@ def handle_tent_listing():
     flash("Listing successfully posted!")
     return redirect('/product-detail/%d' % product.prod_id)
 
-@app.route('/list-sleepingbag')
-def list_sleepingbag():
-    return "This is where you'll list a sleeping bag."
-
-
-@app.route('/list-sleepingpad')
-def list_sleepingpad():
-    return "This is where you'll list a sleeping pad."
-
-
-@app.route('/list-pack')
-def list_pack():
-    return "This is where you'll list a pack."
-
-
-@app.route('/list-stove')
-def list_stove():
-    return "This is where you'll list a stove."
-
-
-@app.route('/list-waterfilter')
-def list_waterfilter():
-    return "This is where you'll list a water filter."
-
-
-
-@app.route('/product-detail/<int:prod_id>')
-def show_item(prod_id):
-    """Product detail page.
-
-    Routes either from Search Results page or List Item page.
-    If click on Borrow This, routes to Borrowed version of this page.
-    """
-    # If item available = True, show regular product detail page.
-    # If item available = False, show BOROWED version of page, which
-    # doesn't allow you to borrow the item.
-    # Show this BORROWED version after a user clicks "borrow this"
-    # SHOW TOTAL COST given the date range the user gave in search
-
-    item = Product.query.get(prod_id)
-
-    if item.available:
-        return render_template("product-detail.html", product=item)
-    else:
-        return "Sorry! The %s %s is no longer available for rent." % (
-            item.brand.brand_name, item.model)
-
-
-@app.route('/rent/<int:prod_id>')
-def rent_item(prod_id):
-
-    # Make rental confirmation page inbetween product detail and this one.
-    # TO DO: Create associated History object.
-
-    product = Product.query.get(prod_id)
-    product.available = False
-    db.session.commit()
-
-
-    flash("You've succcessfully rented %s %s!" % (product.brand.brand_name, product.model))
-
-    return "Prod_id=%d, available=%r" % (product.prod_id, product.available)
-
 
 @app.route('/searchresults')
 def show_results():
@@ -339,6 +274,61 @@ def show_results():
                            users=users_in_area)
 
 
+@app.route('/product-detail/<int:prod_id>')
+def show_item(prod_id):
+    """Product detail page.
+
+    Routes either from Search Results page or List Item page.
+    If click on Borrow This, routes to Borrowed version of this page.
+    """
+    # If item available = True, show regular product detail page.
+    # If item available = False, show BOROWED version of page, which
+    # doesn't allow you to borrow the item.
+    # Show this BORROWED version after a user clicks "borrow this"
+    # SHOW TOTAL COST given the date range the user gave in search
+
+    item = Product.query.get(prod_id)
+
+    if item.available:
+        return render_template("product-detail.html", product=item)
+    else:
+        return "Sorry! The %s %s is no longer available for rent." % (
+            item.brand.brand_name, item.model)
+
+
+@app.route('/rent-confirm/<int:prod_id>', methods=['POST'])
+def confirm_rental(prod_id):
+    """When a user clicks to rent on object, this page
+    confirms they actually meant to rent the item.
+    """
+    # rental_start = request.form.get("rental_start")
+    # rental_end = request.form.get("end_date")
+    rental_start = '2015-12-01'
+    rental_end = '2015-12-15'
+
+    days = calc_num_days(rental_start, rental_end)
+    prod = Product.query.get(prod_id)
+
+    return render_template("rent-confirm.html", product=prod, rental_start_date=rental_start,
+        rental_end_date=rental_end, num_days=days)
+
+
+@app.route('/rent/<int:prod_id>', methods=['POST'])
+def rent_item(prod_id):
+
+    # Make rental confirmation page inbetween product detail and this one.
+    # TO DO: Create associated History object.
+
+    product = Product.query.get(prod_id)
+    product.available = False
+    db.session.commit()
+
+
+    flash("You've succcessfully rented %s %s!" % (product.brand.brand_name, product.model))
+
+    return render_template("rent-final.html")
+
+
 @app.route('/renter_rate')
 def renter_rate():
     """Rating page for renter.
@@ -360,6 +350,30 @@ def owner_rate():
     return "Here owners can rate renters."
 
 
+
+@app.route('/list-sleepingbag')
+def list_sleepingbag():
+    return "This is where you'll list a sleeping bag."
+
+
+@app.route('/list-sleepingpad')
+def list_sleepingpad():
+    return "This is where you'll list a sleeping pad."
+
+
+@app.route('/list-pack')
+def list_pack():
+    return "This is where you'll list a pack."
+
+
+@app.route('/list-stove')
+def list_stove():
+    return "This is where you'll list a stove."
+
+
+@app.route('/list-waterfilter')
+def list_waterfilter():
+    return "This is where you'll list a water filter."
 
 
 

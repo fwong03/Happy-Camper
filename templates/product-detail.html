@@ -15,7 +15,11 @@
         <li>Description: {{ product.description }}</li>
         <li>Condition: {{ product.condition }}</li>
     </ul>
-    <p><a href="/rent/{{ product.prod_id }}">Rent This!</a></p>
+
+    <form action="/rent-confirm/{{ product.prod_id }}" method="POST">
+        <input type="submit" value="Rent This">
+    </form>
+
 
 
 {% endblock %}

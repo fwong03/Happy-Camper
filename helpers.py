@@ -32,6 +32,9 @@ def search_radius(search_center, postalcodes, radius):
 
     """
 
+    # TO DO: Break this search_radius down into smaller functions that
+    # will be easier to test.
+
     google_maps = GoogleMaps(api_key=os.environ['GOOGLE_API_KEY'])
 
     # Put search center in a list because that is how the the geolocation
@@ -97,6 +100,21 @@ def calc_dates(deltadays):
     dates['future_string'] = future.date().isoformat()
 
     return dates
+
+
+def calc_num_days(date1_string, date2_string):
+    """Takes two dates as string in format "yyyy-mm-dd" (e.g. "2015-11-04"
+        for November 4, 2015) and returns number of days between them as an
+        integer.
+
+        Subtracts date1 from date2.
+
+    """
+    date1 = datetime.strptime(date1_string, "%Y-%m-%d")
+    date2 = datetime.strptime(date2_string, "%Y-%m-%d")
+    days = (date2 - date1).days + 1
+
+    return days
 
 
 def get_brands():
