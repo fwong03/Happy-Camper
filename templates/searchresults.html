@@ -3,41 +3,34 @@
 {% block title %}Search Results{% endblock %}
 
 {% block content %}
-<h1>Search Results</h1>
+    <h1>Search Results</h1>
     <p>Location: {{ location }}</p>
     <p>Search radius: {{ miles }} miles</p>
     <p>Dates: {{ start_date.date().isoformat() }} to {{ end_date.date().isoformat() }} </p>
 
-    <table>
+    <table border="1" cellpadding="5">
         <tr>
-            <th>user_id</th>
-            <th>fname</th>
-            <th>lname</th>
-            <th>postal code</th>
-            <th>city</th>
-            <th>email</th>
-            <th>products for rent, dates available, link to detail page</th>
+            <th>Category</th>
+            <th>Brand and Model</th>
+            <th>Price Per Day</th>
+            <th>Cost for {{num_days }} days</th>
+            <th>product location</th>
         </tr>
         {% for user in users %}
+        {% for product in user.products %}
             <tr>
-                <td>{{ user.user_id }}</td>
-                <td>{{ user.fname }}</td>
-                <td>{{ user.lname }}</td>
-                <td>{{ user.postalcode }}</td>
+                <td>{{ product.category.cat_name }}</td>
+                 <td><a href="/product-detail/{{ product.prod_id }}">
+                     {{ product.brand.brand_name }} {{ product.model }} </td>
+                <td>${{ '{:,.2f}'.format(product.price_per_day) }}</td>
+                <td>${{ '{:,.2f}'.format(num_days * product.price_per_day) }}</td>
                 <td>{{ user.city }}</td>
-                <td>{{ user.email }}</td>
-                <td> <ul>
-                    {% for product in user.products %}
-                        <li><a href="/product-detail/{{ product.prod_id }}">item: {{ product.brand.brand_name }} {{ product.model }}, cateogry: {{ product.category.cat_name }}, available dates: {{ product.avail_start_date.date().isoformat() }} to {{product.avail_end_date.date().isoformat() }}</a>
-                        </li>
-                     {% endfor %}
-                 </ul>
-                </td>
+            </tr>
         {% endfor %}
-    </table>
-<br>
+        {% endfor %}
+    </table><br>
 
-<a href="/success">Return to homepage</a>
+    <p><a href="/success">Return to homepage</a></p>
 
 
 {% endblock %}

@@ -102,6 +102,17 @@ def calc_dates(deltadays):
     return dates
 
 
+def convert_strings_to_datetimes(date1_string, date2_string):
+    """Takes two dates as string in format "yyyy-mm-dd" (e.g. "2015-11-04"
+        for November 4, 2015) and returns a list of them as datetime objects.
+    """
+
+    date1 = datetime.strptime(date1_string, "%Y-%m-%d")
+    date2 = datetime.strptime(date2_string, "%Y-%m-%d")
+
+    return [date1, date2]
+
+
 def calc_num_days(date1_string, date2_string):
     """Takes two dates as string in format "yyyy-mm-dd" (e.g. "2015-11-04"
         for November 4, 2015) and returns number of days between them as an
@@ -110,8 +121,10 @@ def calc_num_days(date1_string, date2_string):
         Subtracts date1 from date2.
 
     """
-    date1 = datetime.strptime(date1_string, "%Y-%m-%d")
-    date2 = datetime.strptime(date2_string, "%Y-%m-%d")
+
+    dates = convert_strings_to_datetimes(date1_string, date2_string)
+    date1 = dates[0]
+    date2 = dates[1]
     days = (date2 - date1).days + 1
 
     return days

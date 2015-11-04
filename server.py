@@ -8,7 +8,7 @@ from model import connect_to_db, db
 from model import User, Region, Product, BestUse, Tent
 # Category
 from helpers import get_lat_lngs, search_radius, make_product, get_brands
-from helpers import calc_dates, calc_num_days
+from helpers import calc_dates, calc_num_days, convert_strings_to_datetimes
 from datetime import datetime
 
 
@@ -119,7 +119,6 @@ def handle_createaccount():
         return redirect('/success')
 
 
-
 @app.route('/success')
 def enter_site():
     """Signed in home page."""
@@ -128,8 +127,8 @@ def enter_site():
     dates = calc_dates(30)
 
     return render_template("success.html", user=customer,
-                            p_today=dates['today_string'],
-                            p_month=dates['future_string'])
+                           p_today=dates['today_string'],
+                           p_month=dates['future_string'])
 
 
 @app.route('/account-info')
@@ -189,8 +188,6 @@ def handle_tent_listing():
     db.session.add(product)
     db.session.commit()
 
-    # print product
-
     # Grab info to make a tent.
     bestuse = request.form.get("bestuse")
     sleep = int(request.form.get("sleep"))
@@ -242,14 +239,23 @@ def show_results():
     Routes to Item Detail page.
 
     """
-    # TO DO: Return products available within dates given
+    # STILL LEFT TO DO: Return products available within dates given
+
     search_area = request.args.get("search_area")
     search_miles = request.args.get("search_miles")
     date1 = request.args.get("date1")
     date2 = request.args.get("date2")
 
-    date1 = datetime.strptime(date1, "%Y-%m-%d")
-    date2 = datetime.strptime(date2, "%Y-%m-%d")
+    # Calc num days. This function takes in dates as a string.
+    days = calc_num_days(date1, date2)
+
+    # Then convert the dates into datetimes and add them to the session.
+    dates = convert_strings_to_datetimes(date1, date2)
+    date1 = dates[0]
+    date2 = dates[1]
+
+    session['date1'] = date1
+    session['date2'] = date2
 
     try:
         search_miles = int(search_miles)
@@ -269,9 +275,15 @@ def show_results():
     # Now we get the users within the postal codes returned by searcg_radius.
     users_in_area = User.query.filter(User.postalcode.in_(postal_codes)).all()
 
+    # Take out the currently logged in user, if in the users_in_area list
+    logged_in_user = User.query.filter(User.email == session['user']).one()
+
+    if logged_in_user in users_in_area:
+        users_in_area.remove(logged_in_user)
+
     return render_template("searchresults.html", location=search_area,
                            miles=search_miles, start_date=date1, end_date=date2,
-                           users=users_in_area)
+                           num_days=days, users=users_in_area)
 
 
 @app.route('/product-detail/<int:prod_id>')
@@ -301,16 +313,16 @@ def confirm_rental(prod_id):
     """When a user clicks to rent on object, this page
     confirms they actually meant to rent the item.
     """
-    # rental_start = request.form.get("rental_start")
-    # rental_end = request.form.get("end_date")
-    rental_start = '2015-12-01'
-    rental_end = '2015-12-15'
 
-    days = calc_num_days(rental_start, rental_end)
+    rental_start = session['date1']
+    rental_end = session['date2']
+    days = (rental_end - rental_start).days + 1
+
     prod = Product.query.get(prod_id)
 
-    return render_template("rent-confirm.html", product=prod, rental_start_date=rental_start,
-        rental_end_date=rental_end, num_days=days)
+    return render_template("rent-confirm.html", product=prod,
+                           rental_start_date=rental_start,
+                           rental_end_date=rental_end, num_days=days)
 
 
 @app.route('/rent/<int:prod_id>', methods=['POST'])
@@ -322,7 +334,6 @@ def rent_item(prod_id):
     product = Product.query.get(prod_id)
     product.available = False
     db.session.commit()
-
 
     flash("You've succcessfully rented %s %s!" % (product.brand.brand_name, product.model))
 
