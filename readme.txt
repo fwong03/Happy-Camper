@@ -13,7 +13,7 @@ want to rent it out).
 TECHNOLOGY STACK
 --------------------
 Application: Python, Flask, Jinja, SQLAlchemy, SQLite
-APIs: Google Maps
+APIs: Google Maps (for library geolocation-python 0.2.0)
 
 FILES LIST
 --------------------
