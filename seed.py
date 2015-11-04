@@ -1,5 +1,5 @@
 from model import Region, User, BestUse, Category, Brand, Product, Tent
-from model import FillType, Gender, SleepingBag
+from model import FillType, Gender, SleepingBag, History
 from model import connect_to_db, db
 from server import app
 from datetime import datetime
@@ -48,7 +48,7 @@ def load_users():
         login = row[9]
         pword = row[10]
 
-        lat_lngs = get_lat_lngs(staddress, zcode)
+        lat_lngs = get_lat_lngs(staddress + " " + zcode)
         latde = lat_lngs[0]
         lontde = lat_lngs[1]
 
@@ -231,6 +231,47 @@ def load_sleepingbags():
 
     db.session.commit()
 
+def load_histories():
+    """Load history data"""
+
+    print "Histories"
+    History.query.delete()
+
+    for row in open("data/historiesdata"):
+        row = row.strip()
+        row = row.split("|")
+        print row
+
+        product = int(row[0])
+        renter = int(row[1])
+        date1 = row[2]
+        date2 = row[3]
+        cost = float(row[4])
+
+        try:
+            owner_rate = int(row[5])
+        except ValueError:
+            owner_rate = None
+        try:
+            renter_rate = int(row[6])
+        except ValueError:
+            renter_rate = None
+        try:
+            prod_rate = int(row[7])
+        except ValueError:
+            prod_rate = None
+
+        date1 = datetime.strptime(date1, "%Y-%m-%d")
+        date2 = datetime.strptime(date2, "%Y-%m-%d")
+
+        a = History(prod_id=product, renter_user_id=renter, start_date=date1,
+                 end_date=date2, total_cost=cost, owner_rate_id=owner_rate,
+                 renter_rate_id=renter_rate, prod_rate_id=prod_rate)
+
+        db.session.add(a)
+
+    db.session.commit()
+
 
 if __name__ == "__main__":
     connect_to_db(app)
@@ -249,3 +290,4 @@ if __name__ == "__main__":
     load_filltypes()
     load_gendertypes()
     load_sleepingbags()
+    load_histories()

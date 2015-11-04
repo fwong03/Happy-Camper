@@ -67,6 +67,8 @@ class User(db.Model):
     email = db.Column(db.String(64), nullable=False, unique=True)
     password = db.Column(db.String(32), nullable=False)
 
+    renter = db.relationship('History', backref='renter')
+
     def __repr__(self):
 
         return "<User user_id=%d, name=%s %s, postalcode=%s, email=%s>" % (
@@ -155,6 +157,7 @@ class Product(db.Model):
     owner = db.relationship('User', backref='products')
     brand = db.relationship('Brand', backref='products')
     category = db.relationship('Category', backref='products')
+    history = db.relationship('History', backref='product')
 
     def __repr__(self):
         return "<Product prod_id=%d, cat_id=%d, owner_id=%d, model=%s, description=%s, condition=%s, avail=%r to %r, price=%r>" % (
