@@ -82,7 +82,7 @@ def search_radius(search_center, postalcodes, radius):
     return postalcodes
 
 
-def calc_dates(deltadays):
+def calc_default_dates(deltadays):
     """Takes an integer and returns two datetimes and two strings:
             today: datetime of today
             future: datetime of today plus the number of days
@@ -102,30 +102,29 @@ def calc_dates(deltadays):
     return dates
 
 
-def convert_strings_to_datetimes(date1_string, date2_string):
-    """Takes two dates as string in format "yyyy-mm-dd" (e.g. "2015-11-04"
-        for November 4, 2015) and returns a list of them as datetime objects.
+def convert_string_to_datetime(date_string):
+    """Takes in date as string in format "yyyy-mm-dd" (e.g. "2015-11-04"
+        for November 4, 2015) and returns datetime object.
     """
 
-    date1 = datetime.strptime(date1_string, "%Y-%m-%d")
-    date2 = datetime.strptime(date2_string, "%Y-%m-%d")
+    date = datetime.strptime(date_string, "%Y-%m-%d")
 
-    return [date1, date2]
+    return date
 
 
-def calc_num_days(date1_string, date2_string):
-    """Takes two dates as string in format "yyyy-mm-dd" (e.g. "2015-11-04"
-        for November 4, 2015) and returns number of days between them as an
-        integer.
+# def calc_num_days(date1_string, date2_string):
+#     """Takes two dates as string in format "yyyy-mm-dd" (e.g. "2015-11-04"
+#         for November 4, 2015) and returns number of days between them as an
+#         integer.
 
-        Subtracts date1 from date2.
+#         Subtracts date1 from date2.
 
-    """
+#     """
 
-    dates = convert_strings_to_datetimes(date1_string, date2_string)
-    date1 = dates[0]
-    date2 = dates[1]
-    days = (date2 - date1).days + 1
+#     dates = convert_strings_to_datetimes(date1_string, date2_string)
+#     date1 = dates[0]
+#     date2 = dates[1]
+#     days = (date2 - date1).days + 1
 
     return days
 

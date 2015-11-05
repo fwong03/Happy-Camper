@@ -8,7 +8,7 @@ from model import connect_to_db, db
 from model import User, Region, Product, BestUse, Tent
 # Category
 from helpers import get_lat_lngs, search_radius, make_product, get_brands
-from helpers import calc_dates, calc_num_days, convert_strings_to_datetimes
+from helpers import calc_default_dates, convert_string_to_datetime
 from datetime import datetime
 
 
@@ -17,8 +17,8 @@ app = Flask(__name__)
 # Required to use Flask sessions and the debug toolbar
 app.secret_key = "ABC"
 
-# Normally, if you use an undefined variable in Jinja2, it fails silently.
-# This is horrible. Fix this so that, instead, it raises an error.
+# If you use an undefined variable in Jinja2, it will fails silently. Put this
+# in to instead raise an error.
 app.jinja_env.undefined = StrictUndefined
 
 
@@ -56,6 +56,7 @@ def handle_login():
 
     if user:
         if user.password == password:
+            # Add user email to Flask session
             session['user'] = username
             flash("Welcome! Logged in as %s" % username)
             return redirect('/success')
@@ -124,7 +125,7 @@ def enter_site():
     """Signed in home page."""
 
     customer = User.query.filter(User.email == session['user']).one()
-    dates = calc_dates(30)
+    dates = calc_default_dates(30)
 
     return render_template("success.html", user=customer,
                            p_today=dates['today_string'],
@@ -169,7 +170,7 @@ def list_item():
 @app.route('/list-tent')
 def list_tent():
     allbrands = get_brands()
-    dates = calc_dates(30)
+    dates = calc_default_dates(30)
 
     return render_template("list-tent.html", brands=allbrands,
                            submit_route='/handle-tent',
@@ -197,8 +198,7 @@ def handle_tent_listing():
     # Get use_id from the BestUses table. This is required to make a tent.
     best_use = BestUse.query.filter(BestUse.use_name == bestuse).one()
 
-    # Set optional values, if any
-
+    # Set optional values, if any provided
     try:
         width = int(request.form.get("width"))
     except ValueError:
@@ -246,16 +246,18 @@ def show_results():
     date1 = request.args.get("date1")
     date2 = request.args.get("date2")
 
-    # Calc num days. This function takes in dates as a string.
-    days = calc_num_days(date1, date2)
+    # Convert the dates into datetimes and get the number of days the user is
+    # interested in renting an item so we can calculate his or her total rental cost.
+    date1 = convert_string_to_datetime(date1)
+    date2 = convert_string_to_datetime(date2)
 
-    # Then convert the dates into datetimes and add them to the session.
-    dates = convert_strings_to_datetimes(date1, date2)
-    date1 = dates[0]
-    date2 = dates[1]
+    # Add the rental dates to the flask session so we can access over multiple
+    # pages.
+    days = (date2 - date1).days + 1
 
     session['date1'] = date1
     session['date2'] = date2
+    session['num_days'] = days
 
     try:
         search_miles = int(search_miles)
@@ -316,7 +318,7 @@ def confirm_rental(prod_id):
 
     rental_start = session['date1']
     rental_end = session['date2']
-    days = (rental_end - rental_start).days + 1
+    days = session['num_days']
 
     prod = Product.query.get(prod_id)
 
