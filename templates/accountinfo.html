@@ -35,7 +35,27 @@
 <br>
 
 <h3>Items You Have Rented</h3>
-    <i> Not yet implemented </i>
+<table>
+        <tr>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Product</th>
+            <th>Total Cost</th>
+            <th>Actions Available</th>
+        </tr>
+        {% for history in histories %}
+            {% for history in histories %}
+            <tr>
+                <td>{{ product.category.cat_name }}</td>
+                <td>{{ product.brand.brand_name }}</td>
+                <td>{{ product.model }}</td>
+                <td>{{ product.avail_start_date.date().isoformat() }}</td>
+                <td>{{ product.avail_end_date.date().isoformat() }}</td>
+                <td>${{ '{:,.2f}'.format(product.price_per_day) }}</td>
+            {% endfor %}
+        {% endfor %}
+    </table>
+<br>
 
 
 <p> To add: edit info, deactivate account, unlist items for rent, items rented</p>

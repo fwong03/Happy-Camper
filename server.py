@@ -150,11 +150,14 @@ def show_account():
     phonenumber = user.phone
 
     inventory = Product.query.filter(Product.owner_user_id == user.user_id).all()
+    histories = db.session.query(History.history_id, History.start_date, History.end_date, Brand.brand_name, Product.model, History.total_cost).join(Product).join(Brand).filter(History.renter_user_id == user.user_id).all()
+
+
 
     return render_template("accountinfo.html", firstname=fname, lastname=lname,
                            street=staddress, city=cty, state=st, zipcode=zcode,
                            phone=phonenumber, email=session['user'],
-                           products=inventory)
+                           products=inventory, rentals=histories)
 
 
 @app.route('/list-item')
@@ -304,19 +307,19 @@ def show_item(prod_id):
     Routes either from Search Results page or List Item page.
     If click on Borrow This, routes to Borrowed version of this page.
     """
-    # If item available = True, show regular product detail page.
-    # If item available = False, show BOROWED version of page, which
-    # doesn't allow you to borrow the item.
-    # Show this BORROWED version after a user clicks "borrow this"
-    # SHOW TOTAL COST given the date range the user gave in search
+    # Make this a base template then make separate templates for
+    # tents, sleeping bags, etc that extend.
+    # Make a separate listing confirmation page for rentees.
+    # For potential renters, show total cost.
+    # Make a borrowed version if available = False.
 
     item = Product.query.get(prod_id)
 
     if item.available:
         return render_template("product-detail.html", product=item)
     else:
-        # Make a template and redirect to search results
-        return "Sorry! The %s %s is no longer available for rent." % (
+        # Make a template for this. 
+        return "Sorry! T search resultshe %s %s is no longer available for rent." % (
             item.brand.brand_name, item.model)
 
 
