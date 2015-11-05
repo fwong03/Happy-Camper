@@ -283,6 +283,15 @@ def show_results():
     if logged_in_user in users_in_area:
         users_in_area.remove(logged_in_user)
 
+    # Make and call a seprate function that does the following:
+    #   Get list of users in area
+    #   For each product they have for rent,
+    #       1. Check it's available
+    #       2. Check it's available for search dates.
+    #       3. If yes to both, separate into list of tents, sleeping bags, etc
+    #   Return these lists of tents, sleeping bags, etc in separate lists
+    # Display these lists in separate section in the search results page.
+
     return render_template("searchresults.html", location=search_area,
                            miles=search_miles, start_date=date1, end_date=date2,
                            num_days=days, users=users_in_area)
@@ -306,6 +315,7 @@ def show_item(prod_id):
     if item.available:
         return render_template("product-detail.html", product=item)
     else:
+        # Make a template and redirect to search results
         return "Sorry! The %s %s is no longer available for rent." % (
             item.brand.brand_name, item.model)
 
@@ -316,15 +326,14 @@ def confirm_rental(prod_id):
     confirms they actually meant to rent the item.
     """
 
-    rental_start = session['date1']
-    rental_end = session['date2']
-    days = session['num_days']
-
     prod = Product.query.get(prod_id)
 
+    # On template provide link to original search results if change their mind.
+
     return render_template("rent-confirm.html", product=prod,
-                           rental_start_date=rental_start,
-                           rental_end_date=rental_end, num_days=days)
+                           rental_start_date=session['date1'],
+                           rental_end_date=session['date2'],
+                           num_days=session['num_days'])
 
 
 @app.route('/rent/<int:prod_id>', methods=['POST'])
