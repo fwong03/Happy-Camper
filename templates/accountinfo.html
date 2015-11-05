@@ -10,55 +10,91 @@
     <p><b>Address: </b> {{ street }}, {{ city }}, {{ state }} {{ zipcode }}</p>
     <p><b>Phone: </b> {{ phone }}</p>
     <p><b>email: </b> {{ email }}</p>
+    <p><b>Actions available: </b>deactivate, edit account (not yet implemented)</p>
 <br>
-
 <h3>Items You Have Available for Rent</h3>
-    <table>
-        <tr>
-            <th>Category</th>
-            <th>Brand</th>
-            <th>Model</th>
-            <th>Available Start</th>
-            <th>Available End</th>
-            <th>Price</th>
-        </tr>
-        {% for product in products %}
+    {% if products_available %}
+        <table border="1" cellpadding="5">
             <tr>
-                <td>{{ product.category.cat_name }}</td>
-                <td>{{ product.brand.brand_name }}</td>
-                <td>{{ product.model }}</td>
-                <td>{{ product.avail_start_date.date().isoformat() }}</td>
-                <td>{{ product.avail_end_date.date().isoformat() }}</td>
-                <td>${{ '{:,.2f}'.format(product.price_per_day) }}</td>
-        {% endfor %}
-    </table>
-<br>
-
-<h3>Items You Have Rented</h3>
-<table>
-        <tr>
-            <th>Start Date</th>
-            <th>End Date</th>
-            <th>Product</th>
-            <th>Total Cost</th>
-            <th>Actions Available</th>
-        </tr>
-        {% for history in histories %}
-            {% for history in histories %}
-            <tr>
-                <td>{{ product.category.cat_name }}</td>
-                <td>{{ product.brand.brand_name }}</td>
-                <td>{{ product.model }}</td>
-                <td>{{ product.avail_start_date.date().isoformat() }}</td>
-                <td>{{ product.avail_end_date.date().isoformat() }}</td>
-                <td>${{ '{:,.2f}'.format(product.price_per_day) }}</td>
+                <th>Category</th>
+                <th>Brand</th>
+                <th>Model</th>
+                <th>Available Start</th>
+                <th>Available End</th>
+                <th>Price</th>
+                <th>Actions Available</th>
+            </tr>
+            {% for product in products_available %}
+                <tr>
+                    <td>{{ product.category.cat_name }}</td>
+                    <td>{{ product.brand.brand_name }}</td>
+                    <td>{{ product.model }}</td>
+                    <td>{{ product.avail_start_date.date().isoformat() }}</td>
+                    <td>{{ product.avail_end_date.date().isoformat() }}</td>
+                    <td>${{ '{:,.2f}'.format(product.price_per_day) }}</td>
+                    <td>not yet implemented (edit, delist)</td>
+                </tr>
             {% endfor %}
-        {% endfor %}
-    </table>
+        </table>
+    {% else %}
+        You have no products available for rent.
+{% endif %}
 <br>
 
 
-<p> To add: edit info, deactivate account, unlist items for rent, items rented</p>
-
+<h3>Items You Have Rented Out (Current and Past)</h3>
+    {% if products_not_available %}
+        <table border="1" cellpadding="5">
+            <tr>
+                <th>Category</th>
+                <th>Brand</th>
+                <th>Model</th>
+                <th>Rental Start</th>
+                <th>Rental End</th>
+                <th>Total Cost</th>
+                <th>Actions Available</th>
+            </tr>
+                {% for product in products_not_available %}
+                <tr>
+                    <td>{{ product.category.cat_name }}</td>
+                    <td>{{ product.brand.brand_name }}</td>
+                    <td>{{ product.model }}</td>
+                    <td>{{ product.avail_start_date.date().isoformat() }}</td>
+                    <td>{{ product.avail_end_date.date().isoformat() }}</td>
+                    <td>${{ '{:,.2f}'.format(product.price_per_day) }}</td>
+                    <td>not yet implemented (edit, delist)</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        You have no history of renting out products.
+{% endif %}
+<br>
+<h3>Items You Have Rented</h3>
+{% if histories %}
+    <table border="1" cellpadding="5">
+            <tr>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Product</th>
+                <th>Total Cost</th>
+                <th>Actions Available</th>
+            </tr>
+            {% for history in histories %}
+                {% for history in histories %}
+                <tr>
+                    <td>{{ history.start_date.date().isoformat() }}</td>
+                    <td>{{ history.end_date.date().isoformat() }}</td>
+                    <td>{{ history.brand_name }} {{ history.model }}</td>
+                    <td>${{ '{:,.2f}'.format(history.total_cost) }}</td>
+                    <td>rentee contact, rate experience (not yet implemented)</td>
+                </tr>
+                {% endfor %}
+            {% endfor %}
+        </table>
+    {% else %}
+        You have no rental history.
+{% endif %}
+<br>
 
 {% endblock %}

@@ -5,7 +5,7 @@ from jinja2 import StrictUndefined
 from flask import Flask, render_template, redirect, request, flash, session
 from flask_debugtoolbar import DebugToolbarExtension
 from model import connect_to_db, db
-from model import User, Region, Product, BestUse, Tent
+from model import User, Region, Product, BestUse, Tent, Brand, History
 # Category
 from helpers import get_lat_lngs, search_radius, make_product, get_brands
 from helpers import calc_default_dates, convert_string_to_datetime
@@ -149,15 +149,25 @@ def show_account():
     zcode = user.postalcode
     phonenumber = user.phone
 
-    inventory = Product.query.filter(Product.owner_user_id == user.user_id).all()
-    histories = db.session.query(History.history_id, History.start_date, History.end_date, Brand.brand_name, Product.model, History.total_cost).join(Product).join(Brand).filter(History.renter_user_id == user.user_id).all()
+    products_all = Product.query.filter(Product.owner_user_id == user.user_id).all()
+    products_avail = []
+    products_out = []
 
+    for product in products_all:
+        if product.available:
+            products_avail.append(product)
+        else:
+            products_out.append(product)
 
+    rentals = db.session.query(History.history_id, History.start_date,
+                                 History.end_date, Brand.brand_name, Product.model,
+                                 History.total_cost).join(Product).join(Brand).filter(History.renter_user_id == user.user_id).all()
 
     return render_template("accountinfo.html", firstname=fname, lastname=lname,
                            street=staddress, city=cty, state=st, zipcode=zcode,
                            phone=phonenumber, email=session['user'],
-                           products=inventory, rentals=histories)
+                           products_available=products_avail,
+                           products_not_available=products_out, histories=rentals)
 
 
 @app.route('/list-item')
