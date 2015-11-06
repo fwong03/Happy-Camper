@@ -65,7 +65,7 @@
                     <td>{{ history.brand_name }} {{ history.model }}</td>
                     <td>${{ '{:,.2f}'.format(history.total_cost) }}</td>
                     <td>{% if (today > history.start_date) %}
-                            Rental done
+                            Rental done or ongoing
                         {% else %}
                             {{ (history.start_date - today).days }} days until rental
                             {% endif %}

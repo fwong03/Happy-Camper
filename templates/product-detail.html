@@ -7,8 +7,7 @@
     <h2> Product Detail: {{ product.brand.brand_name }} {{ product.model }} </h2>
     <h3> Category: {{ product.category.cat_name }} </h3>
     <ul>
-        <li>Owner: {{ product.owner.fname }} {{ product.owner.lname }}</li>
-        <li>Owner location: {{ product.owner.city }}, {{ product.owner.region.full }}</li>
+        <li>Product location: {{ product.owner.city }}, {{ product.owner.region.full }}</li>
         <li>Available start date: {{ product.avail_start_date.date().isoformat() }}</li>
         <li>Available end date: {{ product.avail_end_date.date().isoformat() }}</li>
         <li>Price per day: ${{ '{:,.2f}'.format(product.price_per_day) }}</li>
@@ -16,9 +15,23 @@
         <li>Condition: {{ product.condition }}</li>
     </ul>
 
-    <form action="/rent-confirm/{{ product.prod_id }}" method="POST">
-        <input type="submit" value="Rent This">
-    </form>
+        {% if product.owner.email != session['user'] %}
+            <p>Your rental period info:</p>
+            <ul>
+                <li>Rental start date: {{ session['date1'].date().isoformat() }}</li>
+                <li>Rental end date: {{ session['date2'].date().isoformat() }}</li>
+            <li>Number of days: {{ session['num_days'] }}
+            <li>Total cost: ${{ '{:,.2f}'.format(session['num_days'] * product.price_per_day) }}</li>
+            </ul>
+
+            <form action="/rent-confirm/{{ product.prod_id }}" method="POST">
+            <input type="submit" value="Rent This">
+            </form>
+
+             <p>Or, go back to your <a href="/searchresults?search_area={{ session['search_area'] }}&search_miles={{ session['search_radius'] }}&date1={{ date1 }}&date2={{ date2 }}">search results</a></p>
+        {% endif %}
+
+
 
 
 

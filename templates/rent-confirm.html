@@ -10,19 +10,23 @@
         <li>Product: {{ product.brand.brand_name }} {{ product.model }}</li>
         <li> Category: {{ product.category.cat_name }} </li> 
         <li>Owner location: {{ product.owner.city }}, {{ product.owner.region.full }}</li>
-        <li>Rental start date: {{ rental_start_date.date().isoformat() }}</li>
-        <li>Rental end date: {{ rental_end_date.date().isoformat() }}</li>
+        <li>Rental start date: {{ session['date1'].date().isoformat() }}</li>
+        <li>Rental end date: {{ session['date2'].date().isoformat() }}</li>
         <li>Price per day: ${{ '{:,.2f}'.format(product.price_per_day) }}</li>
-        <li><b>NUMBER OF DAYS:</b> {{ num_days }}
-        <li><b>TOTAL COST:</b> ${{ '{:,.2f}'.format(num_days * product.price_per_day) }}</li>
+        <br>
+    </ul>
+    <p><b>Number of Days and Cost</b></p>
+    <ul>
+        <li>NUMBER OF DAYS: {{ session['num_days'] }}
+        <li>TOTAL COST: ${{ '{:,.2f}'.format(session['num_days'] * product.price_per_day) }}</li>
     </ul>
 
-    <p><b>You are about to rent this item for {{ num_days }} days with a total cost of ${{ '{:,.2f}'.format(num_days * product.price_per_day) }}.<br>
-    Are you sure this is what you want to do?<b></p>
+    <p>You are about to rent this item for {{ session['num_days'] }} days with a total cost of ${{ '{:,.2f}'.format(session['num_days'] * product.price_per_day) }}.<br><br>
+    <b>Are you sure this is what you want to do?</b></p>
     <form action="/handle-rental/{{ product.prod_id }}" method="POST">
         <input type="submit" value="Fo shizzle."><br><br>
 
-    <a href="/success">Oops I messed up. Go back to homepage to search again until I figure out how to link you to your original search results.</a> 
+ <p>Nope. Go back to my <a href="/searchresults?search_area={{ session['search_area'] }}&search_miles={{ session['search_radius'] }}&date1={{ date1 }}&date2={{ date2 }}">search results</a></p>
 
 
 {% endblock %}

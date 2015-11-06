@@ -283,6 +283,12 @@ def show_results():
     date1 = request.args.get("date1")
     date2 = request.args.get("date2")
 
+    try:
+        search_miles = int(search_miles)
+    except ValueError:
+        flash("Search radius must be an integer. Please try again.")
+        return redirect('/success')
+
     # Convert the dates into datetimes and get the number of days the user is
     # interested in renting an item so we can calculate his or her total rental cost.
     date1 = convert_string_to_datetime(date1)
@@ -295,12 +301,8 @@ def show_results():
     session['date1'] = date1
     session['date2'] = date2
     session['num_days'] = days
-
-    try:
-        search_miles = int(search_miles)
-    except ValueError:
-        flash("Search radius must be an integer. Please try again.")
-        return redirect('/success')
+    session['search_area'] = search_area
+    session['search_radius'] = search_miles
 
     # Find distinct postal codes in the database. This query returns a list of
     # tuples.
@@ -354,9 +356,12 @@ def show_item(prod_id):
     # Make a borrowed version if available = False.
 
     item = Product.query.get(prod_id)
+    date1_string = session['date1'].date().isoformat()
+    date2_string = session['date2'].date().isoformat()
 
     if item.available:
-        return render_template("product-detail.html", product=item)
+        return render_template("product-detail.html", product=item,
+                               date1=date1_string, date2=date2_string)
     else:
         # Make a template for this.
         return "Sorry! T search results he %s %s is no longer available for rent." % (
@@ -370,13 +375,14 @@ def confirm_rental(prod_id):
     """
 
     prod = Product.query.get(prod_id)
+    date1_string = session['date1'].date().isoformat()
+    date2_string = session['date2'].date().isoformat()
 
     # On template provide link to original search results if change their mind.
 
     return render_template("rent-confirm.html", product=prod,
-                           rental_start_date=session['date1'],
-                           rental_end_date=session['date2'],
-                           num_days=session['num_days'])
+                           date1=date1_string,
+                           date2=date2_string)
 
 
 @app.route('/handle-rental/<int:prod_id>', methods=['POST'])
