@@ -175,6 +175,7 @@ def show_account():
 @app.route('/confirm-deactivate-account')
 def confirm_deactivate_account():
     """Confirm the user wants to deactivate account"""
+
     return render_template("confirm-deactivate-account.html")
 
 
@@ -185,6 +186,9 @@ def deactivate_account():
     user.active = 0
     db.session.commit()
     session.clear()
+
+    # Change this to redirect to signedout honepage with flash message.
+    # Can then delete finalized-deactivate-account route.
 
     return redirect('/finalized-deactivate-account')
 
@@ -276,7 +280,6 @@ def show_results():
     Routes to Item Detail page.
 
     """
-    # STILL LEFT TO DO: Return products available within dates given
 
     search_area = request.args.get("search_area")
     search_miles = request.args.get("search_miles")
@@ -304,38 +307,27 @@ def show_results():
     session['search_area'] = search_area
     session['search_radius'] = search_miles
 
-    # Find distinct postal codes in the database. This query returns a list of
-    # tuples.
+    # Find distinct postal codes in the database. 
     query = db.session.query(User.postalcode).distinct()
     postalcodes = query.all()
 
-    # Call helper function that returns postal codes within the given
-    # search radius.
+    # Get postal codes within the given search radius.
     postal_codes = search_radius(search_area, postalcodes, search_miles)
 
-    # Now we get the users within the postal codes returned by searcg_radius.
+    # Get users within the postal codes.
     users_in_area = User.query.filter(User.postalcode.in_(postal_codes)).all()
 
-    # Take out the currently logged in user, if in the users_in_area list
+    # Take out the currently logged in user, if in the list.
     logged_in_user = User.query.filter(User.email == session['user']).one()
 
     if logged_in_user in users_in_area:
         users_in_area.remove(logged_in_user)
 
+    # Get categories so can categorize products
     categories = Category.query.all()
     categorized_products = categorize_products(categories, users_in_area,
                                                session['date1'], session['date2'])
-
     sorted_cats = sorted(categorized_products.keys())
-
-    # Make and call a seprate function that does the following:
-    #   Get list of users in area
-    #   For each product they have for rent,
-    #       1. Check it's available
-    #       2. Check it's available for search dates.
-    #       3. If yes to both, separate into list of tents, sleeping bags, etc
-    #   Return these lists of tents, sleeping bags, etc in separate lists
-    # Display these lists in separate section in the search results page.
 
     return render_template("searchresults.html", location=search_area,
                            miles=search_miles, start_date=date1, end_date=date2,
@@ -349,11 +341,7 @@ def show_item(prod_id):
     Routes either from Search Results page or List Item page.
     If click on Borrow This, routes to Borrowed version of this page.
     """
-    # Make this a base template then make separate templates for
-    # tents, sleeping bags, etc that extend.
-    # Make a separate listing confirmation page for rentees.
-    # For potential renters, show total cost.
-    # Make a borrowed version if available = False.
+    # Make a borrowed template version if available = False instead
 
     item = Product.query.get(prod_id)
     date1_string = session['date1'].date().isoformat()
@@ -363,8 +351,7 @@ def show_item(prod_id):
         return render_template("product-detail.html", product=item,
                                date1=date1_string, date2=date2_string)
     else:
-        # Make a template for this.
-        return "Sorry! T search results he %s %s is no longer available for rent." % (
+        return "Sorry! The %s %s is no longer available for rent." % (
             item.brand.brand_name, item.model)
 
 
@@ -377,8 +364,6 @@ def confirm_rental(prod_id):
     prod = Product.query.get(prod_id)
     date1_string = session['date1'].date().isoformat()
     date2_string = session['date2'].date().isoformat()
-
-    # On template provide link to original search results if change their mind.
 
     return render_template("rent-confirm.html", product=prod,
                            date1=date1_string,

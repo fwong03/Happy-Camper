@@ -284,12 +284,11 @@ class Rating(db.Model):
 
 
 ##############################################################################
-# Helper functions
 
 def connect_to_db(app):
     """Connect the database to our Flask app."""
 
-    # Configure to use our SQLite database
+    # Configure to use SQLite database
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///camper.db'
     app.config['SQLALCHEMY_ECHO'] = True
     db.app = app
@@ -297,8 +296,7 @@ def connect_to_db(app):
 
 
 if __name__ == "__main__":
-    # As a convenience, if we run this module interactively, it will leave
-    # you in a state of being able to work with the database directly.
+    # This allows direct database interaction if this module is run interactively.
 
     from server import app
     connect_to_db(app)
