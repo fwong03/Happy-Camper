@@ -7,28 +7,34 @@
     <p>Location: {{ location }}</p>
     <p>Search radius: {{ miles }} miles</p>
     <p>Dates: {{ start_date.date().isoformat() }} to {{ end_date.date().isoformat() }} </p>
+    <p>----------------------------------------</p>
 
-    <table border="1" cellpadding="5">
-        <tr>
-            <th>Category</th>
-            <th>Brand and Model</th>
-            <th>Price Per Day</th>
-            <th>Cost for {{num_days }} days</th>
-            <th>product location</th>
-        </tr>
-        {% for user in users %}
-        {% for product in user.products %}
-            <tr>
-                <td>{{ product.category.cat_name }}</td>
-                 <td><a href="/product-detail/{{ product.prod_id }}">
-                     {{ product.brand.brand_name }} {{ product.model }} </td>
-                <td>${{ '{:,.2f}'.format(product.price_per_day) }}</td>
-                <td>${{ '{:,.2f}'.format(num_days * product.price_per_day) }}</td>
-                <td>{{ user.city }}</td>
-            </tr>
-        {% endfor %}
-        {% endfor %}
-    </table><br>
+    {% for category in sorted_categories %}
+    <h3>{{ category }}</h3>
+        {% if products[category] %}
+            <table border="1" cellpadding="5">
+                <tr>
+                    <th>Brand and Model</th>
+                    <th>Price Per Day</th>
+                    <th>Cost for {{num_days }} days</th>
+                    <th>product location</th>
+                </tr>
+                {% for product in products[category] %}
+                    <tr>
+                        <td><a href="/product-detail/{{ product.prod_id }}">
+                             {{ product.brand.brand_name }} {{ product.model }} </td>
+                        <td>${{ '{:,.2f}'.format(product.price_per_day) }}</td>
+                        <td>${{ '{:,.2f}'.format(num_days * product.price_per_day) }}</td>
+                        <td>{{ product.owner.city }}</td>
+                        </tr>
+                {% endfor %}
+            </table><br>
+        {% else %}
+            <p>Sorry, there are no {{ category }} are available in your search area.</p>
+            <br><br><br>
+        {% endif  %}
+    {% endfor %}
+
 
     <p><a href="/success">Return to homepage</a></p>
 

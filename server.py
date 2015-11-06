@@ -4,12 +4,12 @@ from jinja2 import StrictUndefined
 
 from flask import Flask, render_template, redirect, request, flash, session
 from flask_debugtoolbar import DebugToolbarExtension
+
 from model import connect_to_db, db
-from model import User, Region, Product, BestUse, Tent, Brand, History
-# Category
-from helpers import get_lat_lngs, search_radius, make_product, get_brands
+from model import User, Region, Product, BestUse, Tent, Brand, History, Category
+from helpers import get_lat_lngs, search_radius
 from helpers import calc_default_dates, convert_string_to_datetime
-from datetime import datetime
+from helpers import make_product, categorize_products, get_brands
 
 
 app = Flask(__name__)
@@ -160,8 +160,8 @@ def show_account():
             products_out.append(product)
 
     rentals = db.session.query(History.history_id, History.start_date,
-                                 History.end_date, Brand.brand_name, Product.model,
-                                 History.total_cost).join(Product).join(Brand).filter(History.renter_user_id == user.user_id).all()
+                               History.end_date, Brand.brand_name, Product.model,
+                               History.total_cost).join(Product).join(Brand).filter(History.renter_user_id == user.user_id).all()
 
     return render_template("accountinfo.html", firstname=fname, lastname=lname,
                            street=staddress, city=cty, state=st, zipcode=zcode,
@@ -296,6 +296,11 @@ def show_results():
     if logged_in_user in users_in_area:
         users_in_area.remove(logged_in_user)
 
+    categories = Category.query.all()
+    categorized_products = categorize_products(categories, users_in_area)
+    
+    sorted_cats = sorted(categorized_products.keys())
+
     # Make and call a seprate function that does the following:
     #   Get list of users in area
     #   For each product they have for rent,
@@ -307,7 +312,7 @@ def show_results():
 
     return render_template("searchresults.html", location=search_area,
                            miles=search_miles, start_date=date1, end_date=date2,
-                           num_days=days, users=users_in_area)
+                           num_days=days, sorted_categories=sorted_cats, products=categorized_products)
 
 
 @app.route('/product-detail/<int:prod_id>')
@@ -328,8 +333,8 @@ def show_item(prod_id):
     if item.available:
         return render_template("product-detail.html", product=item)
     else:
-        # Make a template for this. 
-        return "Sorry! T search resultshe %s %s is no longer available for rent." % (
+        # Make a template for this.
+        return "Sorry! T search results he %s %s is no longer available for rent." % (
             item.brand.brand_name, item.model)
 
 

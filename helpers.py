@@ -112,23 +112,6 @@ def convert_string_to_datetime(date_string):
     return date
 
 
-# def calc_num_days(date1_string, date2_string):
-#     """Takes two dates as string in format "yyyy-mm-dd" (e.g. "2015-11-04"
-#         for November 4, 2015) and returns number of days between them as an
-#         integer.
-
-#         Subtracts date1 from date2.
-
-#     """
-
-#     dates = convert_strings_to_datetimes(date1_string, date2_string)
-#     date1 = dates[0]
-#     date2 = dates[1]
-#     days = (date2 - date1).days + 1
-
-    return days
-
-
 def get_brands():
     """Takes no arguments and returns a list of all brands in the database.
     """
@@ -194,5 +177,22 @@ def make_product():
     return product
 
 
+def categorize_products(categories, users):
+    """Takes in list of Category objects and User objects and returns dictionary
+        of lists of products by category.
 
+        Category ID/Category: 1/tents, 2/sleeping_bags, 3/pads,
+                              4/packs, 5/stoves, 6/water_filters
 
+    """
+    inventory = {}
+
+    for category in categories:
+        inventory[category.cat_name] = []
+
+    for user in users:
+        for product in user.products:
+            if product.available:
+                inventory[product.category.cat_name].append(product)
+
+    return inventory
