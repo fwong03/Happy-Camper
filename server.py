@@ -41,7 +41,7 @@ def login():
 def handle_logout():
     """Process logout"""
 
-    session.pop('user')
+    session.clear()
     return redirect('/')
 
 
@@ -54,15 +54,14 @@ def handle_login():
 
     user = User.query.filter(User.email == username).one()
 
-    if user:
-        if user.password == password:
-            # Add user email to Flask session
-            session['user'] = username
-            flash("Welcome! Logged in as %s" % username)
-            return redirect('/success')
-        else:
-            flash("Login failed. Please try again.")
-            return redirect('/')
+    if (user.active) and (user.password == password):
+        # Add user email to Flask session
+        session['user'] = username
+        flash("Welcome! Logged in as %s" % username)
+        return redirect('/success')
+    else:
+        flash("Login failed. Please try again.")
+        return redirect('/')
 
 
 @app.route('/createaccount')
@@ -171,6 +170,28 @@ def show_account():
                            products_available=products_avail,
                            products_not_available=products_out,
                            histories=rentals, today=today)
+
+
+@app.route('/confirm-deactivate-account')
+def confirm_deactivate_account():
+    """Confirm the user wants to deactivate account"""
+    return render_template("confirm-deactivate-account.html")
+
+
+@app.route('/handle-deactivate-account', methods=['POST'])
+def deactivate_account():
+    """Deactivate user account"""
+    user = User.query.filter(User.email == session['user']).one()
+    user.active = 0
+    db.session.commit()
+    session.clear()
+
+    return redirect('/finalized-deactivate-account')
+
+
+@app.route('/finalized-deactivate-account')
+def say_goodbye():
+    return render_template("goodbye.html")
 
 
 @app.route('/list-item')

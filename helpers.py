@@ -189,8 +189,9 @@ def categorize_products(categories, users, start_date, end_date):
         inventory[category.cat_name] = []
 
     for user in users:
-        for product in user.products:
-            if product.available and (product.avail_start_date <= start_date) and (product.avail_end_date >= end_date):
-                    inventory[product.category.cat_name].append(product)
+        if user.active:
+            for product in user.products:
+                if product.available and (product.avail_start_date <= start_date) and (product.avail_end_date >= end_date):
+                        inventory[product.category.cat_name].append(product)
 
     return inventory
