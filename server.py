@@ -10,7 +10,7 @@ from model import User, Region, Product, BestUse, Tent, Brand, History, Category
 from helpers import get_lat_lngs, search_radius
 from helpers import calc_default_dates, convert_string_to_datetime
 from helpers import make_product, categorize_products, get_brands
-
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -149,6 +149,8 @@ def show_account():
     zcode = user.postalcode
     phonenumber = user.phone
 
+    today = datetime.today()
+
     products_all = Product.query.filter(Product.owner_user_id == user.user_id).all()
     products_avail = []
     products_out = []
@@ -167,7 +169,8 @@ def show_account():
                            street=staddress, city=cty, state=st, zipcode=zcode,
                            phone=phonenumber, email=session['user'],
                            products_available=products_avail,
-                           products_not_available=products_out, histories=rentals)
+                           products_not_available=products_out,
+                           histories=rentals, today=today)
 
 
 @app.route('/list-item')
