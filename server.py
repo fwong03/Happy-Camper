@@ -349,17 +349,29 @@ def confirm_rental(prod_id):
                            num_days=session['num_days'])
 
 
-@app.route('/rent/<int:prod_id>', methods=['POST'])
-def rent_item(prod_id):
+@app.route('/handle-rental/<int:prod_id>', methods=['POST'])
+def handle_rental(prod_id):
+    """Process a rental. Create associated History object.
 
-    # Make rental confirmation page inbetween product detail and this one.
-    # TO DO: Create associated History object.
-
+    """
+    user = User.query.filter(User.email == session['user']).one()
     product = Product.query.get(prod_id)
+    cost = product.price_per_day * session['num_days']
+
+    history = History(prod_id=prod_id, renter_user_id=user.user_id,
+                      start_date=session['date1'], end_date=session['date2'],
+                      total_cost=cost)
+
     product.available = False
+    db.session.add(history)
     db.session.commit()
 
-    flash("You've succcessfully rented %s %s!" % (product.brand.brand_name, product.model))
+    return redirect('/rental-finalized')
+
+
+@app.route('/rental-finalized')
+def rent_item():
+    """Show rental confirmation page to user."""
 
     return render_template("rent-final.html")
 

@@ -12,6 +12,8 @@
     <p><b>email: </b> {{ email }}</p>
     <p><b>Actions available: </b>deactivate, edit account (not yet implemented)</p>
 <br>
+------------------------------------------------------------
+<br>
 <h3>Items You Have Available for Rent</h3>
     {% if products_available %}
         <table border="1" cellpadding="5">
@@ -81,7 +83,6 @@
                 <th>Actions Available</th>
             </tr>
             {% for history in histories %}
-                {% for history in histories %}
                 <tr>
                     <td>{{ history.start_date.date().isoformat() }}</td>
                     <td>{{ history.end_date.date().isoformat() }}</td>
@@ -89,7 +90,6 @@
                     <td>${{ '{:,.2f}'.format(history.total_cost) }}</td>
                     <td>rentee contact, rate experience (not yet implemented)</td>
                 </tr>
-                {% endfor %}
             {% endfor %}
         </table>
     {% else %}

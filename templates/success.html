@@ -4,26 +4,19 @@
 
 {% block content %}
 
-    <h2>Welcome {{ user.fname }}! You're signed in. Your options are the following:</h2>
+    <h2>Your options are the following:</h2>
     <ul>
-        <li><a href="/list-item">List an item to rent out</a></li>
-
+        <li><a href="/list-item"><b>List an item</b></a></li><br>
         <form action="/searchresults">
-        <li>Search for an item:</li>
-            <ul>
-                <li>Enter search center and search radius:</li>
-                    City and state and/or zipcode to center search around:: <input type="text" size="32" value={{ user.postalcode }} name="search_area"><br>
-                    <br>
+            <li><b>Search for gear:</b></li>
+                <p>(1) Enter search center and search radius:</P>
+                    City and state and/or zipcode: <input type="text" size="32" value={{ user.postalcode }} name="search_area"><br>
+                 <br>
                     Search radius (miles): <input type="text" size="4" value="20" name="search_miles"><br>
-                </li>
-                <li>Now tell us your dates of interest in format YYYY-mm-dd:</li>
-                        Start Date: <input type="text" size="10" value ={{ p_today }} name="date1">
-                        <br>
-                        End Date: <input type="text" size="10" value ={{ p_month }} name="date2">
-                </ul>
-                <input type="submit" value="Search for Gear">
-
-        <li><a href="/account-info">Check out your account</a></li>
+                <p>(2) Dates of interest (format YYYY-mm-dd):</p>
+                        Start Date: <input type="text" size="10" value ={{ p_today }} name="date1"><br><br>
+                        End Date: <input type="text" size="10" value ={{ p_month }} name="date2"><br><br>
+            <input type="submit" value="Search for Gear">
     </ul>
 
 {% endblock %}
