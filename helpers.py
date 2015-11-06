@@ -177,12 +177,10 @@ def make_product():
     return product
 
 
-def categorize_products(categories, users):
-    """Takes in list of Category objects and User objects and returns dictionary
-        of lists of products by category.
-
-        Category ID/Category: 1/tents, 2/sleeping_bags, 3/pads,
-                              4/packs, 5/stoves, 6/water_filters
+def categorize_products(categories, users, start_date, end_date):
+    """Takes in list of Category objects, User objects, and rental start and end
+        dates and returns dictionary of category for keys and associated lists
+        of products that are available during those dates.
 
     """
     inventory = {}
@@ -192,7 +190,7 @@ def categorize_products(categories, users):
 
     for user in users:
         for product in user.products:
-            if product.available:
-                inventory[product.category.cat_name].append(product)
+            if product.available and (product.avail_start_date <= start_date) and (product.avail_end_date >= end_date):
+                    inventory[product.category.cat_name].append(product)
 
     return inventory

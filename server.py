@@ -297,8 +297,9 @@ def show_results():
         users_in_area.remove(logged_in_user)
 
     categories = Category.query.all()
-    categorized_products = categorize_products(categories, users_in_area)
-    
+    categorized_products = categorize_products(categories, users_in_area,
+                                               session['date1'], session['date2'])
+
     sorted_cats = sorted(categorized_products.keys())
 
     # Make and call a seprate function that does the following:
