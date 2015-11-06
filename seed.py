@@ -1,5 +1,5 @@
 from model import Region, User, BestUse, Category, Brand, Product, Tent
-from model import FillType, Gender, SleepingBag, History
+from model import FillType, Gender, SleepingBag, History, Rating
 from model import connect_to_db, db
 from server import app
 from datetime import datetime
@@ -240,7 +240,6 @@ def load_histories():
     for row in open("data/historiesdata"):
         row = row.strip()
         row = row.split("|")
-        print row
 
         product = int(row[0])
         renter = int(row[1])
@@ -273,6 +272,27 @@ def load_histories():
     db.session.commit()
 
 
+def load_ratings():
+    """Load ratings"""
+
+    print "Ratings"
+    Category.query.delete()
+
+    for row in open("data/ratingsdata"):
+        row = row.strip()
+        row = row.split("|")
+
+        num_stars = int(row[0])
+        text_comments = row[1]
+
+        a = Rating(stars=num_stars, comments=text_comments)
+
+        db.session.add(a)
+
+    db.session.commit()
+
+
+
 if __name__ == "__main__":
     connect_to_db(app)
 
@@ -290,4 +310,5 @@ if __name__ == "__main__":
     load_filltypes()
     load_gendertypes()
     load_sleepingbags()
+    load_ratings()
     load_histories()
