@@ -124,7 +124,7 @@ def enter_site():
     """Signed in home page."""
 
     customer = User.query.filter(User.email == session['user']).one()
-    dates = calc_default_dates(30)
+    dates = calc_default_dates(7)
 
     return render_template("success.html", user=customer,
                            p_today=dates['today_string'],
@@ -307,7 +307,7 @@ def show_results():
     session['search_area'] = search_area
     session['search_radius'] = search_miles
 
-    # Find distinct postal codes in the database. 
+    # Find distinct postal codes in the database.
     query = db.session.query(User.postalcode).distinct()
     postalcodes = query.all()
 
@@ -353,6 +353,24 @@ def show_item(prod_id):
     else:
         return "Sorry! The %s %s is no longer available for rent." % (
             item.brand.brand_name, item.model)
+
+
+@app.route('/owner-rating/<int:owner_user_id>')
+def show_owner_rating(owner_user_id):
+    """Show owner star ratings and any comments.
+
+    Routes from Product detail (and Account Info?) page.
+    """
+
+    owner = User.query.get(owner_user_id)
+
+   #  sqlite> SELECT u.fname, u.lname, r.stars, r.comments
+   # ...> FROM Users as u
+   # ...> JOIN Products as p ON (p.owner_user_id = u.user_id)
+   # ...> JOIN Histories as h ON (h.prod_id = p.prod_id)
+   # ...> JOIN Ratings as r ON (h.owner_rate_id = r.rate_id);
+
+    return "This will be owner rating"
 
 
 @app.route('/rent-confirm/<int:prod_id>', methods=['POST'])

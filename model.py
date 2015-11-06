@@ -267,8 +267,14 @@ class History(db.Model):
     renter_rate_id = db.Column(db.Integer, db.ForeignKey('ratings.rate_id'))
     prod_rate_id = db.Column(db.Integer, db.ForeignKey('ratings.rate_id'))
 
+
+    owner_ratings = db.relationship('Rating', foreign_keys='[History.owner_rate_id]')
+    renter_ratings = db.relationship('Rating', foreign_keys='[History.renter_rate_id]')
+    product_ratings = db.relationship('Rating', foreign_keys='[History.prod_rate_id]')
+
+
     def __repr__(self):
-        return "<prod_id=%d, renter_user_id=%d, start_date=%r, end_date=%r, total_cost=%r>" % (
+        return "<History prod_id=%d, renter_user_id=%d, start_date=%r, end_date=%r, total_cost=%r>" % (
             self.prod_id, self.renter_user_id, self.start_date, self.end_date,
             self.total_cost)
 
@@ -281,6 +287,10 @@ class Rating(db.Model):
     rate_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     stars = db.Column(db.Integer, nullable=False)
     comments = db.Column(db.String(128))
+
+    def __repr__(self):
+        return "<Rating rate_id=%d, stars=%d, comments=%s>" % (self.rate_id,
+                self.stars, self.comments)
 
 
 ##############################################################################

@@ -276,7 +276,7 @@ def load_ratings():
     """Load ratings"""
 
     print "Ratings"
-    Category.query.delete()
+    Rating.query.delete()
 
     for row in open("data/ratingsdata"):
         row = row.strip()
