@@ -195,3 +195,15 @@ def categorize_products(categories, users, start_date, end_date):
                         inventory[product.category.cat_name].append(product)
 
     return inventory
+
+
+def get_owner_ratings(user):
+
+    owner_ratings = set([])
+    products = user.products
+
+    for product in products:
+        for history in product.history:
+            owner_ratings.add(history.owner_rating)
+
+    return owner_ratings

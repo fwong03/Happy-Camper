@@ -10,7 +10,9 @@ from model import User, Region, Product, BestUse, Tent, Brand, History, Category
 from helpers import get_lat_lngs, search_radius
 from helpers import calc_default_dates, convert_string_to_datetime
 from helpers import make_product, categorize_products, get_brands
+from helpers import get_owner_ratings
 from datetime import datetime
+
 
 app = Flask(__name__)
 
@@ -361,16 +363,15 @@ def show_owner_rating(owner_user_id):
 
     Routes from Product detail (and Account Info?) page.
     """
-
     owner = User.query.get(owner_user_id)
+    owner_ratings = set([])
+    products = owner.products
 
-   #  sqlite> SELECT u.fname, u.lname, r.stars, r.comments
-   # ...> FROM Users as u
-   # ...> JOIN Products as p ON (p.owner_user_id = u.user_id)
-   # ...> JOIN Histories as h ON (h.prod_id = p.prod_id)
-   # ...> JOIN Ratings as r ON (h.owner_rate_id = r.rate_id);
+    for product in products:
+        for history in product.history:
+            owner_ratings.add(history.owner_rating)
 
-    return "This will be owner rating"
+    return render_template("owner-rating.html", ratings=owner_ratings)
 
 
 @app.route('/rent-confirm/<int:prod_id>', methods=['POST'])

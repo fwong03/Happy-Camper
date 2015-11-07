@@ -50,10 +50,7 @@ class User(db.Model):
     # option to accept nine-digit zip codes.
     postalcode = db.Column(db.String(10), nullable=False)
 
-    # Use pyzipcode to convert zip code to lat lngs?
-    # With pyzip can find zipcodes within a radius of a given zipcode.
-    # Make this non nullable once figure out how you're going to do this.
-    # Index these since will likely use to search for nearby items.
+    # Get rid of these? Don't need anymore?
     lat = db.Column(db.Float)
     lng = db.Column(db.Float)
 
@@ -219,7 +216,7 @@ class Gender(db.Model):
 
 
 class SleepingBag(db.Model):
-    """Slpeping bags is one of the subset tables of Product"""
+    """Sleeping bags is one of the subset tables of Product"""
 
     __tablename__ = 'sleepingbags'
 
@@ -234,6 +231,7 @@ class SleepingBag(db.Model):
     length = db.Column(db.Integer)
     # F, M, or U for female, male, unisex
     gender_code = db.Column(db.String(1), db.ForeignKey('genders.gender_code'))
+
 
     def __repr__(self):
         return "<Sleeping Bag prod_id=%d, fill_code=%s, temp_rating=%d, weight=%d, length=%d, gender=%s>" % (
@@ -267,10 +265,10 @@ class History(db.Model):
     renter_rate_id = db.Column(db.Integer, db.ForeignKey('ratings.rate_id'))
     prod_rate_id = db.Column(db.Integer, db.ForeignKey('ratings.rate_id'))
 
-
-    owner_ratings = db.relationship('Rating', foreign_keys='[History.owner_rate_id]')
-    renter_ratings = db.relationship('Rating', foreign_keys='[History.renter_rate_id]')
-    product_ratings = db.relationship('Rating', foreign_keys='[History.prod_rate_id]')
+    # http://docs.sqlalchemy.org/en/latest/orm/join_conditions.html
+    owner_rating = db.relationship('Rating', foreign_keys='[History.owner_rate_id]')
+    renter_rating = db.relationship('Rating', foreign_keys='[History.renter_rate_id]')
+    product_rating = db.relationship('Rating', foreign_keys='[History.prod_rate_id]')
 
 
     def __repr__(self):
