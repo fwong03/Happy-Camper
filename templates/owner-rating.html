@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Product Owner Rating{% endblock %}
+
+{% block content %}
+
+<h3>Average Star Rating</h3>
+   <ul>
+    {% for rating in ratings %}
+    <li> {{ rating.stars }} </li>
+    {% endfor %}
+</ul>
+<h3>Comments</h3>
+   <table border="1" cellpadding="5">
+        <tr>
+            <th>Stars (out of 4)</th>
+            <th>Comments</th>
+        </tr>
+    {% for rating in ratings %}
+    <tr>
+        <td>{{ rating.stars }}</td>
+        <td>{{ rating.comments }}</td>
+    {% endfor %}
+</table>
+
+
+{% endblock %}
