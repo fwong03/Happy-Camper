@@ -357,21 +357,41 @@ def show_item(prod_id):
             item.brand.brand_name, item.model)
 
 
-@app.route('/owner-rating/<int:owner_user_id>')
-def show_owner_rating(owner_user_id):
+@app.route('/owner-rating/<int:prod_id>')
+def show_owner_rating(prod_id):
     """Show owner star ratings and any comments.
 
     Routes from Product detail (and Account Info?) page.
     """
-    owner = User.query.get(owner_user_id)
+    product = Product.query.get(prod_id)
+    user = product.owner
+    products = user.products
+
     owner_ratings = set([])
-    products = owner.products
 
     for product in products:
-        for history in product.history:
-            owner_ratings.add(history.owner_rating)
+        for history in product.histories:
+            if history.owner_rating:
+                owner_ratings.add(history.owner_rating)
 
-    return render_template("owner-rating.html", ratings=owner_ratings)
+    sum_stars = 0
+    count_star_ratings = 0
+    avg_star_rating = 0
+
+    if owner_ratings:
+        print "\n\n Owner ratings is true"
+        for rating in owner_ratings:
+            print "\n\nRating: ", rating
+            if rating.stars:
+                sum_stars += rating.stars
+                count_star_ratings += 1
+
+        avg_star_rating = sum_stars / count_star_ratings
+    else:
+        print "\n\nOwner ratings is false"
+
+    return render_template("owner-rating.html", ratings=owner_ratings,
+                           average=avg_star_rating, prod=product)
 
 
 @app.route('/rent-confirm/<int:prod_id>', methods=['POST'])

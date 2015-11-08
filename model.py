@@ -154,7 +154,7 @@ class Product(db.Model):
     owner = db.relationship('User', backref='products')
     brand = db.relationship('Brand', backref='products')
     category = db.relationship('Category', backref='products')
-    history = db.relationship('History', backref='product')
+    histories = db.relationship('History', backref='product')
 
     def __repr__(self):
         return "<Product prod_id=%d, cat_id=%d, owner_id=%d, model=%s, description=%s, condition=%s, avail=%r to %r, price=%r>" % (
@@ -270,11 +270,10 @@ class History(db.Model):
     renter_rating = db.relationship('Rating', foreign_keys='[History.renter_rate_id]')
     product_rating = db.relationship('Rating', foreign_keys='[History.prod_rate_id]')
 
-
     def __repr__(self):
-        return "<History prod_id=%d, renter_user_id=%d, start_date=%r, end_date=%r, total_cost=%r>" % (
-            self.prod_id, self.renter_user_id, self.start_date, self.end_date,
-            self.total_cost)
+        return "<History history_id=%d, prod_id=%d, renter_user_id=%r, owner_rate_id=%r, renter_rate_id=%r, prod_rate_id=%r>" % (
+            self.history_id, self.prod_id, self.renter_user_id,
+            self.owner_rate_id, self.renter_rate_id, self.prod_rate_id)
 
 
 class Rating(db.Model):
