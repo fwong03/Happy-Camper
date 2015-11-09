@@ -17,15 +17,15 @@
 
     <h3>Product Info</h3>
       Brand: 
-        <select name="brand">
+        <select name="brand_id">
           {% for brand in brands %}
-            <option value="{{ brand }}">{{ brand }}</option>
+            <option value="{{ brand.brand_id }}">{{ brand.brand_name }}</option>
           {% endfor %}
-          <option value="addbrand">Add new brand</option>
+          <option value="-1">Add new brand</option>
         </select><br> <br>
 
       Add new brand: (Show this only if adding new brand) 
-        <input type="text" size="50" name="newbrandname"><br><br>
+        <input type="text" size="50" name="new_brand_name"><br><br>
 
       Model Name: <input type="text" size="50" name="modelname" placeholder =
                   "e.g. Passage 2"><br><br>

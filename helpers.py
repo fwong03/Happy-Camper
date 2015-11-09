@@ -112,16 +112,18 @@ def convert_string_to_datetime(date_string):
     return date
 
 
-def get_brands():
-    """Takes no arguments and returns a list of all brands in the database.
-    """
-    brands = Brand.query.all()
-    names = []
+# Used this to return a list of brand names, but changed template for list-item
+# to use brand_id as value, not brand name (per Drew rec 11/9)
+# def get_brands():
+#     """Takes no arguments and returns a list of all brands in the database.
+#     """
+#     brands = Brand.query.all()
+#     names = []
 
-    for brand in brands:
-        names.append(brand.brand_name)
+#     for brand in brands:
+#         names.append(brand.brand_name)
 
-    return names
+#     return names
 
 
 def make_brand(brandname):
@@ -140,14 +142,13 @@ def get_brand_id(brandname):
     return brand.brand_id
 
 
-def make_product():
+def make_product(brand_id):
     """Takes no arguments and returns a Product object.
 
     Will take a listing form submission to make a parent Product object.
     Make this before a child (e.g. Tent, Sleeping Bag) object.
     """
 
-    brandname = request.form.get("brand")
     modelname = request.form.get("modelname")
     desc = request.form.get("desc")
     cond = request.form.get("cond")
@@ -159,16 +160,11 @@ def make_product():
     avail_start = datetime.strptime(avail_start, "%Y-%m-%d")
     avail_end = datetime.strptime(avail_end, "%Y-%m-%d")
 
-    if brandname == "addbrand":
-        newbrandname = request.form.get("newbrandname")
-        make_brand(newbrandname)
-        brandname = newbrandname
-
     user = User.query.filter(User.email == session['user']).one()
-    category = Category.query.filter(Category.cat_name == 'Tents').one()
-    brand = Brand.query.filter(Brand.brand_name == brandname).one()
 
-    product = Product(cat_id=category.cat_id, brand_id=brand.brand_id,
+    category = Category.query.filter(Category.cat_name == 'Tents').one()
+
+    product = Product(cat_id=category.cat_id, brand_id=brand_id,
                       owner_user_id=user.user_id, model=modelname,
                       description=desc, condition=cond,
                       avail_start_date=avail_start, avail_end_date=avail_end,

@@ -9,7 +9,7 @@ from model import connect_to_db, db
 from model import User, Region, Product, BestUse, Tent, Brand, History, Category
 from helpers import get_lat_lngs, search_radius
 from helpers import calc_default_dates, convert_string_to_datetime
-from helpers import make_product, categorize_products, get_brands
+from helpers import make_product, categorize_products
 from datetime import datetime
 
 
@@ -211,10 +211,13 @@ def list_item():
 
 @app.route('/list-tent')
 def list_tent():
-    allbrands = get_brands()
+    # 11/9: Changed from return list of brand names to just use brand objects.
+    # This way can use brand_id has value returned from list-base template.
+    # Also changed value of "add new brand" to -1. Per Drew rec.
+    all_brands = Brand.query.all()
     dates = calc_default_dates(30)
 
-    return render_template("list-tent.html", brands=allbrands,
+    return render_template("list-tent.html", brands=all_brands,
                            submit_route='/handle-tent',
                            p_today=dates['today_string'],
                            p_month=dates['future_string'])
@@ -222,12 +225,27 @@ def list_tent():
 
 @app.route('/handle-tent', methods=['POST'])
 def handle_tent_listing():
-    """Handle tent listing. Makes a parent Product object, adds it to the database
-    so you have a PK, then make the assoicated Tent object.
+    """Handle tent listing.
+
+    First checks if it needs to make a new Brand. If so, makes a new Brand object.
+    
+    Then makes Product object. Calls a function where you need to pass it the
+    brand_id.
+
+    Then makes a Tent object. Need to pass it the same primary key of the parent
+    Product object.
     """
-    # Make associated parent Product object.
-    product = make_product()
-    # Add and commit product to database so you can use its PK to make a tent.
+    # Check if new brand. If so make new brand nad add to database.
+    brand_id = int(request.form.get("brand_id"))
+
+    if brand_id < 0:
+        new_brand_name = request.form.get("new_brand_name")
+        brand = Brand(brand_name=new_brand_name)
+        db.session.add(brand)
+        db.session.commit()
+        brand_id = brand.brand_id
+
+    product = make_product(brand_id)
     db.session.add(product)
     db.session.commit()
 
@@ -237,10 +255,9 @@ def handle_tent_listing():
     seasoncat = request.form.get("seasoncat")
     weight = int(request.form.get("weight"))
 
-    # Get use_id from the BestUses table. This is required to make a tent.
     best_use = BestUse.query.filter(BestUse.use_name == bestuse).one()
 
-    # Set optional values, if any provided
+    # Below are optional values.
     try:
         width = int(request.form.get("width"))
     except ValueError:
