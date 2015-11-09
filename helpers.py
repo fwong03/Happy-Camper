@@ -7,7 +7,7 @@ from geolocation.google_maps import GoogleMaps
 from geolocation.distance_matrix import const
 import os
 
-
+# Get rid of this? Don't need in user table anymore?
 def get_lat_lngs(address):
     """Takes address as string, returns a list of latitude and
         longitude as floats.
@@ -33,7 +33,7 @@ def search_radius(search_center, postalcodes, radius):
     """
 
     # TO DO: Break this search_radius down into smaller functions that
-    # will be easier to test.
+    # will be easier to test? Use sets instad of lists? Need to return a list though.
 
     google_maps = GoogleMaps(api_key=os.environ['GOOGLE_API_KEY'])
 
@@ -197,13 +197,3 @@ def categorize_products(categories, users, start_date, end_date):
     return inventory
 
 
-def get_owner_ratings(user):
-
-    owner_ratings = set([])
-    products = user.products
-
-    for product in products:
-        for history in product.history:
-            owner_ratings.add(history.owner_rating)
-
-    return owner_ratings

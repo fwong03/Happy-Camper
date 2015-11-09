@@ -8,12 +8,12 @@
     <h3> Category: {{ product.category.cat_name }} </h3>
     <ul>
         <li>Product location: {{ product.owner.city }}, {{ product.owner.region.full }}</li>
-        <li><a href="/owner-rating/{{ product.prod_id }}">Product Ower Rating</a>
         <li>Available start date: {{ product.avail_start_date.date().isoformat() }}</li>
         <li>Available end date: {{ product.avail_end_date.date().isoformat() }}</li>
         <li>Price per day: ${{ '{:,.2f}'.format(product.price_per_day) }}</li>
         <li>Description: {{ product.description }}</li>
         <li>Condition: {{ product.condition }}</li>
+        <li><a href="/owner-rating/{{ product.prod_id }}">Product Owner Rating</a>
     </ul>
 
         {% if product.owner.email != session['user'] %}

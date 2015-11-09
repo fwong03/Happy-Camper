@@ -10,7 +10,6 @@ from model import User, Region, Product, BestUse, Tent, Brand, History, Category
 from helpers import get_lat_lngs, search_radius
 from helpers import calc_default_dates, convert_string_to_datetime
 from helpers import make_product, categorize_products, get_brands
-from helpers import get_owner_ratings
 from datetime import datetime
 
 
@@ -363,32 +362,29 @@ def show_owner_rating(prod_id):
 
     Routes from Product detail (and Account Info?) page.
     """
+    # TO DO: Change from set to list. In DB order date descending.
     product = Product.query.get(prod_id)
     user = product.owner
     products = user.products
 
-    owner_ratings = set([])
+    owner_ratings = []
 
     for product in products:
         for history in product.histories:
             if history.owner_rating:
-                owner_ratings.add(history.owner_rating)
+                owner_ratings.append(history.owner_rating)
 
     sum_stars = 0
     count_star_ratings = 0
     avg_star_rating = 0
 
     if owner_ratings:
-        print "\n\n Owner ratings is true"
         for rating in owner_ratings:
-            print "\n\nRating: ", rating
             if rating.stars:
                 sum_stars += rating.stars
                 count_star_ratings += 1
 
         avg_star_rating = sum_stars / count_star_ratings
-    else:
-        print "\n\nOwner ratings is false"
 
     return render_template("owner-rating.html", ratings=owner_ratings,
                            average=avg_star_rating, prod=product)
