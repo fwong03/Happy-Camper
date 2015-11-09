@@ -79,6 +79,7 @@ class Category(db.Model):
 
     cat_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     cat_name = db.Column(db.String(16), nullable=False, unique=True)
+    # add display name attribute
 
     def __repr__(self):
 
@@ -111,6 +112,8 @@ class Brand(db.Model):
 
 class Product(db.Model):
     """Product parent class."""
+    # CHANGE: pricing is some amount first day then another amount per day 
+    # following not counting pickup or dropoff date (REI model)
 
     __tablename__ = 'products'
 
@@ -269,6 +272,8 @@ class History(db.Model):
     owner_rating = db.relationship('Rating', foreign_keys='[History.owner_rate_id]')
     renter_rating = db.relationship('Rating', foreign_keys='[History.renter_rate_id]')
     product_rating = db.relationship('Rating', foreign_keys='[History.prod_rate_id]')
+
+
 
     def __repr__(self):
         return "<History history_id=%d, prod_id=%d, renter_user_id=%r, owner_rate_id=%r, renter_rate_id=%r, prod_rate_id=%r>" % (

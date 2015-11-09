@@ -165,7 +165,7 @@ def make_product():
         brandname = newbrandname
 
     user = User.query.filter(User.email == session['user']).one()
-    category = Category.query.filter(Category.cat_name == 'tents').one()
+    category = Category.query.filter(Category.cat_name == 'Tents').one()
     brand = Brand.query.filter(Brand.brand_name == brandname).one()
 
     product = Product(cat_id=category.cat_id, brand_id=brand.brand_id,
@@ -191,6 +191,7 @@ def categorize_products(categories, users, start_date, end_date):
     for user in users:
         if user.active:
             for product in user.products:
+                # Separate this out. You may use separately.
                 if product.available and (product.avail_start_date <= start_date) and (product.avail_end_date >= end_date):
                         inventory[product.category.cat_name].append(product)
 

@@ -10,8 +10,8 @@
         <li>Product: {{ product.brand.brand_name }} {{ product.model }}</li>
         <li> Category: {{ product.category.cat_name }} </li> 
         <li>Owner location: {{ product.owner.city }}, {{ product.owner.region.full }}</li>
-        <li>Rental start date: {{ session['date1'].date().isoformat() }}</li>
-        <li>Rental end date: {{ session['date2'].date().isoformat() }}</li>
+        <li>Rental start date: {{ start_date_string }}</li>
+        <li>Rental end date: {{ end_date_string }}</li>
         <li>Price per day: ${{ '{:,.2f}'.format(product.price_per_day) }}</li>
         <br>
     </ul>
@@ -26,7 +26,7 @@
     <form action="/handle-rental/{{ product.prod_id }}" method="POST">
         <input type="submit" value="Fo shizzle."><br><br>
 
- <p>Nope. Go back to my <a href="/searchresults?search_area={{ session['search_area'] }}&search_miles={{ session['search_radius'] }}&date1={{ date1 }}&date2={{ date2 }}">search results</a></p>
+ <p>Nope. Go back to my <a href="/searchresults?search_area={{ session['search_area'] }}&search_miles={{ session['search_radius'] }}&search_start_date={{ start_date_string }}&search_end_date={{ end_date_string }}">search results</a></p>
 
 
 {% endblock %}

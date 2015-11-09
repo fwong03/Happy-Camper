@@ -29,7 +29,7 @@
             <input type="submit" value="Rent This">
             </form>
 
-             <p>Or, go back to your <a href="/searchresults?search_area={{ session['search_area'] }}&search_miles={{ session['search_radius'] }}&date1={{ date1 }}&date2={{ date2 }}">search results</a></p>
+             <p>Or, go back to your <a href="/searchresults?search_area={{ session['search_area'] }}&search_miles={{ session['search_radius'] }}&search_start_date={{ start_date_string }}&search_end_date={{ end_date_string }}">search results</a></p>
         {% endif %}
 
 

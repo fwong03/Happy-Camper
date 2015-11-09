@@ -284,8 +284,8 @@ def show_results():
 
     search_area = request.args.get("search_area")
     search_miles = request.args.get("search_miles")
-    date1 = request.args.get("date1")
-    date2 = request.args.get("date2")
+    search_start_date = request.args.get("search_start_date")
+    search_end_date = request.args.get("search_end_date")
 
     try:
         search_miles = int(search_miles)
@@ -295,15 +295,17 @@ def show_results():
 
     # Convert the dates into datetimes and get the number of days the user is
     # interested in renting an item so we can calculate his or her total rental cost.
-    date1 = convert_string_to_datetime(date1)
-    date2 = convert_string_to_datetime(date2)
+    search_start_date = convert_string_to_datetime(search_start_date)
+    search_end_date = convert_string_to_datetime(search_end_date)
 
     # Add the rental dates to the flask session so we can access over multiple
     # pages.
-    days = (date2 - date1).days + 1
+    days = (search_end_date - search_start_date).days + 1
 
-    session['date1'] = date1
-    session['date2'] = date2
+    # Future version maybe save to table last search so default next search to that.
+
+    session['search_start_date'] = search_start_date
+    session['search_end_date'] = search_end_date
     session['num_days'] = days
     session['search_area'] = search_area
     session['search_radius'] = search_miles
@@ -313,6 +315,7 @@ def show_results():
     postalcodes = query.all()
 
     # Get postal codes within the given search radius.
+    # Save zipcode pair distances to DB the first time.
     postal_codes = search_radius(search_area, postalcodes, search_miles)
 
     # Get users within the postal codes.
@@ -326,13 +329,18 @@ def show_results():
 
     # Get categories so can categorize products
     categories = Category.query.all()
+
+    # Separate check if available during dates and categorization
     categorized_products = categorize_products(categories, users_in_area,
-                                               session['date1'], session['date2'])
+                                               session['search_start_date'],
+                                               session['search_end_date'])
     sorted_cats = sorted(categorized_products.keys())
 
     return render_template("searchresults.html", location=search_area,
-                           miles=search_miles, start_date=date1, end_date=date2,
-                           num_days=days, sorted_categories=sorted_cats, products=categorized_products)
+                           miles=search_miles, start_date=search_start_date,
+                           end_date=search_end_date, num_days=days,
+                           sorted_categories=sorted_cats,
+                           products=categorized_products)
 
 
 @app.route('/product-detail/<int:prod_id>')
@@ -345,12 +353,13 @@ def show_item(prod_id):
     # Make a borrowed template version if available = False instead
 
     item = Product.query.get(prod_id)
-    date1_string = session['date1'].date().isoformat()
-    date2_string = session['date2'].date().isoformat()
+    search_start_date_string = session['search_start_date'].date().isoformat()
+    search_end_date_string = session['search_end_date'].date().isoformat()
 
     if item.available:
         return render_template("product-detail.html", product=item,
-                               date1=date1_string, date2=date2_string)
+                               start_date_string=search_start_date_string,
+                               end_date_string=search_end_date_string)
     else:
         return "Sorry! The %s %s is no longer available for rent." % (
             item.brand.brand_name, item.model)
@@ -369,9 +378,19 @@ def show_owner_rating(prod_id):
 
     owner_ratings = []
 
+    """
+    products = Product.query.all()
+    # if brand filter
+    if ...
+        products = products.filter(brand=...)
+    if category filter
+        products
+    """
+
     for product in products:
-        for history in product.histories:
+        for history in product.histories.filter(owner_rating__isnot=None):
             if history.owner_rating:
+                # filter out owner_ratings != NULL
                 owner_ratings.append(history.owner_rating)
 
     sum_stars = 0
@@ -397,12 +416,12 @@ def confirm_rental(prod_id):
     """
 
     prod = Product.query.get(prod_id)
-    date1_string = session['date1'].date().isoformat()
-    date2_string = session['date2'].date().isoformat()
+    search_start_date_string = session['search_start_date'].date().isoformat()
+    search_end_date_string = session['search_end_date'].date().isoformat()
 
     return render_template("rent-confirm.html", product=prod,
-                           date1=date1_string,
-                           date2=date2_string)
+                           start_date_string=search_start_date_string,
+                           end_date_string=search_end_date_string)
 
 
 @app.route('/handle-rental/<int:prod_id>', methods=['POST'])
@@ -415,7 +434,8 @@ def handle_rental(prod_id):
     cost = product.price_per_day * session['num_days']
 
     history = History(prod_id=prod_id, renter_user_id=user.user_id,
-                      start_date=session['date1'], end_date=session['date2'],
+                      start_date=session['search_start_date'],
+                      end_date=session['search_end_date'],
                       total_cost=cost)
 
     product.available = False
