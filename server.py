@@ -163,8 +163,10 @@ def show_account():
             products_out.append(product)
 
     rentals = db.session.query(History.history_id, History.start_date,
-                               History.end_date, Brand.brand_name, Product.model, Product.owner_user_id,
-                               History.total_cost).join(Product).join(Brand).filter(History.renter_user_id == user.user_id).all()
+                               History.end_date, History.total_cost,
+                               History.owner_rating_id, Brand.brand_name,
+                               Product.model,
+                               Product.owner_user_id).join(Product).join(Brand).filter(History.renter_user_id == user.user_id).all()
 
     return render_template("accountinfo.html", firstname=fname, lastname=lname,
                            street=staddress, city=cty, state=st, zipcode=zcode,
@@ -521,6 +523,9 @@ def handle_owner_rate():
     history.owner_rating_id = owner_rating.rating_id
 
     db.session.commit()
+
+    session.pop('history_id_for_rating')
+    session.pop('owner_username_for_rating')
 
     flash("Thank you for your rating!")
 

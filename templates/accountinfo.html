@@ -71,7 +71,9 @@
                             {% endif %}
                     </td>
                     <td>This will be links to owner email and option to rate experience
-                        <a href="/owner-rate/{{ history.owner_user_id }}-{{ history.history_id }}">Rate owner here {{ history.owner_user_id }}</a>
+                        {% if not history.owner_rating_id %}
+                        <br><a href="/owner-rate/{{ history.owner_user_id }}-{{ history.history_id }}">Rate owner here</a><br>
+                        {% endif %}
                     </td>
                 </tr>
             {% endfor %}
