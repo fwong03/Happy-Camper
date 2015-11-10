@@ -15,29 +15,41 @@
     </ul>
 
 
-  <h3>{% block content %} put your content here {% endblock %}</h3>
+  <h3>{% block page_heading %}PUT PAGE HEADING HERE{% endblock %}</h3>
 
 
    <form action="{{ submit_route }}" method="POST">
 
     <h3>Star rating</h3>
-      <p>
-        {% block star_instructions %}STAR RATING INSTRUCTIONS HERE{% endblock %}
-        (Total out of four.)</p>
-      <br>
-    <select name="stars">
+      
+      <p> 
+        {% block star_instructions %}
 
-        <option value="1">1: Awful</option>
-        <option value="2">2: Less good than okay, though not awful</option>
-        <option value="3">3: As expected</option>
-        <option value="4">4: Better than expected</option>
-    </select><br>
-      <br>
+          STAR RATING INSTRUCTIONS HERE
+        
+        {% endblock %} 
+      </p><br>
+
+        {% block star_dropdown %}
+        
+          STAR RATING DROP DOWN HERE
+        
+        {% endblock %}
+      
+      <br><br>
 
       <h3>Comments</h3>
-      <p>{% block comments_instructions %}COMMENT INSTRUCTIONS HERE{% endblock %}
-      Thank you for leaving comments. This info helps future renters!</p><br>
-      <textarea rows="4" cols="50" name="comments"></textarea><br><br>
+      <p>
+        {% block comments_instructions %}
+
+          COMMENT INSTRUCTIONS HERE
+
+        {% endblock %}
+      </p><br>
+
+       {% block comments_text %}
+          COMMENT TEXT AREA HERE
+        {% endblock %}
 
       <input type="submit">
 

@@ -1,23 +1,34 @@
-{% extends 'base.html' %}
+{% extends 'rate-form-base.html' %}
 
-{% block title %}Owner Rating Form Confirmation{% endblock %}
+{% block title %}Owner Rating Confirmation{% endblock %}
 
-{% block content %} 
+{% block page_heading %}Confirmation: Product Owner Rating for {{ session['owner_username_for_rating'] }} {% endblock %}
 
-<form action="{{ submit_route }}" method="POST">
+ {% block star_instructions %}{% endblock %}
 
-<h3>Confirmation: Rating for{{ owner.email }} </h3>
-
-<p><b>Number of stars:</b> <input type="text" size="4" name="stars" value={{ num_stars }}{{ num_stars }}></p>
-
-<p><b>Comments:</b><textarea rows="4" cols="50" name="comments" value={{ text_comments }}></textarea></p>
-
-<input type="submit" value="Submit Rating">
-
-<a href="/owner-rate/{{ user_id }}">Or, edit rating</a>
-
-
+{% block star_dropdown %} You gave this owner a star rating of: <div name="num_stars" value="{{ num_stars }}"><i>{{ num_stars }}</i> out of 4</div>
 
 {% endblock %}
+
+{% block comments_instructions %}
+    <p>Here is how you described your experience:</p>
+
+{% endblock %}
+
+{% block comments_text %}
+<div name="comments_text" value = {{ comments_text }}>
+
+<p><i>{{ comments_text }}</i></p>
+</div>
+<br>
+<p>Submit below or <a href="/owner-rate-edit/">click here to edit rating</a></p>
+
+ {% endblock %}
+
+
+
+
+
+
 
 

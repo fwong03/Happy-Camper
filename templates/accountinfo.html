@@ -70,7 +70,9 @@
                             {{ (history.start_date - today).days }} days until rental
                             {% endif %}
                     </td>
-                    <td>This will be links to owner email and option to rate experience <a href="/owner-rate/{{ history.owner_user_id }}">Rate owner here</a></td>
+                    <td>This will be links to owner email and option to rate experience
+                        <a href="/owner-rate/{{ history.owner_user_id }}-{{ history.history_id }}">Rate owner here {{ history.owner_user_id }}</a>
+                    </td>
                 </tr>
             {% endfor %}
         </table><br><br>

@@ -6,7 +6,7 @@ from flask import Flask, render_template, redirect, request, flash, session
 from flask_debugtoolbar import DebugToolbarExtension
 
 from model import connect_to_db, db
-from model import User, Region, Product, BestUse, Tent, Brand, History, Category
+from model import User, Region, Product, BestUse, Tent, Brand, History, Category, Rating
 from helpers import get_lat_lngs, search_radius
 from helpers import calc_default_dates, convert_string_to_datetime
 from helpers import make_product, categorize_products
@@ -386,39 +386,6 @@ def show_item(prod_id):
             item.brand.brand_name, item.model)
 
 
-@app.route('/owner-rating/<int:prod_id>')
-def show_owner_rating(prod_id):
-    """Show owner star ratings and any comments.
-
-    Routes from Product detail (and Account Info?) page.
-    """
-    # TO DO: Change from set to list. In DB order date descending.
-    product = Product.query.get(prod_id)
-    owner = product.owner
-    products = owner.products
-
-    owner_ratings = []
-
-    for product in products:
-        # Can do something along lines of .filter(owner_rating.isnot(None))?
-        for history in product.histories:
-            if history.owner_rating:
-                owner_ratings.append(history.owner_rating)
-
-    sum_stars = 0
-    count_star_ratings = 0
-    avg_star_rating = 0
-
-    for rating in owner_ratings:
-        if rating.stars:
-            sum_stars += rating.stars
-            count_star_ratings += 1
-
-        avg_star_rating = sum_stars / count_star_ratings
-
-    return render_template("owner-rating.html", ratings=owner_ratings,
-                           average=avg_star_rating, prod=product)
-
 
 @app.route('/rent-confirm/<int:prod_id>', methods=['POST'])
 def confirm_rental(prod_id):
@@ -463,6 +430,105 @@ def rent_item():
     return render_template("rent-final.html")
 
 
+@app.route('/owner-rating/<int:prod_id>')
+def show_owner_rating(prod_id):
+    """Show owner star ratings and any comments.
+
+    Routes from Product detail (and Account Info?) page.
+    """
+   
+    product = Product.query.get(prod_id)
+    owner = product.owner
+    products = owner.products
+
+    owner_ratings = []
+
+    for product in products:
+        # Can do something along lines of .filter(owner_rating.isnot(None))?
+        for history in product.histories:
+            if history.owner_rating:
+                owner_ratings.append(history.owner_rating)
+
+    sum_stars = 0
+    count_star_ratings = 0
+    avg_star_rating = 0
+
+    for rating in owner_ratings:
+        if rating.stars:
+            sum_stars += rating.stars
+            count_star_ratings += 1
+
+        avg_star_rating = sum_stars / count_star_ratings
+
+    return render_template("owner-rating.html", ratings=owner_ratings,
+                           average=avg_star_rating, prod=product)
+
+
+@app.route('/owner-rate/<int:owner_id>-<int:history_id>')
+def rate_owner(owner_id, history_id):
+    """Page to rate owner.
+
+    """
+
+    owner_id = owner_id
+    owner = User.query.get(owner_id)
+
+    session['history_id_for_rating'] = history_id
+    session['owner_username_for_rating'] = owner.email
+
+    return render_template("owner-rate-edit.html",
+                           submit_route='/owner-rate-confirm/')
+
+
+@app.route('/owner-rate-edit/')
+def edit_owner_rating():
+    """Page to edit rating of owner.
+
+    """
+
+    return render_template("owner-rate-edit.html",
+                           submit_route='/owner-rate-confirm/')
+
+
+@app.route('/owner-rate-confirm/', methods=['POST'])
+def confirm_owner_rating(owner_id):
+    """Confirm owner rating before adding to database"""
+
+    stars = request.form.get("stars")
+    comments = request.form.get("comments")
+
+    return render_template("owner-rate-confirm.html", num_stars=stars,
+                           comments_text=comments,
+                           submit_route='/handle-owner-rate')
+
+
+@app.route('/handle-owner-rate', methods=['POST'])
+def handle_owner_rate():
+    """Handle owner rating form submission.
+
+    Will (1) create rating object and (2)update associated history object's
+    owner_rating_id.
+    """
+
+    num_stars = request.form.get("num_stars")
+    comments_text = request.form.get("comments_text")
+    hist = int(request.form.get("hist"))
+
+    owner_rating = Rating(stars=num_stars, comments=comments_text)
+    db.session.add(owner_rating)
+    db.session.commit()
+
+    history = History.query.get(hist)
+    history.owner_rating_id = owner_rating.rating_id
+
+    db.session.commit()
+
+    flash("Thank you for your rating!")
+
+    return redirect('/success')
+
+
+
 @app.route('/renter_rate')
 def renter_rate():
     """Rating page for renter.
@@ -472,50 +538,6 @@ def renter_rate():
     thanking them for their rating."""
 
     return "Here renters can rate the owner and the product they rented."
-
-
-@app.route('/owner-rate/<int:user_id>')
-def rate_owner(user_id):
-    """Rating page for owner.
-
-    Owners rate renters. They access this page from their account page, and
-    this routes to the account page with a flashed message thanking them."""
-
-    user = User.query.get(user_id)
-
-    return render_template("owner-rate-form.html",
-                           submit_route='/owner-rate-confirm/%d' % user_id,
-                           owner=user)
-
-
-@app.route('/owner-rate-confirm/<int:user_id>', methods=['POST'])
-def confirm_owner_rating(user_id):
-    """Confirm owner rating before adding to database"""
-
-    stars = request.form.get("stars")
-    comments = request.form.get("comments")
-    user = User.query.get(user_id)
-
-    return render_template("owner-rate-confirm.html", num_stars=stars,
-                            text_comments=comments, owner=user
-                            submit_route='/handle-owner-rate',
-                            user_id=user_id)
-
-
-
-@app.route('/handle-owner-rate', methods='POST')
-def handle_owner_rate():
-    """Handle owner rating form submission.
-
-    Will (1) create rating object and (2)update associated history object's
-    owner_rating_id.
-    """
-
-    stars = request.form.get("stars")
-    comments = request.form.get("comments")
-
-    return "Owner rating submission will be handled here."
-
 
 
 
