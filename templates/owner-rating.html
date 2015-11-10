@@ -26,7 +26,7 @@
         <tr>
             <td>{{ rating.stars }}</td>
             <td>{{ rating.comments }}</td>
-            <td>not yet implemented</td>
+            <td><a href="/product-detail/{{ rating.ohistory[0].product.prod_id }}">{{ rating.ohistory[0].product.brand.brand_name }}: {{ rating.ohistory[0].product.model }}</td>
         {% endfor %}
     </table>
     {% else %}
