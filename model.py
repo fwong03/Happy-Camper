@@ -269,11 +269,9 @@ class History(db.Model):
     prod_rating_id = db.Column(db.Integer, db.ForeignKey('ratings.rating_id'))
 
     # http://docs.sqlalchemy.org/en/latest/orm/join_conditions.html
-    owner_rating = db.relationship('Rating', foreign_keys='[History.owner_rating_id]')
-    renter_rating = db.relationship('Rating', foreign_keys='[History.renter_rating_id]')
-    product_rating = db.relationship('Rating', foreign_keys='[History.prod_rating_id]')
-
-
+    owner_rating = db.relationship('Rating', foreign_keys='History.owner_rating_id', backref='ohistory')
+    renter_rating = db.relationship('Rating', foreign_keys='History.renter_rating_id', backref='rhistory')
+    product_rating = db.relationship('Rating', foreign_keys='History.prod_rating_id', backref='phistory')
 
     def __repr__(self):
         return "<History history_id=%d, prod_id=%d, renter_user_id=%r, owner_rating_id=%r, renter_rating_id=%r, prod_rating_id=%r>" % (
@@ -289,6 +287,7 @@ class Rating(db.Model):
     rating_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     stars = db.Column(db.Integer, nullable=False)
     comments = db.Column(db.String(128))
+
 
     def __repr__(self):
         return "<Rating rating_id=%d, stars=%d, comments=%s>" % (self.rating_id,

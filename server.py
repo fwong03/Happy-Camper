@@ -392,13 +392,13 @@ def show_owner_rating(prod_id):
     """
     # TO DO: Change from set to list. In DB order date descending.
     product = Product.query.get(prod_id)
-    user = product.owner
-    products = user.products
+    owner = product.owner
+    products = owner.products
 
     owner_ratings = []
 
     for product in products:
-        # Can do .filter(History.owner_rating_id.isnot(None))?
+        # Can do something along lines of .filter(owner_rating.isnot(None))?
         for history in product.histories:
             if history.owner_rating:
                 owner_ratings.append(history.owner_rating)
