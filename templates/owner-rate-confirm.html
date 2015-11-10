@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}Owner Rating Form Confirmation{% endblock %}
+
+{% block content %} 
+
+<form action="{{ submit_route }}" method="POST">
+
+<h3>Confirmation: Rating for{{ owner.email }} </h3>
+
+<p><b>Number of stars:</b> <input type="text" size="4" name="stars" value={{ num_stars }}{{ num_stars }}></p>
+
+<p><b>Comments:</b><textarea rows="4" cols="50" name="comments" value={{ text_comments }}></textarea></p>
+
+<input type="submit" value="Submit Rating">
+
+<a href="/owner-rate/{{ user_id }}">Or, edit rating</a>
+
+
+
+{% endblock %}
+
+
