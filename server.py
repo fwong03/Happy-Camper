@@ -162,7 +162,7 @@ def show_account():
             products_out.append(product)
 
     rentals = db.session.query(History.history_id, History.start_date,
-                               History.end_date, Brand.brand_name, Product.model,
+                               History.end_date, Brand.brand_name, Product.model, Product.owner_user_id,
                                History.total_cost).join(Product).join(Brand).filter(History.renter_user_id == user.user_id).all()
 
     return render_template("accountinfo.html", firstname=fname, lastname=lname,
@@ -217,6 +217,7 @@ def list_tent():
     all_brands = Brand.query.all()
     dates = calc_default_dates(30)
 
+    # Change so pass in BestUse objects and use best_use_id as value?
     return render_template("list-tent.html", brands=all_brands,
                            submit_route='/handle-tent',
                            p_today=dates['today_string'],
@@ -252,12 +253,12 @@ def handle_tent_listing():
     db.session.commit()
 
     # Grab info to make a tent.
-    bestuse = request.form.get("bestuse")
+    best_use_id = int(request.form.get("bestuse"))
     sleep = int(request.form.get("sleep"))
     seasoncat = int(request.form.get("seasoncat"))
     weight = int(request.form.get("weight"))
 
-    best_use = BestUse.query.filter(BestUse.use_name == bestuse).one()
+    best_use = BestUse.query.get(best_use_id)
 
     # Below are optional values.
     try:
@@ -280,7 +281,7 @@ def handle_tent_listing():
     except ValueError:
         poles = None
 
-    tent = Tent(prod_id=product.prod_id, use_id=best_use.use_id,
+    tent = Tent(prod_id=product.prod_id, use_id=best_use_id,
                 sleep_capacity=sleep, seasons=seasoncat, min_trail_weight=weight,
                 floor_width=width, floor_length=length, num_doors=doors,
                 num_poles=poles)
@@ -474,14 +475,29 @@ def renter_rate():
     return "Here renters can rate the owner and the product they rented."
 
 
-@app.route('/owner_rate')
-def owner_rate():
+@app.route('/owner-rate/<int:user_id>')
+def owner_rate(user_id):
     """Rating page for owner.
 
     Owners rate renters. They access this page from their account page, and
     this routes to the account page with a flashed message thanking them."""
 
-    return "Here owners can rate renters."
+    user = User.query.get(user_id)
+
+    return render_template("owner-rate-form.html", submit_route='/handle-owner-rate-form',
+       owner=user)
+
+
+@app.route('/handle-owner-rate-form', methods='POST')
+def handle_owner_rate():
+    """Handle owner rating form submission.
+
+    Will (1) create rating object and (2)update associated history object's
+    owner_rating_id.
+    """
+
+    return "Owner rating submission will be handled here."
+
 
 
 
