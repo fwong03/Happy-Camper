@@ -476,7 +476,7 @@ def rate_owner(owner_id, history_id):
     session['history_id_for_rating'] = history_id
     session['owner_username_for_rating'] = owner.email
 
-    return render_template("owner-rate-edit.html",
+    return render_template("owner-rate-form.html",
                            submit_route='/owner-rate-confirm/')
 
 
@@ -491,7 +491,7 @@ def edit_owner_rating():
 
 
 @app.route('/owner-rate-confirm/', methods=['POST'])
-def confirm_owner_rating(owner_id):
+def confirm_owner_rating():
     """Confirm owner rating before adding to database"""
 
     stars = request.form.get("stars")
@@ -510,15 +510,14 @@ def handle_owner_rate():
     owner_rating_id.
     """
 
-    num_stars = request.form.get("num_stars")
+    number_stars = int(request.form.get("number_stars"))
     comments_text = request.form.get("comments_text")
-    hist = int(request.form.get("hist"))
 
-    owner_rating = Rating(stars=num_stars, comments=comments_text)
+    owner_rating = Rating(stars=number_stars, comments=comments_text)
     db.session.add(owner_rating)
     db.session.commit()
 
-    history = History.query.get(hist)
+    history = History.query.get(session['history_id_for_rating'])
     history.owner_rating_id = owner_rating.rating_id
 
     db.session.commit()

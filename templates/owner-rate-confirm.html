@@ -6,7 +6,10 @@
 
  {% block star_instructions %}{% endblock %}
 
-{% block star_dropdown %} You gave this owner a star rating of: <div name="num_stars" value="{{ num_stars }}"><i>{{ num_stars }}</i> out of 4</div>
+{% block star_dropdown %} You gave this owner a star rating of: 
+    <div name="number_stars" value="{{ num_stars }}">
+        <i>{{ num_stars }}</i> out of 4
+    </div>
 
 {% endblock %}
 
