@@ -64,15 +64,20 @@
                     <td>{{ history.end_date.date().isoformat() }}</td>
                     <td>{{ history.brand_name }} {{ history.model }}</td>
                     <td>${{ '{:,.2f}'.format(history.total_cost) }}</td>
-                    <td>{% if (today > history.start_date) %}
-                            Rental done or ongoing
-                        {% else %}
+                    <td>{% if (today > history.end_date) %}
+                            Rental done
+                        {% elif (today < history.start_date) %}
                             {{ (history.start_date - today).days }} days until rental
-                            {% endif %}
+                        {% else %}
+                            Rental ongoing
+                        {% endif %}
                     </td>
                     <td>This will be links to owner email and option to rate experience
                         {% if not history.owner_rating_id %}
                         <br><a href="/owner-rate/{{ history.owner_user_id }}-{{ history.history_id }}">Rate owner here</a><br>
+                        {% endif %}
+                         {% if not history.prod_rating_id %}
+                        <br><a href="/product-rate/{{ history.prod_id }}-{{ history.history_id }}">Rate product here</a><br>
                         {% endif %}
                     </td>
                 </tr>

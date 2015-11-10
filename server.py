@@ -164,8 +164,8 @@ def show_account():
 
     rentals = db.session.query(History.history_id, History.start_date,
                                History.end_date, History.total_cost,
-                               History.owner_rating_id, Brand.brand_name,
-                               Product.model,
+                               History.owner_rating_id, History.prod_rating_id,
+                               Brand.brand_name, Product.model, Product.prod_id,
                                Product.owner_user_id).join(Product).join(Brand).filter(History.renter_user_id == user.user_id).all()
 
     return render_template("accountinfo.html", firstname=fname, lastname=lname,
@@ -360,8 +360,9 @@ def show_results():
     sorted_cats = sorted(categorized_products.keys())
 
     return render_template("searchresults.html", location=search_area,
-                           miles=search_miles, start_date=search_start_date,
-                           end_date=search_end_date, num_days=days,
+                           miles=search_miles,
+                           start_date_string=session['search_start_date'].date().isoformat(),
+                           end_date_string=ssession['search_end_date'].date().isoformat,
                            sorted_categories=sorted_cats,
                            products=categorized_products)
 
@@ -432,13 +433,13 @@ def rent_item():
     return render_template("rent-final.html")
 
 
-@app.route('/owner-rating/<int:prod_id>')
+@app.route('/show-owner-rating/<int:prod_id>')
 def show_owner_rating(prod_id):
     """Show owner star ratings and any comments.
 
     Routes from Product detail (and Account Info?) page.
     """
-   
+
     product = Product.query.get(prod_id)
     owner = product.owner
     products = owner.products
@@ -472,7 +473,6 @@ def rate_owner(owner_id, history_id):
 
     """
 
-    owner_id = owner_id
     owner = User.query.get(owner_id)
 
     session['history_id_for_rating'] = history_id
@@ -501,11 +501,11 @@ def confirm_owner_rating():
 
     return render_template("owner-rate-confirm.html", num_stars=stars,
                            comments_text=comments,
-                           submit_route='/handle-owner-rate')
+                           submit_route='/handle-owner-rating')
 
 
-@app.route('/handle-owner-rate', methods=['POST'])
-def handle_owner_rate():
+@app.route('/handle-owner-rating', methods=['POST'])
+def handle_owner_rating():
     """Handle owner rating form submission.
 
     Will (1) create rating object and (2)update associated history object's
@@ -526,6 +526,72 @@ def handle_owner_rate():
 
     session.pop('history_id_for_rating')
     session.pop('owner_username_for_rating')
+
+    flash("Thank you for your rating!")
+
+    return redirect('/success')
+
+
+@app.route('/product-rate/<int:prod_id>-<int:history_id>')
+def rate_product(prod_id, history_id):
+    """Page to rate product.
+
+    """
+
+    item = Product.query.get(prod_id)
+
+    session['history_id_for_rating'] = history_id
+    session['prod_id_for_rating'] = prod_id
+    session['prod_name_for_rating'] = "%s %s" % (item.brand.brand_name, item.model)
+
+    return render_template("product-rate-form.html", product=item,
+                           submit_route='/product-rate-confirm/')
+
+
+@app.route('/product-rate-edit/')
+def edit_product_rating():
+    """Page to edit rating of product.
+
+    """
+
+    return render_template("product-rate-edit.html",
+                           submit_route='/product-rate-confirm/')
+
+
+@app.route('/product-rate-confirm/', methods=['POST'])
+def confirm_product_rating():
+    """Confirm product rating before adding to database"""
+
+    stars = request.form.get("stars")
+    comments = request.form.get("comments")
+
+    return render_template("product-rate-confirm.html", num_stars=stars,
+                           comments_text=comments,
+                           submit_route='/handle-product-rating')
+
+
+@app.route('/handle-product-rating', methods=['POST'])
+def handle_product_rating():
+    """Handle product rating form submission.
+
+    Will (1) create rating object and (2) update associated history object's
+    prod_rating_id.
+    """
+
+    number_stars = int(request.form.get("number_stars"))
+    comments_text = request.form.get("comments_text")
+
+    product_rating = Rating(stars=number_stars, comments=comments_text)
+    db.session.add(product_rating)
+    db.session.commit()
+
+    history = History.query.get(session['history_id_for_rating'])
+    history.prod_rating_id = product_rating.rating_id
+
+    db.session.commit()
+
+    session.pop('history_id_for_rating')
+    session.pop('prod_name_for_rating')
 
     flash("Thank you for your rating!")
 

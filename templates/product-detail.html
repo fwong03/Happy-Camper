@@ -13,14 +13,14 @@
         <li>Price per day: ${{ '{:,.2f}'.format(product.price_per_day) }}</li>
         <li>Description: {{ product.description }}</li>
         <li>Condition: {{ product.condition }}</li>
-        <li><a href="/owner-rating/{{ product.prod_id }}">Product Owner Rating</a>
+        <li><a href="/show-owner-rating/{{ product.prod_id }}">Product Owner Rating</a>
     </ul>
 
         {% if product.owner.email != session['user'] %}
             <p>Your rental period info:</p>
             <ul>
-                <li>Rental start date: {{ session['date1'].date().isoformat() }}</li>
-                <li>Rental end date: {{ session['date2'].date().isoformat() }}</li>
+                <li>Rental start date: {{ start_date_string }}</li>
+                <li>Rental end date: {{ end_date_string }}</li>
             <li>Number of days: {{ session['num_days'] }}
             <li>Total cost: ${{ '{:,.2f}'.format(session['num_days'] * product.price_per_day) }}</li>
             </ul>

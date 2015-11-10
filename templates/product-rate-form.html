@@ -1,0 +1,30 @@
+{% extends 'rate-form-base.html' %}
+
+{% block title %}Product Rating Form{% endblock %}
+
+{% block page_heading %} Rating for {{ session['prod_name_for_rating'] }} {% endblock %}
+
+ {% block star_instructions %}
+
+     How many stars would you rate this product?
+
+{% endblock %}
+
+{% block star_dropdown %}
+    <select name="stars">
+        <option value="4">4: Great! Even better than expected. Would be happy to rent again if needed. </option>
+        <option value="3">3: As expected. Would not mind renting again if needed. </option>
+        <option value="2">2: Not as good as expected. Might rent again if in a pinch.</option>
+        <option value="1">1: Awful. Would not rent again.</option>
+  </select>
+{% endblock %}
+
+{% block comments_instructions %}
+    Please describe your star rating for this product.
+{% endblock %}
+
+{% block comments_text %}
+
+ <textarea rows="4" cols="50" name="comments"></textarea><br><br>
+
+ {% endblock %}
