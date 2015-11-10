@@ -264,8 +264,8 @@ def load_histories():
         date2 = datetime.strptime(date2, "%Y-%m-%d")
 
         a = History(prod_id=product, renter_user_id=renter, start_date=date1,
-                 end_date=date2, total_cost=cost, owner_rate_id=owner_rate,
-                 renter_rate_id=renter_rate, prod_rate_id=prod_rate)
+                 end_date=date2, total_cost=cost, owner_rating_id=owner_rate,
+                 renter_rating_id=renter_rate, prod_rating_id=prod_rate)
 
         db.session.add(a)
 

@@ -264,21 +264,21 @@ class History(db.Model):
     total_cost = db.Column(db.Float, nullable=False)
 
     # Ratings are optional
-    owner_rate_id = db.Column(db.Integer, db.ForeignKey('ratings.rate_id'))
-    renter_rate_id = db.Column(db.Integer, db.ForeignKey('ratings.rate_id'))
-    prod_rate_id = db.Column(db.Integer, db.ForeignKey('ratings.rate_id'))
+    owner_rating_id = db.Column(db.Integer, db.ForeignKey('ratings.rating_id'))
+    renter_rating_id = db.Column(db.Integer, db.ForeignKey('ratings.rating_id'))
+    prod_rating_id = db.Column(db.Integer, db.ForeignKey('ratings.rating_id'))
 
     # http://docs.sqlalchemy.org/en/latest/orm/join_conditions.html
-    owner_rating = db.relationship('Rating', foreign_keys='[History.owner_rate_id]')
-    renter_rating = db.relationship('Rating', foreign_keys='[History.renter_rate_id]')
-    product_rating = db.relationship('Rating', foreign_keys='[History.prod_rate_id]')
+    owner_rating = db.relationship('Rating', foreign_keys='[History.owner_rating_id]')
+    renter_rating = db.relationship('Rating', foreign_keys='[History.renter_rating_id]')
+    product_rating = db.relationship('Rating', foreign_keys='[History.prod_rating_id]')
 
 
 
     def __repr__(self):
-        return "<History history_id=%d, prod_id=%d, renter_user_id=%r, owner_rate_id=%r, renter_rate_id=%r, prod_rate_id=%r>" % (
+        return "<History history_id=%d, prod_id=%d, renter_user_id=%r, owner_rating_id=%r, renter_rating_id=%r, prod_rating_id=%r>" % (
             self.history_id, self.prod_id, self.renter_user_id,
-            self.owner_rate_id, self.renter_rate_id, self.prod_rate_id)
+            self.owner_rating_id, self.renter_rating_id, self.prod_rating_id)
 
 
 class Rating(db.Model):
@@ -286,12 +286,12 @@ class Rating(db.Model):
 
     __tablename__ = 'ratings'
 
-    rate_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    rating_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     stars = db.Column(db.Integer, nullable=False)
     comments = db.Column(db.String(128))
 
     def __repr__(self):
-        return "<Rating rate_id=%d, stars=%d, comments=%s>" % (self.rate_id,
+        return "<Rating rating_id=%d, stars=%d, comments=%s>" % (self.rating_id,
                 self.stars, self.comments)
 
 

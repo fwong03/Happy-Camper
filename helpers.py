@@ -142,7 +142,7 @@ def get_brand_id(brandname):
     return brand.brand_id
 
 
-def make_product(brand_id):
+def make_product(brand_id, category_id):
     """Takes no arguments and returns a Product object.
 
     Will take a listing form submission to make a parent Product object.
@@ -162,9 +162,7 @@ def make_product(brand_id):
 
     user = User.query.filter(User.email == session['user']).one()
 
-    category = Category.query.filter(Category.cat_name == 'Tents').one()
-
-    product = Product(cat_id=category.cat_id, brand_id=brand_id,
+    product = Product(cat_id=category_id, brand_id=brand_id,
                       owner_user_id=user.user_id, model=modelname,
                       description=desc, condition=cond,
                       avail_start_date=avail_start, avail_end_date=avail_end,

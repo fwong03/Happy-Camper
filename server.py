@@ -228,31 +228,33 @@ def handle_tent_listing():
     """Handle tent listing.
 
     First checks if it needs to make a new Brand. If so, makes a new Brand object.
-    
+
     Then makes Product object. Calls a function where you need to pass it the
-    brand_id.
+    brand_id and cat_id. For tents, cat_id==1.
 
     Then makes a Tent object. Need to pass it the same primary key of the parent
     Product object.
     """
-    # Check if new brand. If so make new brand nad add to database.
-    brand_id = int(request.form.get("brand_id"))
+    # Tent category ID is 1
+    cat_id = 1
+    # Check if new brand. If so make new brand and add to database.
+    brd_id = int(request.form.get("brand_id"))
 
-    if brand_id < 0:
+    if brd_id < 0:
         new_brand_name = request.form.get("new_brand_name")
         brand = Brand(brand_name=new_brand_name)
         db.session.add(brand)
         db.session.commit()
-        brand_id = brand.brand_id
+        brd_id = brand.brand_id
 
-    product = make_product(brand_id)
+    product = make_product(brand_id=brd_id, category_id=cat_id)
     db.session.add(product)
     db.session.commit()
 
     # Grab info to make a tent.
     bestuse = request.form.get("bestuse")
     sleep = int(request.form.get("sleep"))
-    seasoncat = request.form.get("seasoncat")
+    seasoncat = int(request.form.get("seasoncat"))
     weight = int(request.form.get("weight"))
 
     best_use = BestUse.query.filter(BestUse.use_name == bestuse).one()
@@ -279,7 +281,7 @@ def handle_tent_listing():
         poles = None
 
     tent = Tent(prod_id=product.prod_id, use_id=best_use.use_id,
-                sleep_capacity=sleep, seasons=3, min_trail_weight=weight,
+                sleep_capacity=sleep, seasons=seasoncat, min_trail_weight=weight,
                 floor_width=width, floor_length=length, num_doors=doors,
                 num_poles=poles)
 
@@ -395,25 +397,17 @@ def show_owner_rating(prod_id):
 
     owner_ratings = []
 
-    """
-    products = Product.query.all()
-    # if brand filter
-    if ...
-        products = products.filter(brand=...)
-    if category filter
-        products
-    """
-
     for product in products:
-        for history in product.histories.filter(owner_rating__isnot=None):
+        # Can do .filter(History.owner_rating_id.isnot(None))?
+        for history in product.histories:
             if history.owner_rating:
-                # filter out owner_ratings != NULL
                 owner_ratings.append(history.owner_rating)
 
     sum_stars = 0
     count_star_ratings = 0
     avg_star_rating = 0
 
+    # Filter out ratings without owner ratings before this
     if owner_ratings:
         for rating in owner_ratings:
             if rating.stars:
