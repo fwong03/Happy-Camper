@@ -94,6 +94,8 @@ class BestUse(db.Model):
     use_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     use_name = db.Column(db.String(16), nullable=False, unique=True)
 
+    tent = db.relationship('Tent', backref='bestuse')
+
     def __repr__(self):
         return "<BestUse use_id=%d, use_name=%s>" % (self.use_id, self.use_name)
 
@@ -112,7 +114,7 @@ class Brand(db.Model):
 
 class Product(db.Model):
     """Product parent class."""
-    # CHANGE: pricing is some amount first day then another amount per day 
+    # CHANGE: pricing is some amount first day then another amount per day
     # following not counting pickup or dropoff date (REI model)
 
     __tablename__ = 'products'
@@ -235,7 +237,6 @@ class SleepingBag(db.Model):
     # F, M, or U for female, male, unisex
     gender_code = db.Column(db.String(1), db.ForeignKey('genders.gender_code'))
 
-
     def __repr__(self):
         return "<Sleeping Bag prod_id=%d, fill_code=%s, temp_rating=%d, weight=%d, length=%d, gender=%s>" % (
             self.prod_id, self.fill_code, self.temp_rating, self.weight,
@@ -287,7 +288,6 @@ class Rating(db.Model):
     rating_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     stars = db.Column(db.Integer, nullable=False)
     comments = db.Column(db.String(128))
-
 
     def __repr__(self):
         return "<Rating rating_id=%d, stars=%d, comments=%s>" % (self.rating_id,

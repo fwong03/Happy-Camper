@@ -359,8 +359,22 @@ def show_results():
                            products=categorized_products)
 
 
+# @app.route('/product-detail/<int:prod_id>')
+# def show_item(prod_id):
+#     """Product detail page.
+
+#     Routes either from Search Results page or List Item page.
+#     If click on Borrow This, routes to Borrowed version of this page.
+#     """
+#     # Make a borrowed template version if available = False instead
+
+#     item = Product.query.get(prod_id)
+
+#     return render_template("product-detail.html", product=item)
+
+
 @app.route('/product-detail/<int:prod_id>')
-def show_item(prod_id):
+def show_product(prod_id):
     """Product detail page.
 
     Routes either from Search Results page or List Item page.
@@ -368,13 +382,26 @@ def show_item(prod_id):
     """
     # Make a borrowed template version if available = False instead
 
-    item = Product.query.get(prod_id)
+    # item = Product.query.get(prod_id)
+    cat_id = item.cat_id
+    categories = {1: Tent.query.get(prod_id),
+                 2: SleepingBag.query.get(prod_id),
+                 # 3: SleepingPad.query.get(prod_id),
+                 # 4: Pack.query.get(prod_id),
+                 # 5: Stove.query.get(prod_id),
+                 # 6: WaterFilter.query.get(prod_id),
+                 }
 
-    if item.available:
-        return render_template("product-detail.html", product=item)
-    else:
-        return "Sorry! The %s %s is no longer available for rent." % (
-            item.brand.brand_name, item.model)
+    templates = {1: 'tent.html',
+                 2: 'sleeping-bag.html',
+                 3: 'sleeping-pad.html',
+                 4: 'pack.html',
+                 5: 'stove.html',
+                 6: 'water-filter.html',
+                 }
+    item = categories[cat_id]
+
+    return render_template(templates[cat_id], product=item)
 
 
 @app.route('/rent-confirm/<int:prod_id>', methods=['POST'])

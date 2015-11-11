@@ -1,0 +1,46 @@
+{% extends 'product-detail-base.html' %}
+
+{% block title %}Tent Detail: {{ product.brand.brand_name }} {{ product.model }}{% endblock %}
+
+{% block content %}
+
+<table border="1" cellpadding="5">
+            <tr>
+                <th>Best Use</th>
+                <th>Sleep Capacity</th>
+                <th>Seasons</th>
+                <th>Minimum Trail Weight</th>
+                <th>Floor Dimensions (in.)</th>
+                <th>Number of Doors</th>
+                <th>Number of Polse</th>
+            </tr>
+                <tr>
+                    <td>{{  }}</td>
+                    <td><a href="/product-detail/{{ history.product.prod_id }}">{{ history.product.brand.brand_name }} {{ history.product.model }}</a></td>
+                    <td>${{ '{:,.2f}'.format(history.total_cost) }}</td>
+                    <td>
+                    </td>
+                    <td> 
+                        <ul>
+                            <li><a href="mailto:{{ history.product.owner.email }}">Send owner an email</a></li>
+                            <li> 
+                                {% if not history.owner_rating_id %}
+                                    <a href="/rate-owner/{{ history.product.owner_user_id }}-{{ history.history_id }}">Rate owner here</a>
+                                {% else %}
+                                    Owner rating already submitted.
+                                {% endif %}
+                            </li>
+                            <li>
+                                {% if not history.prod_rating_id %}
+                                    <a href="/rate-product/{{ history.prod_id }}-{{ history.history_id }}">Rate product here</a>
+                                {% else %}
+                                    Product rating already submitted.
+                                {% endif %}
+                            </li>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table><br><br>
+
+
+{% endblock %}
