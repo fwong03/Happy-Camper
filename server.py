@@ -431,18 +431,7 @@ def show_owner_rating(user_id):
             if history.owner_rating:
                 owner_ratings.append(history.owner_rating)
 
-    # Replace below with calc_avg_star_rating(ratings)
-
-    sum_stars = 0
-    count_star_ratings = 0
-    avg_star_rating = 0
-
-    for rating in owner_ratings:
-        if rating.stars:
-            sum_stars += rating.stars
-            count_star_ratings += 1
-
-        avg_star_rating = sum_stars / count_star_ratings
+    avg_star_rating = calc_avg_star_rating(owner_ratings)
 
     return render_template("show-owner-ratings.html", ratings=owner_ratings,
                            average=avg_star_rating, prod=product)

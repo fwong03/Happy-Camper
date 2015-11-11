@@ -8,8 +8,8 @@
 
 <h3>Average Star Rating</h3>
    <ul>
-    {% if average %}
-        <li> {{ average }} Stars </li>
+    {% if average > 0 %}
+        <li> {{ '{:,.1f}'.format(average) }} Stars </li>
     {% else %}
         <li>This user has no star ratings.</li>
     {% endif %}

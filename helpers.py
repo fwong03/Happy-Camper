@@ -1,6 +1,6 @@
 # Helper functions for my routes in server.py
 from flask import request, session
-from model import User, Brand, Category, Product
+from model import User, Brand, Category, Product, Rating
 from model import db
 from datetime import datetime, timedelta
 from geolocation.google_maps import GoogleMaps
@@ -9,8 +9,17 @@ import os
 
 
 def calc_avg_star_rating(ratings):
-    """Takes a list of ratings and returns average star rating"""
+    """Takes a list of ratings and returns average star rating as a
+        float. If no star ratings, returns -1.
 
+        >>> rating1 = Rating(rating_id=1, stars=4, comments="abc")
+        >>> rating2 = Rating(rating_id=3, stars=2, comments="def")
+        >>> rating3 = Rating(rating_id=3, stars=1, comments="ghi")
+        >>> ratings = [rating1, rating2, rating3]
+        >>> calc_avg_star_rating(ratings)
+        2.3333333333333335
+
+    """
     avg_star_rating = -1
 
     if ratings:
@@ -22,9 +31,17 @@ def calc_avg_star_rating(ratings):
                 sum_stars += rating.stars
                 count_star_ratings += 1
 
-        avg_star_rating = sum_stars / count_star_ratings
+        avg_star_rating = float(sum_stars) / count_star_ratings
 
     return avg_star_rating
+
+# rating1 = Rating(rating_id=1, stars=4, comments="abc")
+# rating2 = Rating(rating_id=3, stars=2, comments="def")
+# rating3 = Rating(rating_id=3, stars=1, comments="ghi")
+
+# ratings = [rating1, rating2, rating3]
+
+# calc_avg_star_rating(ratings)
 
 
 # Get rid of this? Don't need in user table anymore?
