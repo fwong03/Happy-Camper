@@ -36,25 +36,34 @@
                     <td>{{ product.avail_start_date.date().isoformat() }}</td>
                     <td>{{ product.avail_end_date.date().isoformat() }}</td>
                     <td>${{ '{:,.2f}'.format(product.price_per_day) }}</td> <td>
-                        <ul>
-                            {% if not product.histories %}
-                                <li>This product has no rental history</li>
-                            {% else %}
+                        {% if not product.histories %}
+                            This product has no rental history
+                        {% else %}
+                            <table border="1" cellpadding="2">
+                                <tr>
+                                    <th>Rental Dates</th>
+                                    <th>Total Cost</th>
+                                    <th>email Renter</th>
+                                    <th>See Ratings of Renter</th>
+                                    <th>Rate Renter</th>
+                                </tr>
                                 {% for history in product.histories %}
-                                    <li>Dates: {{ history.start_date.date().isoformat() }} to {{ history.end_date.date().isoformat() }} || Total Cost: ${{ '{:,.2f}'.format(product.price_per_day) }} || <a href="mailto:{{ history.renter.email }}">email renter: {{ history.renter.email }}</a> || <a href="/show-renter-rating/{{ history.renter_user_id }}">See ratings for this renter</a>||
-                                        {% if not history.renter_rating_id %}
-                                            <a href="/rate-renter/{{ history.renter_user_id }}-{{ history.history_id }}">Rate Renter</a>
-                                        {% else %}
-                                            Renter rating already submitted.
-                                        {% endif %}
-                                        </li>
+                                    <tr>
+                                        <td>{{ history.start_date.date().isoformat() }} to {{ history.end_date.date().isoformat() }}</td>
+                                        <td>${{ '{:,.2f}'.format(history.total_cost) }}</td>
+                                        <td><a href="mailto:{{ history.renter.email }}">email renter: {{ history.renter.email }}</a></td>
+                                        <td> <a href="/show-renter-rating/{{ history.renter_user_id }}">Ratings of {{ history.renter.email }} </a></td>
+                                        <td>
+                                            {% if not history.renter_rating_id %}
+                                                <a href="/rate-renter/{{ history.renter_user_id }}-{{ history.history_id }}">Rate Renter</a>
+                                            {% else %}
+                                                You've already submitted a rating for this renter.
+                                            {% endif %}
+                                        </td>
                                 {% endfor %}
-                        {% endif %}
-
-                        </ul>
-
-                    </td>
-                    <td>
+                            </table>
+                            {% endif %}
+                        <td>
                         <ul>
                             <li><a href="confirm-delist-product/{{ product.prod_id }}">Delist product</a></li>
                             <li>not yet implemented: edit listing</td>
@@ -81,26 +90,34 @@
                     <td>{{ product.category.cat_name }}</td>
                     <td><a href="/product-detail/{{ product.prod_id }}">{{ product.brand.brand_name }} {{ product.model }}</a></td>
                     <td>${{ '{:,.2f}'.format(product.price_per_day) }}</td> <td>
-                        <ul>
-                            {% if not product.histories %}
-                                <li>This product has no rental history</li>
-                            {% else %}
+                        {% if not product.histories %}
+                            This product has no rental history
+                        {% else %}
+                            <table border="1" cellpadding="2">
+                                <tr>
+                                    <th>Rental Dates</th>
+                                    <th>Total Cost</th>
+                                    <th>email Renter</th>
+                                    <th>See Ratings of Renter</th>
+                                    <th>Rate Renter</th>
+                                </tr>
                                 {% for history in product.histories %}
-                                    <li>Dates: {{ history.start_date.date().isoformat() }} to {{ history.end_date.date().isoformat() }} || Total Cost: ${{ '{:,.2f}'.format(product.price_per_day) }} || <a href="mailto:{{ history.renter.email }}">email renter: {{ history.renter.email }}</a> || <a href="/show-renter-rating/{{ history.renter_user_id }}">See ratings for this renter</a>||
-                                        {% if not history.renter_rating_id %}
-                                            <a href="/rate-renter/{{ history.renter_user_id }}-{{ history.history_id }}">Rate Renter</a>
-                                        {% else %}
-                                            Renter rating already submitted.
-                                        {% endif %}
-                                        </li>
+                                    <tr>
+                                        <td>{{ history.start_date.date().isoformat() }} to {{ history.end_date.date().isoformat() }}</td>
+                                        <td>${{ '{:,.2f}'.format(history.total_cost) }}</td>
+                                        <td><a href="mailto:{{ history.renter.email }}">email renter: {{ history.renter.email }}</a></td>
+                                        <td> <a href="/show-renter-rating/{{ history.renter_user_id }}">Ratings of {{ history.renter.email }} </a></td>
+                                        <td>
+                                            {% if not history.renter_rating_id %}
+                                                <a href="/rate-renter/{{ history.renter_user_id }}-{{ history.history_id }}">Rate Renter</a>
+                                            {% else %}
+                                                You've already submitted a rating for this renter.
+                                            {% endif %}
+                                        </td>
                                 {% endfor %}
-                        {% endif %}
-
-                        </ul>
-
-                    </td>
-                    <td>
-                        <ul>
+                            </table>
+                            {% endif %}
+                        <td>
                             <li><a href="relist-product/{{ product.prod_id }}">Relist product (this link doesn't do anything)</a></li>
                             <li>not yet implemented: edit listing</td>
                 </tr>
@@ -114,8 +131,7 @@
 {% if histories %}
     <table border="1" cellpadding="5">
             <tr>
-                <th>Start Date</th>
-                <th>End Date</th>
+                <th>Dates</th>
                 <th>Product</th>
                 <th>Total Cost</th>
                 <th>Status</th>
@@ -124,8 +140,7 @@
             </tr>
             {% for history in histories %}
                 <tr>
-                    <td>{{ history.start_date.date().isoformat() }}</td>
-                    <td>{{ history.end_date.date().isoformat() }}</td>
+                    <td>{{ history.start_date.date().isoformat() }} to {{ history.end_date.date().isoformat() }}</td>
                     <td><a href="/product-detail/{{ history.product.prod_id }}">{{ history.product.brand.brand_name }} {{ history.product.model }}</a></td>
                     <td>${{ '{:,.2f}'.format(history.total_cost) }}</td>
                     <td>{% if (today > history.end_date) %}
