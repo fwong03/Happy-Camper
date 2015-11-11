@@ -6,7 +6,8 @@ from flask import Flask, render_template, redirect, request, flash, session
 from flask_debugtoolbar import DebugToolbarExtension
 
 from model import connect_to_db, db
-from model import User, Region, Product, BestUse, Tent, Brand, History, Category, Rating
+from model import User, Region, Product, BestUse, Tent, SleepingBag
+from model import Brand, History, Category, Rating
 from helpers import get_lat_lngs, search_radius
 from helpers import calc_default_dates, convert_string_to_datetime
 from helpers import make_product, categorize_products
@@ -382,15 +383,13 @@ def show_product(prod_id):
     """
     # Make a borrowed template version if available = False instead
 
-    # item = Product.query.get(prod_id)
-    cat_id = item.cat_id
     categories = {1: Tent.query.get(prod_id),
-                 2: SleepingBag.query.get(prod_id),
-                 # 3: SleepingPad.query.get(prod_id),
-                 # 4: Pack.query.get(prod_id),
-                 # 5: Stove.query.get(prod_id),
-                 # 6: WaterFilter.query.get(prod_id),
-                 }
+                  2: SleepingBag.query.get(prod_id),
+                  # 3: SleepingPad.query.get(prod_id),
+                  # 4: Pack.query.get(prod_id),
+                  # 5: Stove.query.get(prod_id),
+                  # 6: WaterFilter.query.get(prod_id),
+                  }
 
     templates = {1: 'tent.html',
                  2: 'sleeping-bag.html',
@@ -399,9 +398,14 @@ def show_product(prod_id):
                  5: 'stove.html',
                  6: 'water-filter.html',
                  }
-    item = categories[cat_id]
 
-    return render_template(templates[cat_id], product=item)
+    parent_product = Product.query.get(prod_id)
+    cat_id = parent_product.cat_id
+
+    child_item = categories[cat_id]
+
+    return render_template(templates[cat_id], product=parent_product,
+                           item=child_item)
 
 
 @app.route('/rent-confirm/<int:prod_id>', methods=['POST'])
