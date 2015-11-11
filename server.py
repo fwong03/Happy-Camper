@@ -140,19 +140,13 @@ def show_account():
     They can also delete listings, rate stuff, get the emails of people
     renting to or renting from.
     """
-    user = User.query.filter(User.email == session['user']).one()
-    fname = user.fname
-    lname = user.lname
-    staddress = user.street
-    cty = user.city
-    state_id = user.region_id
+    customer = User.query.filter(User.email == session['user']).one()
+    state_id = customer.region_id
     st = Region.query.get(state_id).full
-    zcode = user.postalcode
-    phonenumber = user.phone
 
     today_date = datetime.today()
 
-    products_all = Product.query.filter(Product.owner_user_id == user.user_id).all()
+    products_all = Product.query.filter(Product.owner_user_id == customer.user_id).all()
     products_avail = []
     products_out = []
 
@@ -162,17 +156,9 @@ def show_account():
         else:
             products_out.append(product)
 
-    rentals = History.query.filter(History.renter_user_id == user.user_id)
+    rentals = History.query.filter(History.renter_user_id == customer.user_id).all()
 
-    # rentals = db.session.query(History.history_id, History.start_date,
-    #                            History.end_date, History.total_cost,
-    #                            History.owner_rating_id, History.prod_rating_id,
-    #                            Brand.brand_name, Product.model, Product.prod_id,
-    #                            Product.owner_user_id, User.email).join(Product).join(Brand).join(User.user_id==Product.owner_user_id).filter(History.renter_user_id == user.user_id).all()
-
-    return render_template("accountinfo.html", firstname=fname, lastname=lname,
-                           street=staddress, city=cty, state=st, zipcode=zcode,
-                           phone=phonenumber, email=session['user'],
+    return render_template("accountinfo.html", user=customer, state=st,
                            products_available=products_avail,
                            products_not_available=products_out,
                            histories=rentals, today=today_date)
@@ -465,11 +451,11 @@ def show_owner_rating(prod_id):
 
         avg_star_rating = sum_stars / count_star_ratings
 
-    return render_template("owner-rating.html", ratings=owner_ratings,
+    return render_template("show-owner-ratings.html", ratings=owner_ratings,
                            average=avg_star_rating, prod=product)
 
 
-@app.route('/owner-rate/<int:owner_id>-<int:history_id>')
+@app.route('/rate-owner/<int:owner_id>-<int:history_id>')
 def rate_owner(owner_id, history_id):
     """Page to rate owner.
 
@@ -480,28 +466,28 @@ def rate_owner(owner_id, history_id):
     session['history_id_for_rating'] = history_id
     session['owner_username_for_rating'] = owner.email
 
-    return render_template("owner-rate-form.html",
-                           submit_route='/owner-rate-confirm/')
+    return render_template("rate-owner.html",
+                           submit_route='/rate-owner-confirm/')
 
 
-@app.route('/owner-rate-edit/')
+@app.route('/rate-owner-edit/')
 def edit_owner_rating():
     """Page to edit rating of owner.
 
     """
 
-    return render_template("owner-rate-edit.html",
-                           submit_route='/owner-rate-confirm/')
+    return render_template("rate-owner-edit.html",
+                           submit_route='/rate-owner-confirm/')
 
 
-@app.route('/owner-rate-confirm/', methods=['POST'])
+@app.route('/rate-owner-confirm/', methods=['POST'])
 def confirm_owner_rating():
     """Confirm owner rating before adding to database"""
 
     stars = request.form.get("stars")
     comments = request.form.get("comments")
 
-    return render_template("owner-rate-confirm.html", num_stars=stars,
+    return render_template("rate-owner-confirm.html", num_stars=stars,
                            comments_text=comments,
                            submit_route='/handle-owner-rating')
 
@@ -534,7 +520,7 @@ def handle_owner_rating():
     return redirect('/success')
 
 
-@app.route('/product-rate/<int:prod_id>-<int:history_id>')
+@app.route('/rate-product/<int:prod_id>-<int:history_id>')
 def rate_product(prod_id, history_id):
     """Page to rate product.
 
@@ -546,28 +532,28 @@ def rate_product(prod_id, history_id):
     session['prod_id_for_rating'] = prod_id
     session['prod_name_for_rating'] = "%s %s" % (item.brand.brand_name, item.model)
 
-    return render_template("product-rate-form.html", product=item,
-                           submit_route='/product-rate-confirm/')
+    return render_template("rate-product.html", product=item,
+                           submit_route='/rate-product-confirm/')
 
 
-@app.route('/product-rate-edit/')
+@app.route('/rate-product-edit/')
 def edit_product_rating():
     """Page to edit rating of product.
 
     """
 
-    return render_template("product-rate-edit.html",
-                           submit_route='/product-rate-confirm/')
+    return render_template("rate-product-edit.html",
+                           submit_route='/rate-product-confirm/')
 
 
-@app.route('/product-rate-confirm/', methods=['POST'])
+@app.route('/rate-product-confirm/', methods=['POST'])
 def confirm_product_rating():
     """Confirm product rating before adding to database"""
 
     stars = request.form.get("stars")
     comments = request.form.get("comments")
 
-    return render_template("product-rate-confirm.html", num_stars=stars,
+    return render_template("rate-product-confirm.html", num_stars=stars,
                            comments_text=comments,
                            submit_route='/handle-product-rating')
 
@@ -601,15 +587,20 @@ def handle_product_rating():
 
 
 
-@app.route('/renter_rate')
-def renter_rate():
-    """Rating page for renter.
+@app.route('/rate-renter/<int:renter_id>-<int:history_id>')
+def rate_renter(renter_id, history_id):
+    """Page to rate renter.
 
-    Here they can rent the owner and the product.
-    Routes from Account page and routes to Account Page with flashed message
-    thanking them for their rating."""
+    """
 
-    return "Here renters can rate the owner and the product they rented."
+    renter = User.query.get(renter_id)
+
+    session['history_id_for_rating'] = history_id
+    session['renter_username_for_rating'] = renter.email
+
+    return render_template("rate-renter.html",
+                           submit_route='/rate-renter-confirm/')
+
 
 
 

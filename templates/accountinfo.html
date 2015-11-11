@@ -6,10 +6,10 @@
 <h1>Your Account</h1>
 
 <h3>Contact Info</h3>
-    <p><b>Name: </b>{{ firstname }} {{ lastname }}</p>
-    <p><b>Address: </b> {{ street }}, {{ city }}, {{ state }} {{ zipcode }}</p>
-    <p><b>Phone: </b> {{ phone }}</p>
-    <p><b>email: </b> {{ email }}</p>
+    <p><b>Name: </b>{{ user.fname }} {{ user.lname }}</p>
+    <p><b>Address: </b> {{ user.street }}, {{ user.city }}, {{ state }} {{ user.postalcode }}</p>
+    <p><b>Phone: </b> {{ user.phone }}</p>
+    <p><b>email: </b> {{ user.email }}</p>
     <p><b>Actions available: </b>
     <ul>
         <li>Edit account (not yet implemented)</li>
@@ -26,7 +26,8 @@
                 <th>Model</th>
                 <th>Available Start</th>
                 <th>Available End</th>
-                <th>Price</th>
+                <th>Price Per Day</th>
+                <th>Rental History</th>
                 <th>Actions Available</th>
             </tr>
             {% for product in products_available %}
@@ -36,9 +37,15 @@
                     <td>{{ product.model }}</td>
                     <td>{{ product.avail_start_date.date().isoformat() }}</td>
                     <td>{{ product.avail_end_date.date().isoformat() }}</td>
-                    <td>{{ product.avail_start_date.date().isoformat() }}</td>
-                    <td>{{ product.avail_end_date.date().isoformat() }}</td>
-                    <td>${{ '{:,.2f}'.format(product.price_per_day) }}</td>
+                    <td>${{ '{:,.2f}'.format(product.price_per_day) }}</td> <td>
+                        <ul>
+                        {% for history in product.histories %}
+                            <li>Dates: {{ history.start_date.date().isoformat() }} to {{ history.end_date.date().isoformat() }} || Total Cost: ${{ '{:,.2f}'.format(product.price_per_day) }} || <a href="mailto:{{ history.renter.email }}">email renter</a> || <a href="/rate-renter/{{ history.renter_user_id }}">Rate Renter</a></li>
+                        {% endfor %}
+
+                        </ul>
+
+                    </td>
                     <td>not yet implemented (edit, delist)</td>
                 </tr>
             {% endfor %}
@@ -56,6 +63,7 @@
                 <th>Product</th>
                 <th>Total Cost</th>
                 <th>Status</th>
+                <th>Rental History</th>
                 <th>Actions Available</th>
             </tr>
             {% for history in histories %}
@@ -75,12 +83,20 @@
                     <td> 
                         <ul>
                             <li><a href="mailto:{{ history.product.owner.email }}">Send owner an email</a></li>
-                        {% if not history.owner_rating_id %}
-                            <li><a href="/owner-rate/{{ history.product.owner_user_id }}-{{ history.history_id }}">Rate owner here</a></li>
-                        {% endif %}
-                        {% if not history.prod_rating_id %}
-                            <li><a href="/product-rate/{{ history.prod_id }}-{{ history.history_id }}">Rate product here</a></li>
-                        {% endif %}
+                            <li> 
+                                {% if not history.owner_rating_id %}
+                                    <a href="/rate-owner/{{ history.product.owner_user_id }}-{{ history.history_id }}">Rate owner here</a>
+                                {% else %}
+                                    Owner rating already submitted.
+                                {% endif %}
+                            </li>
+                            <li>
+                                {% if not history.prod_rating_id %}
+                                    <a href="/rate-product/{{ history.prod_id }}-{{ history.history_id }}">Rate product here</a>
+                                {% else %}
+                                    Product rating already submitted.
+                                {% endif %}
+                            </li>
                     </td>
                 </tr>
             {% endfor %}
