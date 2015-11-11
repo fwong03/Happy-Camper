@@ -174,14 +174,21 @@ def confirm_deactivate_account():
 
 @app.route('/handle-deactivate-account', methods=['POST'])
 def deactivate_account():
-    """Deactivate user account"""
+    """Deactivate user account.
+
+        Sets availablility to each owner's product to false.
+        Sets user active to false.
+    """
     user = User.query.filter(User.email == session['user']).one()
+    products = user.products
+
+    for product in products:
+        product.available = 0
+
     user.active = 0
     db.session.commit()
     session.clear()
 
-    # Change this to redirect to signedout honepage with flash message.
-    # Can then delete finalized-deactivate-account route.
     flash("Your account has been deactivated. Thank you for using Happy Camper!")
 
     return redirect('/')
