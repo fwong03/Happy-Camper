@@ -159,7 +159,7 @@ def show_account():
 
     rentals = History.query.filter(History.renter_user_id == customer.user_id).all()
 
-    return render_template("accountinfo.html", user=customer, state=st,
+    return render_template("account-info.html", user=customer, state=st,
                            products_available=products_avail,
                            products_not_available=products_out,
                            histories=rentals, today=today_date)
@@ -410,7 +410,9 @@ def handle_rental(prod_id):
     db.session.add(history)
     db.session.commit()
 
-    return redirect('/rental-finalized')
+    flash("Rental finalized! Check your account page under \"Items Rented\" for info.")
+
+    return redirect('/account-info')
 
 
 @app.route('/rental-finalized')
