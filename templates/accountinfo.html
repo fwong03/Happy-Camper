@@ -40,7 +40,13 @@
                     <td>${{ '{:,.2f}'.format(product.price_per_day) }}</td> <td>
                         <ul>
                         {% for history in product.histories %}
-                            <li>Dates: {{ history.start_date.date().isoformat() }} to {{ history.end_date.date().isoformat() }} || Total Cost: ${{ '{:,.2f}'.format(product.price_per_day) }} || <a href="mailto:{{ history.renter.email }}">email renter</a> || <a href="/rate-renter/{{ history.renter_user_id }}-{{ history.history_id }}">Rate Renter</a></li>
+                            <li>Dates: {{ history.start_date.date().isoformat() }} to {{ history.end_date.date().isoformat() }} || Total Cost: ${{ '{:,.2f}'.format(product.price_per_day) }} || <a href="mailto:{{ history.renter.email }}">email renter</a> || 
+                                {% if not history.renter_rating_id %}
+                                    <a href="/rate-renter/{{ history.renter_user_id }}-{{ history.history_id }}">Rate Renter</a>
+                                {% else %}
+                                    Renter rating already submitted.
+                                {% endif %}
+                                </li>
                         {% endfor %}
 
                         </ul>

@@ -648,6 +648,7 @@ def handle_renter_rating():
     flash("Thank you for your rating!")
 
     return redirect('/success')
+    
 @app.route('/list-sleepingbag')
 def list_sleepingbag():
     return "This is where you'll list a sleeping bag."
