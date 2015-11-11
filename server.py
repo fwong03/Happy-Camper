@@ -476,7 +476,7 @@ def edit_owner_rating():
 
     """
 
-    return render_template("rate-owner-edit.html",
+    return render_template("rate-owner.html",
                            submit_route='/rate-owner-confirm/')
 
 
@@ -542,7 +542,7 @@ def edit_product_rating():
 
     """
 
-    return render_template("rate-product-edit.html",
+    return render_template("rate-product.html",
                            submit_route='/rate-product-confirm/')
 
 
@@ -601,9 +601,53 @@ def rate_renter(renter_id, history_id):
     return render_template("rate-renter.html",
                            submit_route='/rate-renter-confirm/')
 
+@app.route('/rate-renter-edit/')
+def edit_renter_rating():
+    """Page to edit rating of renter.
+
+    """
+
+    return render_template("rate-renter.html",
+                           submit_route='/rate-renter-confirm/')
 
 
+@app.route('/rate-renter-confirm/', methods=['POST'])
+def confirm_renter_rating():
+    """Confirm renter rating before adding to database"""
 
+    stars = request.form.get("stars")
+    comments = request.form.get("comments")
+
+    return render_template("rate-renter-confirm.html", num_stars=stars,
+                           comments_text=comments,
+                           submit_route='/handle-renter-rating')
+
+@app.route('/handle-renter-rating', methods=['POST'])
+def handle_renter_rating():
+    """Handle renter rating form submission.
+
+    Will (1) create rating object and (2) update associated history object's
+    renter_rating_id.
+    """
+
+    number_stars = int(request.form.get("number_stars"))
+    comments_text = request.form.get("comments_text")
+
+    renter_rating = Rating(stars=number_stars, comments=comments_text)
+    db.session.add(renter_rating)
+    db.session.commit()
+
+    history = History.query.get(session['history_id_for_rating'])
+    history.renter_rating_id = renter_rating.rating_id
+
+    db.session.commit()
+
+    session.pop('history_id_for_rating')
+    session.pop('renter_username_for_rating')
+
+    flash("Thank you for your rating!")
+
+    return redirect('/success')
 @app.route('/list-sleepingbag')
 def list_sleepingbag():
     return "This is where you'll list a sleeping bag."

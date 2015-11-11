@@ -1,12 +1,12 @@
 {% extends 'rate-form-base.html' %}
 
-{% block title %}Rate Owner Confirmation{% endblock %}
+{% block title %}Rate Renter Confirmation{% endblock %}
 
-{% block page_heading %}Confirmation: Product Owner Rating for {{ session['owner_username_for_rating'] }} {% endblock %}
+{% block page_heading %}Confirmation: Renter Rating for {{ session['renter_username_for_rating'] }} {% endblock %}
 
  {% block star_instructions %}{% endblock %}
 
-{% block star_dropdown %} You gave this owner a star rating of: 
+{% block star_dropdown %} You gave this renter a star rating of: 
     <input type="hidden" name="number_stars" value="{{ num_stars }}">
         <i>{{ num_stars }}</i> out of 4
 
@@ -23,7 +23,7 @@
 <p><i>{{ comments_text }}</i></p>
 
 <br>
-<p>Submit below or <a href="/rate-owner-edit/">click here to edit rating</a></p>
+<p>Submit below or <a href="/rate-renter-edit/">click here to edit rating</a></p>
 
  {% endblock %}
 
