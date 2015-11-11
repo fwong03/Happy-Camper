@@ -181,13 +181,9 @@ def deactivate_account():
 
     # Change this to redirect to signedout honepage with flash message.
     # Can then delete finalized-deactivate-account route.
+    flash("Your account has been deactivated. Thank you for using Happy Camper!")
 
-    return redirect('/finalized-deactivate-account')
-
-
-@app.route('/finalized-deactivate-account')
-def say_goodbye():
-    return render_template("goodbye.html")
+    return redirect('/')
 
 
 @app.route('/list-item')
@@ -365,17 +361,12 @@ def show_item(prod_id):
     # Make a borrowed template version if available = False instead
 
     item = Product.query.get(prod_id)
-    search_start_date_string = session['search_start_date'].date().isoformat()
-    search_end_date_string = session['search_end_date'].date().isoformat()
 
     if item.available:
-        return render_template("product-detail.html", product=item,
-                               start_date_string=search_start_date_string,
-                               end_date_string=search_end_date_string)
+        return render_template("product-detail.html", product=item)
     else:
         return "Sorry! The %s %s is no longer available for rent." % (
             item.brand.brand_name, item.model)
-
 
 
 @app.route('/rent-confirm/<int:prod_id>', methods=['POST'])
@@ -517,7 +508,7 @@ def handle_owner_rating():
 
     flash("Thank you for your rating!")
 
-    return redirect('/success')
+    return redirect('/account-info')
 
 
 @app.route('/rate-product/<int:prod_id>-<int:history_id>')
@@ -583,8 +574,7 @@ def handle_product_rating():
 
     flash("Thank you for your rating!")
 
-    return redirect('/success')
-
+    return redirect('/account-info')
 
 
 @app.route('/rate-renter/<int:renter_id>-<int:history_id>')
@@ -600,6 +590,7 @@ def rate_renter(renter_id, history_id):
 
     return render_template("rate-renter.html",
                            submit_route='/rate-renter-confirm/')
+
 
 @app.route('/rate-renter-edit/')
 def edit_renter_rating():
@@ -621,6 +612,7 @@ def confirm_renter_rating():
     return render_template("rate-renter-confirm.html", num_stars=stars,
                            comments_text=comments,
                            submit_route='/handle-renter-rating')
+
 
 @app.route('/handle-renter-rating', methods=['POST'])
 def handle_renter_rating():
@@ -647,8 +639,46 @@ def handle_renter_rating():
 
     flash("Thank you for your rating!")
 
-    return redirect('/success')
-    
+    return redirect('/account-info')
+
+
+@app.route('/confirm-delist-product/<int:prod_id>')
+def confirm_delist_product(prod_id):
+    """Confirm the user wants to delist product"""
+
+    item = Product.query.get(prod_id)
+
+    return render_template("confirm-delist-product.html", product=item)
+
+
+@app.route('/handle-delist-product', methods=['POST'])
+def delist_product():
+    """Delist product"""
+
+    prod_id = int(request.form.get("prod_id"))
+    product = Product.query.get(prod_id)
+    product.available = 0
+    db.session.commit()
+
+    # Change this to redirect to signedout honepage with flash message.
+    # Can then delete finalized-deactivate-account route.
+    flash("This product has been delisted.")
+
+    return redirect('/account-info')
+
+
+@app.route('/relist-product/<int:prod_id>')
+def relist_product(prod_id):
+    """Relist product"""
+
+    # product = Product.query.get(prod_id)
+    # product.available = 1
+    # db.session.commit()
+
+    return render_template("relist.html")
+
+
+
 @app.route('/list-sleepingbag')
 def list_sleepingbag():
     return "This is where you'll list a sleeping bag."

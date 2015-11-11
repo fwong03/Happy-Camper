@@ -3,7 +3,7 @@
 {% block title %}Product Owner Rating{% endblock %}
 
 {% block content %}
-<h3>Ratings for Owner of {{ prod.brand.brand_name }} {{ prod.model }}</h3>
+<h3>Ratings for Owner: {{ prod.owner.email }}</h3>
 <p>Note: Ratings are from renters across all of this owner's products</p>
 
 <h3>Average Star Rating</h3>

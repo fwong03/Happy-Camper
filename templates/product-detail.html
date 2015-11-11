@@ -19,8 +19,8 @@
         {% if product.owner.email != session['user'] %}
             <p>Your rental period info:</p>
             <ul>
-                <li>Rental start date: {{ start_date_string }}</li>
-                <li>Rental end date: {{ end_date_string }}</li>
+                <li>Rental start date: {{ session['search_start_date'].date().isoformat() }}</li>
+                <li>Rental end date: {{ session['search_end_date'].date().isoformat() }}</li>
             <li>Number of days: {{ session['num_days'] }}
             <li>Total cost: ${{ '{:,.2f}'.format(session['num_days'] * product.price_per_day) }}</li>
             </ul>
@@ -29,7 +29,7 @@
             <input type="submit" value="Rent This">
             </form>
 
-             <p>Or, go back to your <a href="/searchresults?search_area={{ session['search_area'] }}&search_miles={{ session['search_radius'] }}&search_start_date={{ start_date_string }}&search_end_date={{ end_date_string }}">search results</a></p>
+             <p>Or, go back to your <a href="/searchresults?search_area={{ session['search_area'] }}&search_miles={{ session['search_radius'] }}&search_start_date={{ session['search_start_date'].date().isoformat() }}&search_end_date={{ session['search_end_date'].date().isoformat() }}">search results</a></p>
         {% endif %}
 
 
