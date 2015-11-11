@@ -52,7 +52,7 @@
                                         <td>{{ history.start_date.date().isoformat() }} to {{ history.end_date.date().isoformat() }}</td>
                                         <td>${{ '{:,.2f}'.format(history.total_cost) }}</td>
                                         <td><a href="mailto:{{ history.renter.email }}">email renter: {{ history.renter.email }}</a></td>
-                                        <td> <a href="/show-renter-rating/{{ history.renter_user_id }}">Ratings of {{ history.renter.email }} </a></td>
+                                        <td> <a href="/show-renter-ratings/{{ history.renter_user_id }}">Ratings of {{ history.renter.email }} </a></td>
                                         <td>
                                             {% if not history.renter_rating_id %}
                                                 <a href="/rate-renter/{{ history.renter_user_id }}-{{ history.history_id }}">Rate Renter</a>
@@ -106,7 +106,7 @@
                                         <td>{{ history.start_date.date().isoformat() }} to {{ history.end_date.date().isoformat() }}</td>
                                         <td>${{ '{:,.2f}'.format(history.total_cost) }}</td>
                                         <td><a href="mailto:{{ history.renter.email }}">email renter: {{ history.renter.email }}</a></td>
-                                        <td> <a href="/show-renter-rating/{{ history.renter_user_id }}">Ratings of {{ history.renter.email }} </a></td>
+                                        <td> <a href="/show-renter-ratings/{{ history.renter_user_id }}">Ratings of {{ history.renter.email }} </a></td>
                                         <td>
                                             {% if not history.renter_rating_id %}
                                                 <a href="/rate-renter/{{ history.renter_user_id }}-{{ history.history_id }}">Rate Renter</a>

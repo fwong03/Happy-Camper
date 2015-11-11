@@ -420,11 +420,11 @@ def rent_item():
     return render_template("rent-final.html")
 
 
-@app.route('/show-owner-rating/<int:user_id>')
-def show_owner_rating(user_id):
+@app.route('/show-owner-ratings/<int:user_id>')
+def show_owner_ratings(user_id):
     """Show owner star ratings and any comments.
 
-    Routes from Product detail (and Account Info?) page.
+    Routes from Product detail and Account Info page.
     """
 
     owner = User.query.get(user_id)
@@ -444,8 +444,8 @@ def show_owner_rating(user_id):
                            average=avg_star_rating, prod=product)
 
 
-@app.route('/show-renter-rating/<int:renter_id>')
-def show_renter_rating(renter_id):
+@app.route('/show-renter-ratings/<int:renter_id>')
+def show_renter_ratings(renter_id):
     """Show renter star ratings and any comments.
 
     Routes from account info page.
@@ -467,6 +467,28 @@ def show_renter_rating(renter_id):
     return render_template("show-renter-ratings.html", ratings=renter_ratings,
                            average=avg_star_rating, username=renter_email)
 
+
+@app.route('/show-product-ratings/<int:prod_id>')
+def show_product_ratings(prod_id):
+    """Show product star ratings and any comments.
+
+    Routes from product detail page.
+    """
+
+    item = Product.query.get(prod_id)
+    histories = History.query.filter(History.prod_id == prod_id).all()
+
+    product_ratings = []
+
+    for history in histories:
+        # Can filter out null renter_ratings in line above?
+        if history.product_rating:
+            product_ratings.append(history.product_rating)
+
+    avg_star_rating = calc_avg_star_rating(product_ratings)
+
+    return render_template("show-product-ratings.html", ratings=product_ratings,
+                           average=avg_star_rating, product=item)
 
 
 @app.route('/rate-owner/<int:owner_id>-<int:history_id>')

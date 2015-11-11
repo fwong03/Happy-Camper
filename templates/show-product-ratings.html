@@ -1,16 +1,16 @@
 {% extends 'base.html' %}
 
-{% block title %}Renter Ratings{% endblock %}
+{% block title %}Product Ratings{% endblock %}
 
 {% block content %}
-<h3>Ratings for Renter: {{ username }}</h3>
+<h3>Ratings for Product: {{ product.brand.brand_name }} {{ product.model }}</h3>
 
 <h3>Average Star Rating</h3>
    <ul>
     {% if average > 0 %}
         <li> {{ '{:,.1f}'.format(average) }} Stars </li>
     {% else %}
-        <li>This user has no renter star ratings yet.</li>
+        <li>This product has no star ratings yet.</li>
     {% endif %}
 </ul>
 <h3>Comments</h3>
@@ -19,18 +19,16 @@
             <tr>
                 <th>Stars (out of 4)</th>
                 <th>Comments</th>
-                <th>Product</th>
             </tr>
         {% for rating in ratings %}
         <tr>
             <td>{{ rating.stars }}</td>
             <td>{{ rating.comments }}</td>
-            <td><a href="/product-detail/{{ rating.rhistory[0].product.prod_id }}">{{ rating.rhistory[0].product.brand.brand_name }}: {{ rating.rhistory[0].product.model }}</td>
         {% endfor %}
     </table>
     {% else %}
         <ul>
-            <li>This user has no renter comments yet.</li>
+            <li>This product has no comments yet.</li>
         </ul>
     {% endif %}
 
