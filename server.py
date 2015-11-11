@@ -150,7 +150,7 @@ def show_account():
     zcode = user.postalcode
     phonenumber = user.phone
 
-    today = datetime.today()
+    today_date = datetime.today()
 
     products_all = Product.query.filter(Product.owner_user_id == user.user_id).all()
     products_avail = []
@@ -162,18 +162,20 @@ def show_account():
         else:
             products_out.append(product)
 
-    rentals = db.session.query(History.history_id, History.start_date,
-                               History.end_date, History.total_cost,
-                               History.owner_rating_id, History.prod_rating_id,
-                               Brand.brand_name, Product.model, Product.prod_id,
-                               Product.owner_user_id).join(Product).join(Brand).filter(History.renter_user_id == user.user_id).all()
+    rentals = History.query.filter(History.renter_user_id == user.user_id)
+
+    # rentals = db.session.query(History.history_id, History.start_date,
+    #                            History.end_date, History.total_cost,
+    #                            History.owner_rating_id, History.prod_rating_id,
+    #                            Brand.brand_name, Product.model, Product.prod_id,
+    #                            Product.owner_user_id, User.email).join(Product).join(Brand).join(User.user_id==Product.owner_user_id).filter(History.renter_user_id == user.user_id).all()
 
     return render_template("accountinfo.html", firstname=fname, lastname=lname,
                            street=staddress, city=cty, state=st, zipcode=zcode,
                            phone=phonenumber, email=session['user'],
                            products_available=products_avail,
                            products_not_available=products_out,
-                           histories=rentals, today=today)
+                           histories=rentals, today=today_date)
 
 
 @app.route('/confirm-deactivate-account')
@@ -362,7 +364,7 @@ def show_results():
     return render_template("searchresults.html", location=search_area,
                            miles=search_miles,
                            start_date_string=session['search_start_date'].date().isoformat(),
-                           end_date_string=ssession['search_end_date'].date().isoformat,
+                           end_date_string=session['search_end_date'].date().isoformat,
                            sorted_categories=sorted_cats,
                            products=categorized_products)
 

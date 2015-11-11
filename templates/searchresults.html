@@ -6,7 +6,7 @@
     <h1>Search Results</h1>
     <p>Location: {{ location }}</p>
     <p>Search radius: {{ miles }} miles</p>
-    <p>Dates: {{ start_date.date().isoformat() }} to {{ end_date.date().isoformat() }} </p>
+    <p>Dates: {{ start_date_string }} to {{ end_date_string }} </p>
     <p>----------------------------------------</p>
 
     {% for category in sorted_categories %}
@@ -16,7 +16,7 @@
                 <tr>
                     <th>Brand and Model</th>
                     <th>Price Per Day</th>
-                    <th>Cost for {{num_days }} days</th>
+                    <th>Cost for {{ session['num_days'] }} days</th>
                     <th>product location</th>
                 </tr>
                 {% for product in products[category] %}
@@ -24,7 +24,7 @@
                         <td><a href="/product-detail/{{ product.prod_id }}">
                              {{ product.brand.brand_name }} {{ product.model }} </td>
                         <td>${{ '{:,.2f}'.format(product.price_per_day) }}</td>
-                        <td>${{ '{:,.2f}'.format(num_days * product.price_per_day) }}</td>
+                        <td>${{ '{:,.2f}'.format(session['num_days'] * product.price_per_day) }}</td>
                         <td>{{ product.owner.city }}</td>
                         </tr>
                 {% endfor %}

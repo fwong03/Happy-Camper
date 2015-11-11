@@ -62,7 +62,7 @@
                 <tr>
                     <td>{{ history.start_date.date().isoformat() }}</td>
                     <td>{{ history.end_date.date().isoformat() }}</td>
-                    <td>{{ history.brand_name }} {{ history.model }}</td>
+                    <td>{{ history.product.brand.brand_name }} {{ history.product.model }}</td>
                     <td>${{ '{:,.2f}'.format(history.total_cost) }}</td>
                     <td>{% if (today > history.end_date) %}
                             Rental done
@@ -72,12 +72,14 @@
                             Rental ongoing
                         {% endif %}
                     </td>
-                    <td>This will be links to owner email and option to rate experience
+                    <td> 
+                        <ul>
+                            <li><a href="mailto:{{ history.product.owner.email }}">Send owner an email</a></li>
                         {% if not history.owner_rating_id %}
-                        <br><a href="/owner-rate/{{ history.owner_user_id }}-{{ history.history_id }}">Rate owner here</a><br>
+                            <li><a href="/owner-rate/{{ history.product.owner_user_id }}-{{ history.history_id }}">Rate owner here</a></li>
                         {% endif %}
-                         {% if not history.prod_rating_id %}
-                        <br><a href="/product-rate/{{ history.prod_id }}-{{ history.history_id }}">Rate product here</a><br>
+                        {% if not history.prod_rating_id %}
+                            <li><a href="/product-rate/{{ history.prod_id }}-{{ history.history_id }}">Rate product here</a></li>
                         {% endif %}
                     </td>
                 </tr>
