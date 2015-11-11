@@ -64,7 +64,7 @@
 {% endif %}
 <br>
 
-<h3>Items Unavailable for Rent</h3>
+<h3>Items you have rented out in the past but are currently unavailable</h3>
     {% if products_not_available %}
         <table border="1" cellpadding="5">
             <tr>
@@ -87,7 +87,7 @@
                     <td>${{ '{:,.2f}'.format(product.price_per_day) }}</td> <td>
                         <ul>
                         {% for history in product.histories %}
-                            <li>Dates: {{ history.start_date.date().isoformat() }} to {{ history.end_date.date().isoformat() }} || Total Cost: ${{ '{:,.2f}'.format(product.price_per_day) }} || <a href="mailto:{{ history.renter.email }}">email renter</a> || 
+                            <li>Dates: {{ history.start_date.date().isoformat() }} to {{ history.end_date.date().isoformat() }} || Total Cost: ${{ '{:,.2f}'.format(product.price_per_day) }} || <a href="mailto:{{ history.renter.email }}">email renter</a> || <a href="/show-renter-rating/{{ history.renter_user_id }}">See ratings for this renter</a>||
                                 {% if not history.renter_rating_id %}
                                     <a href="/rate-renter/{{ history.renter_user_id }}-{{ history.history_id }}">Rate Renter</a>
                                 {% else %}

@@ -7,6 +7,26 @@ from geolocation.google_maps import GoogleMaps
 from geolocation.distance_matrix import const
 import os
 
+
+def calc_avg_star_rating(ratings):
+    """Takes a list of ratings and returns average star rating"""
+
+    avg_star_rating = -1
+
+    if ratings:
+        sum_stars = 0
+        count_star_ratings = 0
+
+        for rating in ratings:
+            if rating.stars:
+                sum_stars += rating.stars
+                count_star_ratings += 1
+
+        avg_star_rating = sum_stars / count_star_ratings
+
+    return avg_star_rating
+
+
 # Get rid of this? Don't need in user table anymore?
 def get_lat_lngs(address):
     """Takes address as string, returns a list of latitude and

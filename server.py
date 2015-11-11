@@ -10,6 +10,7 @@ from model import User, Region, Product, BestUse, Tent, Brand, History, Category
 from helpers import get_lat_lngs, search_radius
 from helpers import calc_default_dates, convert_string_to_datetime
 from helpers import make_product, categorize_products
+from helpers import calc_avg_star_rating
 from datetime import datetime
 
 
@@ -412,15 +413,14 @@ def rent_item():
     return render_template("rent-final.html")
 
 
-@app.route('/show-owner-rating/<int:prod_id>')
-def show_owner_rating(prod_id):
+@app.route('/show-owner-rating/<int:user_id>')
+def show_owner_rating(user_id):
     """Show owner star ratings and any comments.
 
     Routes from Product detail (and Account Info?) page.
     """
 
-    product = Product.query.get(prod_id)
-    owner = product.owner
+    owner = User.query.get(user_id)
     products = owner.products
 
     owner_ratings = []
@@ -430,6 +430,8 @@ def show_owner_rating(prod_id):
         for history in product.histories:
             if history.owner_rating:
                 owner_ratings.append(history.owner_rating)
+
+    # Replace below with calc_avg_star_rating(ratings)
 
     sum_stars = 0
     count_star_ratings = 0
@@ -444,6 +446,31 @@ def show_owner_rating(prod_id):
 
     return render_template("show-owner-ratings.html", ratings=owner_ratings,
                            average=avg_star_rating, prod=product)
+
+
+@app.route('/show-renter-rating/<int:renter_id>')
+def show_renter_rating(renter_id):
+    """Show renter star ratings and any comments.
+
+    Routes from account info page.
+    """
+
+    histories = History.query.filter(History.renter_user_id == renter_id).all()
+    renter = User.query.get(renter_id)
+    renter_email = renter.email
+
+    renter_ratings = []
+
+    for history in histories:
+        # Can filter out null renter_ratings in line above?
+        if history.renter_rating:
+            renter_ratings.append(history.renter_rating)
+
+    avg_star_rating = calc_avg_star_rating(renter_ratings)
+
+    return render_template("show-renter-ratings.html", ratings=renter_ratings,
+                           average=avg_star_rating, username=renter_email)
+
 
 
 @app.route('/rate-owner/<int:owner_id>-<int:history_id>')
@@ -676,7 +703,6 @@ def relist_product(prod_id):
     # db.session.commit()
 
     return render_template("relist.html")
-
 
 
 @app.route('/list-sleepingbag')

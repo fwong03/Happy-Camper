@@ -13,7 +13,7 @@
         <li>Price per day: ${{ '{:,.2f}'.format(product.price_per_day) }}</li>
         <li>Description: {{ product.description }}</li>
         <li>Condition: {{ product.condition }}</li>
-        <li><a href="/show-owner-rating/{{ product.prod_id }}">Product Owner Rating</a>
+        <li><a href="/show-owner-rating/{{ product.owner.user_id }}">Product Owner Rating</a>
     </ul>
 
         {% if product.owner.email != session['user'] %}
