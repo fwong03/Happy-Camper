@@ -203,6 +203,8 @@ class FillType(db.Model):
     fill_code = db.Column(db.String(1), primary_key=True)
     fill_name = db.Column(db.String(16), unique=True)
 
+    sleepingbag = db.relationship('SleepingBag', backref='filltype')
+
 
 class Gender(db.Model):
     """Pull gender out so future tables can reference and have option to easily
@@ -213,11 +215,11 @@ class Gender(db.Model):
     gender_code = db.Column(db.String(1), primary_key=True)
     gender_name = db.Column(db.String(8), nullable=False, unique=True)
 
+    sleepingbag = db.relationship('SleepingBag', backref='gender')
+
     def __repr__(self):
         return "<Gender gender_code=%s gender_name=%s>" % (self.gender_code,
                                                            self.gender_name)
-
-    #TO DO: Make gender seed table, change sleepingbagdata
 
 
 class SleepingBag(db.Model):
@@ -240,7 +242,7 @@ class SleepingBag(db.Model):
     def __repr__(self):
         return "<Sleeping Bag prod_id=%d, fill_code=%s, temp_rating=%d, weight=%d, length=%d, gender=%s>" % (
             self.prod_id, self.fill_code, self.temp_rating, self.weight,
-            self.length, self.gender)
+            self.length, self.gender_code)
 
 
 class History(db.Model):

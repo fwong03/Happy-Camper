@@ -28,7 +28,7 @@
             <li><a href="/show-owner-ratings/{{ product.owner.user_id }}">See Product Owner Ratings</a>
             <li><a href="/show-product-ratings/{{ product.prod_id }}">See Product Ratings</a>
         </ul>
-    <br> {{ product.category.cat_name }}-specific info
+    <br> {{ product.category.cat_name }}-Specific Info:
 
         {% block content %}
 
@@ -37,7 +37,7 @@
         {% endblock %}
 
 
-        {% if product.owner.email != session['user'] %}
+        {% if session.get('search_start_date') %}
             <p>Your rental period info:</p>
             <ul>
                 <li>Rental start date: {{ session['search_start_date'].date().isoformat() }}</li>

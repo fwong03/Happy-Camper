@@ -7,11 +7,11 @@
                 <li>Best Use: {{ item.bestuse.use_name }}</li>
                 <li>Sleep Capacity: {{ item.sleep_capacity }}</li>
                 <li>Seasons: {{ item.seasons }}</li>
-                <li>Minimum Trail Weight: {{ item.min_trail_weight }} ounces</li>
-                <li>Floor Dimensions: {{ item.floor_width }} in. x {{ item.floor_length }} in.</li>
+                <li>Minimum Trail Weight (ounces): {{ item.min_trail_weight }} </li>
+                <li>Floor Dimensions: {% if item.floor_width %} {{ item.floor_width }} in. x {{ item.floor_length }} in. {% endif %} </li>
                 <li>Number of Doors: {{ item.num_doors }}</li>
                 <li>Number of Poles: {{ item.num_poles }}</li>
-            </ul><br>
+            </ul>
 
 
 {% endblock %}
