@@ -5,6 +5,8 @@ from jinja2 import StrictUndefined
 from flask import Flask, render_template, redirect, request, flash, session
 from flask_debugtoolbar import DebugToolbarExtension
 
+from sqlalchemy.orm.exc import NoResultFound
+
 from model import connect_to_db, db
 from model import User, Region, Product, BestUse, Tent, SleepingBag
 from model import Brand, History, Category, Rating
@@ -29,16 +31,16 @@ app.jinja_env.undefined = StrictUndefined
 @app.route('/')
 def index():
     """Signed out homepage."""
-    # Is there a way to deal with login with if/else Get vs Post request?
 
+    # Is there a way to deal with login with if/else Get vs Post request?
     return render_template("signedout.html")
 
 
 @app.route('/login')
 def login():
     """User login page."""
-    # Make username can display for ratings?
 
+    # Make username can display for ratings?
     return render_template("login.html")
 
 
@@ -57,10 +59,14 @@ def handle_login():
     username = request.form.get('email')
     password = request.form.get('password')
 
-    user = User.query.filter(User.email == username).one()
+    try:
+        user = User.query.filter(User.email == username).one()
+
+    except NoResultFound:
+        flash("The email %s does not exist in our records. Please try again." % username)
+        return redirect("/")
 
     if (user.active) and (user.password == password):
-        # Add user email to Flask session
         session['user'] = username
         flash("Welcome! Logged in as %s" % username)
         return redirect('/success')
@@ -80,8 +86,7 @@ def create_account():
 def handle_createaccount():
     """Process create account form.
 
-    To create the user, this function calls the
-    get_lat_lngs function from helpers.py.
+    Creates a User object using a helper function.
 
     """
 
@@ -111,8 +116,8 @@ def enter_site():
     dates = calc_default_dates(7)
 
     return render_template("success.html", user=customer,
-                           p_today=dates['today_string'],
-                           p_month=dates['future_string'])
+                           today=dates['today_string'],
+                           future=dates['future_string'])
 
 
 @app.route('/account-info')
