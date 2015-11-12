@@ -1,6 +1,6 @@
 # Helper functions for my routes in server.py
 from flask import request, session
-from model import User, Brand, Category, Product, Rating, Region
+from model import User, Brand, Category, Product, Tent, Rating, Region
 from model import db
 from datetime import datetime, timedelta
 from geolocation.google_maps import GoogleMaps
@@ -63,14 +63,6 @@ def calc_avg_star_rating(ratings):
         avg_star_rating = float(sum_stars) / count_star_ratings
 
     return avg_star_rating
-
-# rating1 = Rating(rating_id=1, stars=4, comments="abc")
-# rating2 = Rating(rating_id=3, stars=2, comments="def")
-# rating3 = Rating(rating_id=3, stars=1, comments="ghi")
-
-# ratings = [rating1, rating2, rating3]
-
-# calc_avg_star_rating(ratings)
 
 
 # Get rid of this? Don't need in user table anymore?
@@ -233,6 +225,42 @@ def make_product(brand_id, category_id):
                       price_per_day=pricing, image_url=image)
 
     return product
+
+
+def make_tent(prod_id):
+    """Make tent object given the corresponding product id"""
+
+    best_use_id = int(request.form.get("bestuse"))
+    sleep = int(request.form.get("sleep"))
+    seasoncat = int(request.form.get("seasoncat"))
+    weight = int(request.form.get("weight"))
+
+    # Deal with optional values.
+    try:
+        width = int(request.form.get("width"))
+    except ValueError:
+        width = None
+
+    try:
+        length = int(request.form.get("length"))
+    except ValueError:
+        length = None
+
+    try:
+        doors = int(request.form.get("doors"))
+    except ValueError:
+        doors = None
+
+    try:
+        poles = int(request.form.get("poles"))
+    except ValueError:
+        poles = None
+
+    tent = Tent(prod_id=prod_id, use_id=best_use_id,
+                sleep_capacity=sleep, seasons=seasoncat, min_trail_weight=weight,
+                floor_width=width, floor_length=length, num_doors=doors,
+                num_poles=poles)
+    return tent
 
 
 def categorize_products(categories, products):

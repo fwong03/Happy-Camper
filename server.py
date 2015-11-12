@@ -8,12 +8,12 @@ from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.orm.exc import NoResultFound
 
 from model import connect_to_db, db
-from model import User, Region, Product, BestUse, Tent, SleepingBag
+from model import User, Region, Product, Tent, SleepingBag
 from model import Brand, History, Category, Rating
 from helpers import make_user
 from helpers import search_radius, get_users_in_area
 from helpers import calc_default_dates, convert_string_to_datetime
-from helpers import make_product, categorize_products, get_products_within_dates
+from helpers import make_product, make_tent, categorize_products, get_products_within_dates
 from helpers import calc_avg_star_rating
 from datetime import datetime
 
@@ -59,6 +59,7 @@ def handle_login():
     username = request.form.get('email')
     password = request.form.get('password')
 
+    # http://docs.sqlalchemy.org/en/latest/orm/exceptions.html
     try:
         user = User.query.filter(User.email == username).one()
 
@@ -220,52 +221,21 @@ def handle_tent_listing():
     # Tent category ID is 1
     cat_id = 1
     # Check if new brand. If so make new brand and add to database.
-    brd_id = int(request.form.get("brand_id"))
+    brand_num = int(request.form.get("brand_id"))
 
-    if brd_id < 0:
+    if brand_num < 0:
         new_brand_name = request.form.get("new_brand_name")
         brand = Brand(brand_name=new_brand_name)
         db.session.add(brand)
         db.session.commit()
-        brd_id = brand.brand_id
+        brand_num = brand.brand_id
 
-    product = make_product(brand_id=brd_id, category_id=cat_id)
+    product = make_product(brand_id=brand_num, category_id=cat_id)
+
     db.session.add(product)
     db.session.commit()
 
-    # Grab info to make a tent.
-    best_use_id = int(request.form.get("bestuse"))
-    sleep = int(request.form.get("sleep"))
-    seasoncat = int(request.form.get("seasoncat"))
-    weight = int(request.form.get("weight"))
-
-    best_use = BestUse.query.get(best_use_id)
-
-    # Below are optional values.
-    try:
-        width = int(request.form.get("width"))
-    except ValueError:
-        width = None
-
-    try:
-        length = int(request.form.get("length"))
-    except ValueError:
-        length = None
-
-    try:
-        doors = int(request.form.get("doors"))
-    except ValueError:
-        doors = None
-
-    try:
-        poles = int(request.form.get("poles"))
-    except ValueError:
-        poles = None
-
-    tent = Tent(prod_id=product.prod_id, use_id=best_use_id,
-                sleep_capacity=sleep, seasons=seasoncat, min_trail_weight=weight,
-                floor_width=width, floor_length=length, num_doors=doors,
-                num_poles=poles)
+    tent = make_tent(product.prod_id)
 
     db.session.add(tent)
     db.session.commit()
