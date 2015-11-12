@@ -8,9 +8,9 @@ from flask_debugtoolbar import DebugToolbarExtension
 from model import connect_to_db, db
 from model import User, Region, Product, BestUse, Tent, SleepingBag
 from model import Brand, History, Category, Rating
-from helpers import get_lat_lngs, search_radius
+from helpers import get_lat_lngs, search_radius, get_users_in_area
 from helpers import calc_default_dates, convert_string_to_datetime
-from helpers import make_product, categorize_products
+from helpers import make_product, categorize_products, get_products_within_dates
 from helpers import calc_avg_star_rating
 from datetime import datetime
 
@@ -303,23 +303,23 @@ def show_results():
     search_start_date = request.args.get("search_start_date")
     search_end_date = request.args.get("search_end_date")
 
+    # I randomly chose search miles as the one thing I would validate.
     try:
         search_miles = int(search_miles)
     except ValueError:
         flash("Search radius must be an integer. Please try again.")
         return redirect('/success')
 
-    # Convert the dates into datetimes and get the number of days the user is
-    # interested in renting an item so we can calculate his or her total rental cost.
+    # Convert the dates into datetimes get rental and get rental number of days.
     search_start_date = convert_string_to_datetime(search_start_date)
     search_end_date = convert_string_to_datetime(search_end_date)
-
-    # Add the rental dates to the flask session so we can refer to over multiple
-    # pages.
     days = (search_end_date - search_start_date).days + 1
 
-    # Future version: save this search to table so default to last search next time
-    # log in.
+    # Future version: save this search to table so default to last search next
+    # time the user logs in.
+
+    # Now put all this search info into the session so we can refer to it in
+    # future pages.
 
     session['search_start_date'] = search_start_date
     session['search_end_date'] = search_end_date
@@ -327,46 +327,48 @@ def show_results():
     session['search_area'] = search_area
     session['search_radius'] = search_miles
 
-    # Find distinct postal codes in the database.
+    # Find distinct postal codes in the database. We'll use this to determine
+    # which users (and products) are within the search radius. It didn't like
+    # it when I stuck the ".all()" at the end of the query and I was too lazy,
+    # to look into why, so I just did the".all()" separately.
     query = db.session.query(User.postalcode).distinct()
     postalcodes = query.all()
 
-    # Get postal codes within the given search radius.
-    # Save zipcode pair distances to DB the first time.
+    # Use helper function to get which zipcodes in the database are within the
+    # search radius. Then use another helper function to get users with
+    # those zipcodes.
     postal_codes = search_radius(search_area, postalcodes, search_miles)
     users_in_area = get_users_in_area(postal_codes)
 
-    # Get categories so can categorize products
+    # We then use a helper function to get products of those users who have
+    #products available for rent during the search dates.
+    available_products = get_products_within_dates(search_start_date,
+                                                   search_end_date,
+                                                   users_in_area)
+
+    # Now we start organizing the products for display. First we get all
+    # categories in the database.
     categories = Category.query.all()
 
-    # Separate check if available during dates and categorization
-    categorized_products = categorize_products(categories, users_in_area,
-                                               session['search_start_date'],
-                                               session['search_end_date'])
-    
-    sorted_cats = sorted(categorized_products.keys())
+    # Then, using a helper function, we make a dictionary of available products
+    # organized by category (the categories are the keys of the dictionary).
+    products_by_category = categorize_products(categories, available_products)
 
-    # To show filter search need brands
+    # We then create a list of category names sorted in alphabetical order.
+    sorted_category_names = sorted(products_by_category.keys())
+
+    # For the saerch filter on top of the page, we need categories (which we
+    # already have) and brands. Here we get brands.
     brands = Brand.query.all()
 
     return render_template("searchresults.html", location=search_area,
                            miles=search_miles,
-                           sorted_categories=sorted_cats,
-                           products=categorized_products,
+                           categories=sorted_category_names,
+                           products=products_by_category,
+                           # Below are for for search filter
                            product_categories=categories,
                            product_brands=brands)
 
-
-def get_users_in_area(postal_codes):
-    """Give a list of postal with searching user taken out"""
-
-    users_in_area = User.query.filter(User.postalcode.in_(postal_codes)).all()
-    logged_in_user = User.query.filter(User.email == session['user']).one()
-
-    if logged_in_user in users_in_area:
-        users_in_area.remove(logged_in_user)
-
-    return users_in_area
 
 
 @app.route('/search-filter')

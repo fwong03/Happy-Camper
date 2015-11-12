@@ -30,7 +30,7 @@
 
     <input type="submit" value="Filter Results">
 
-    {% for category in sorted_categories %}
+    {% for category in categories %}
     <h3>{{ category }}</h3>
         {% if products[category] %}
             <table border="1" cellpadding="5">

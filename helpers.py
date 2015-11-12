@@ -119,6 +119,18 @@ def search_radius(search_center, postalcodes, radius):
     return postalcodes
 
 
+def get_users_in_area(postal_codes):
+    """Give a list of postal with searching user taken out"""
+
+    users_in_area = User.query.filter(User.postalcode.in_(postal_codes)).all()
+    logged_in_user = User.query.filter(User.email == session['user']).one()
+
+    if logged_in_user in users_in_area:
+        users_in_area.remove(logged_in_user)
+
+    return users_in_area
+
+
 def calc_default_dates(deltadays):
     """Takes an integer and returns two datetimes and two strings:
             today: datetime of today
@@ -147,20 +159,6 @@ def convert_string_to_datetime(date_string):
     date = datetime.strptime(date_string, "%Y-%m-%d")
 
     return date
-
-
-# Used this to return a list of brand names, but changed template for list-item
-# to use brand_id as value, not brand name (per Drew rec 11/9)
-# def get_brands():
-#     """Takes no arguments and returns a list of all brands in the database.
-#     """
-#     brands = Brand.query.all()
-#     names = []
-
-#     for brand in brands:
-#         names.append(brand.brand_name)
-
-#     return names
 
 
 def make_brand(brandname):
@@ -208,10 +206,9 @@ def make_product(brand_id, category_id):
     return product
 
 
-def categorize_products(categories, users, start_date, end_date):
-    """Takes in list of Category objects, User objects, and rental start and end
-        dates and returns dictionary of category for keys and associated lists
-        of products that are available during those dates.
+def categorize_products(categories, products):
+    """Takes in lists of Category and Product objects and returns dictionary of
+        Products objects organized by category name.
 
     """
     inventory = {}
@@ -219,13 +216,25 @@ def categorize_products(categories, users, start_date, end_date):
     for category in categories:
         inventory[category.cat_name] = []
 
-    for user in users:
-        if user.active:
-            for product in user.products:
-                # Separate this out. You may use separately.
-                if product.available and (product.avail_start_date <= start_date) and (product.avail_end_date >= end_date):
-                        inventory[product.category.cat_name].append(product)
+    for product in products:
+        inventory[product.category.cat_name].append(product)
 
     return inventory
 
 
+def get_products_within_dates(start_date, end_date, users):
+    """Takes in list of User objects and returns a list of Product objects
+        those users have available for rent within the specified start and
+        end dates (inclusive).
+
+    """
+
+    available_products= []
+
+    for user in users:
+        if user.active:
+            for product in user.products:
+                if product.available and (product.avail_start_date <= start_date) and (product.avail_end_date >= end_date):
+                    available_products.append(product)
+
+    return available_products
