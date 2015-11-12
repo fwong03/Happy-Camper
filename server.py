@@ -314,11 +314,12 @@ def show_results():
     search_start_date = convert_string_to_datetime(search_start_date)
     search_end_date = convert_string_to_datetime(search_end_date)
 
-    # Add the rental dates to the flask session so we can access over multiple
+    # Add the rental dates to the flask session so we can refer to over multiple
     # pages.
     days = (search_end_date - search_start_date).days + 1
 
-    # Future version maybe save to table last search so default next search to that.
+    # Future version: save this search to table so default to last search next time
+    # log in.
 
     session['search_start_date'] = search_start_date
     session['search_end_date'] = search_end_date
@@ -333,15 +334,7 @@ def show_results():
     # Get postal codes within the given search radius.
     # Save zipcode pair distances to DB the first time.
     postal_codes = search_radius(search_area, postalcodes, search_miles)
-
-    # Get users within the postal codes.
-    users_in_area = User.query.filter(User.postalcode.in_(postal_codes)).all()
-
-    # Take out the currently logged in user, if in the list.
-    logged_in_user = User.query.filter(User.email == session['user']).one()
-
-    if logged_in_user in users_in_area:
-        users_in_area.remove(logged_in_user)
+    users_in_area = get_users_in_area(postal_codes)
 
     # Get categories so can categorize products
     categories = Category.query.all()
@@ -350,14 +343,49 @@ def show_results():
     categorized_products = categorize_products(categories, users_in_area,
                                                session['search_start_date'],
                                                session['search_end_date'])
+    
     sorted_cats = sorted(categorized_products.keys())
+
+    # To show filter search need brands
+    brands = Brand.query.all()
 
     return render_template("searchresults.html", location=search_area,
                            miles=search_miles,
-                           start_date_string=session['search_start_date'].date().isoformat(),
-                           end_date_string=session['search_end_date'].date().isoformat,
                            sorted_categories=sorted_cats,
-                           products=categorized_products)
+                           products=categorized_products,
+                           product_categories=categories,
+                           product_brands=brands)
+
+
+def get_users_in_area(postal_codes):
+    """Give a list of postal with searching user taken out"""
+
+    users_in_area = User.query.filter(User.postalcode.in_(postal_codes)).all()
+    logged_in_user = User.query.filter(User.email == session['user']).one()
+
+    if logged_in_user in users_in_area:
+        users_in_area.remove(logged_in_user)
+
+    return users_in_area
+
+
+@app.route('/search-filter')
+def filter_results():
+    """Filter results page.
+
+    Routes from search page.
+
+    """
+    category_id = int(request.args.get("category_id"))
+    brand_id = int(request.args.get("brand_id"))
+
+    search_start_date = session['search_start_date']
+    search_end_date = session['search_end_date']
+    search_area = session['search_area']
+    search_radius = session['search_radius']
+
+    return "this will show filtered results for brand_id %d and cat_id %d" % (
+        brand_id, category_id)
 
 
 # @app.route('/product-detail/<int:prod_id>')

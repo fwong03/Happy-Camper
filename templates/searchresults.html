@@ -6,8 +6,29 @@
     <h1>Search Results</h1>
     <p>Location: {{ location }}</p>
     <p>Search radius: {{ miles }} miles</p>
-    <p>Dates: {{ start_date_string }} to {{ end_date_string }} </p>
+    <p>Dates: {{ session['search_start_date'].date().isoformat() }} to {{ session['search_end_date'].date().isoformat() }} </p>
     <p>----------------------------------------</p>
+
+    <form action="/search-filter">
+
+    <br>Filter Results:
+        Category: 
+        <select name="category_id">     
+            <option value="-1">Any</option>
+          {% for category in product_categories %}
+            <option value="{{ category.cat_id }}">{{ category.cat_name }}</option>
+          {% endfor %}
+        </select>
+
+        Brand: 
+        <select name="brand_id">
+            <option value="-1">Any</option>
+          {% for brand in product_brands %}
+            <option value="{{ brand.brand_id }}">{{ brand.brand_name }}</option>
+          {% endfor %}
+        </select>
+
+    <input type="submit" value="Filter Results">
 
     {% for category in sorted_categories %}
     <h3>{{ category }}</h3>
@@ -34,9 +55,6 @@
             <br><br><br>
         {% endif  %}
     {% endfor %}
-
-
-    <p><a href="/success">Return to homepage</a></p>
 
 
 {% endblock %}
