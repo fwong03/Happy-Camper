@@ -5,7 +5,7 @@
 {% block content %}
     <h1>Search Results</h1>
     <br>Location: {{ location }}
-    <br>Search radius: {{ miles }} miles<
+    <br>Search radius: {{ miles }} miles
     <br>Dates: {{ session['search_start_date'].date().isoformat() }} to {{ session['search_end_date'].date().isoformat() }}
     <br>----------------------------------------
 
@@ -61,7 +61,7 @@
                 {% endfor %}
             </table><br>
         {% else %}
-            <p>Sorry, there are no {{ category }} are available in your search area during your search dates.</p>
+            <p>Sorry, there are currently no available {{ category }} fitting your search criteria.</p>
             <br><br><br>
         {% endif  %}
     {% endfor %}

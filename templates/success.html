@@ -7,16 +7,32 @@
     <h2>Your options are the following:</h2>
     <ul>
         <li><a href="/list-item-choices"><b>List an item</b></a></li><br>
+
         <form action="/searchresults">
             <li><b>Search for gear:</b></li>
-                <p>(1) Enter search center and search radius:</P>
+                <p><b>(1)</b> Enter search center and search radius:</P>
                     City and state and/or zipcode: <input type="text" size="32" value={{ user.postalcode }} name="search_area"><br>
                  <br>
                     Search radius (miles): <input type="text" size="4" value="20" name="search_miles"><br>
-                <p>(2) Dates of interest (format YYYY-mm-dd):</p>
-                        Start Date: <input type="text" size="10" value ={{ today }} name="search_start_date"><br><br>
-                        End Date: <input type="text" size="10" value ={{ future }} name="search_end_date"><br><br>
-            <input type="submit" value="Search for Gear">
+                <p><b>(2)</b> Dates of interest (format YYYY-mm-dd):</p>
+                        Start Date: <input type="text" size="10" value ={{ today }} name="search_start_date">
+                        End Date: <input type="text" size="10" value ={{ future }} name="search_end_date"><br>
+                <p><b>(3)</b> Category and/or brand (optional):</p>
+                    Category    <select name="category_id">     
+                        <option value="-1">Any</option>
+                          {% for category in product_categories %}
+                            <option value="{{ category.cat_id }}">{{ category.cat_name }}</option>
+                          {% endfor %}
+                    </select>
+                     Brand 
+                        <select name="brand_id">
+                            <option value="-1">Any</option>
+                          {% for brand in product_brands %}
+                            <option value="{{ brand.brand_id }}">{{ brand.brand_name }}</option>
+                          {% endfor %}
+                        </select>
+                        <br><br>
+                <input type="submit" value="Search for Gear">
     </ul>
 
 {% endblock %}

@@ -13,7 +13,7 @@ from model import Brand, History, Category, Rating
 from helpers import make_user
 from helpers import search_radius, get_users_in_area
 from helpers import calc_default_dates, convert_string_to_datetime
-from helpers import make_product, make_tent, categorize_products, get_products_within_dates
+from helpers import make_product, make_tent, filter_products, categorize_products, get_products_within_dates
 from helpers import calc_avg_star_rating
 from datetime import datetime
 
@@ -116,9 +116,14 @@ def enter_site():
     customer = User.query.filter(User.email == session['user']).one()
     dates = calc_default_dates(7)
 
+    categories = Category.query.all()
+    brands = Brand.query.all()
+
     return render_template("success.html", user=customer,
                            today=dates['today_string'],
-                           future=dates['future_string'])
+                           future=dates['future_string'],
+                           product_categories=categories,
+                           product_brands=brands)
 
 
 @app.route('/account-info')
@@ -253,21 +258,28 @@ def show_results():
 
     """
 
-    search_area = request.args.get("search_area")
-    search_miles = request.args.get("search_miles")
-    search_start_date = request.args.get("search_start_date")
-    search_end_date = request.args.get("search_end_date")
-
-    # I randomly chose search miles as the one thing I would validate.
     try:
-        search_miles = int(search_miles)
+        search_miles = int(request.args.get("search_miles"))
     except ValueError:
         flash("Search radius must be an integer. Please try again.")
         return redirect('/success')
 
-    # Convert the dates into datetimes get rental and get rental number of days.
-    search_start_date = convert_string_to_datetime(search_start_date)
-    search_end_date = convert_string_to_datetime(search_end_date)
+    try:
+        search_start_date = convert_string_to_datetime(request.args.get("search_start_date"))
+    except ValueError:
+        flash("Search dates must be formatted YYYY-mm-dd. Please try again.")
+        return redirect('/success')
+
+    try:
+        search_end_date = convert_string_to_datetime(request.args.get("search_end_date"))
+    except ValueError:
+        flash("Search dates must be formatted YYYY-mm-dd. Please try again.")
+        return redirect('/success')
+
+    search_area = request.args.get("search_area")
+    category_id = int(request.args.get("category_id"))
+    brand_id = int(request.args.get("brand_id"))
+
     days = (search_end_date - search_start_date).days + 1
 
     # Future version: save this search to table so default to last search next
@@ -292,22 +304,29 @@ def show_results():
     # Use helper function to get which zipcodes in the database are within the
     # search radius. Then use another helper function to get users with
     # those zipcodes.
-    postal_codes = search_radius(search_area, postalcodes, search_miles)
+    postal_codes = search_radius(search_center=search_area,
+                                 postalcodes=postalcodes, radius=search_miles)
     users_in_area = get_users_in_area(postal_codes)
 
     # We then use a helper function to get products of those users who have
     #products available for rent during the search dates.
-    available_products = get_products_within_dates(search_start_date,
-                                                   search_end_date,
-                                                   users_in_area)
+    available_products = get_products_within_dates(start_date=search_start_date,
+                                                   end_date=search_end_date,
+                                                   users=users_in_area)
 
-    # Now we start organizing the products for display. First we get all
-    # categories in the database.
-    categories = Category.query.all()
+    filtered_products = filter_products(available_products, category_id=category_id,
+                                        brand_id=brand_id)
+
+    # Get categories of interest
+    if category_id < 0:
+        categories = Category.query.all()
+    else:
+        categories = [Category.query.get(category_id)]
 
     # Then, using a helper function, we make a dictionary of available products
     # organized by category (the categories are the keys of the dictionary).
-    products_by_category = categorize_products(categories, available_products)
+    products_by_category = categorize_products(categories=categories,
+                                               products=filtered_products)
 
     # We then create a list of category names sorted in alphabetical order.
     sorted_category_names = sorted(products_by_category.keys())

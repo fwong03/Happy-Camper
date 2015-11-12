@@ -263,6 +263,50 @@ def make_tent(prod_id):
     return tent
 
 
+def filter_products(products, category_id, brand_id):
+    """Takes in list of products, category_id as int and brand_id as int and
+        returns products with those category and brand IDs.
+    """
+
+    if category_id < 0 and brand_id < 0:
+        return products
+    else:
+        filtered_products = []
+
+        if category_id > 0 and brand_id < 0:
+            for product in products:
+                if product.cat_id == category_id:
+                    filtered_products.append(product)
+        elif (category_id < 0) and (brand_id > 0):
+            for product in products:
+                if product.brand_id == brand_id:
+                    filtered_products.append(product)
+        else:
+            for product in products:
+                if (product.cat_id == category_id) and (product.brand_id == brand_id):
+                    filtered_products.append(product)
+
+    return filtered_products
+
+
+def get_products_within_dates(start_date, end_date, users):
+    """Takes in list of User objects and returns a list of Product objects
+        those users have available for rent within the specified start and
+        end dates (inclusive).
+
+    """
+
+    available_products = []
+
+    for user in users:
+        if user.active:
+            for product in user.products:
+                if product.available and (product.avail_start_date <= start_date) and (product.avail_end_date >= end_date):
+                    available_products.append(product)
+
+    return available_products
+
+
 def categorize_products(categories, products):
     """Takes in lists of Category and Product objects and returns dictionary of
         Products objects organized by category name.
@@ -277,21 +321,3 @@ def categorize_products(categories, products):
         inventory[product.category.cat_name].append(product)
 
     return inventory
-
-
-def get_products_within_dates(start_date, end_date, users):
-    """Takes in list of User objects and returns a list of Product objects
-        those users have available for rent within the specified start and
-        end dates (inclusive).
-
-    """
-
-    available_products= []
-
-    for user in users:
-        if user.active:
-            for product in user.products:
-                if product.available and (product.avail_start_date <= start_date) and (product.avail_end_date >= end_date):
-                    available_products.append(product)
-
-    return available_products
