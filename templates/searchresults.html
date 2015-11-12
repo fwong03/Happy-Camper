@@ -9,38 +9,35 @@
     <br>Dates: {{ session['search_start_date'].date().isoformat() }} to {{ session['search_end_date'].date().isoformat() }}
     <br>----------------------------------------
 
-    <form action="/search-filter">
+    <form action="/search-results">
 
-    <br>Filter Results:
-        Category: 
-        <select name="category_id">     
-            <option value="-1">Any</option>
-          {% for category in product_categories %}
-            <option value="{{ category.cat_id }}">{{ category.cat_name }}</option>
-          {% endfor %}
-        </select>
-
-        Brand: 
-        <select name="brand_id">
-            <option value="-1">Any</option>
-          {% for brand in product_brands %}
-            <option value="{{ brand.brand_id }}">{{ brand.brand_name }}</option>
-          {% endfor %}
-        </select><br>
-
-    <br>You can also modify your original search criteria:
+    <br>Modify Search:
     <ul>
-        <li>Search area: <input type="text" size="20" value={{ session['search_area'] }} name="search_area"> Search radius (miles): <input type="text" size="4" value="{{ session['search_radius'] }}" name="search_miles"></li>
-        <li>Search dates (format YYYY-mm-dd):
-            Start Date: <input type="text" size="10" value ={{ session['search_start_date'].date().isoformat() }} name="search_start_date">
+        <li>Search center: <input type="text" size="20" value={{ session['search_area'] }} name="search_area"> Search radius (miles): <input type="text" size="4" value="{{ session['search_radius'] }}" name="search_miles"></li>
+        <li>Search dates (YYYY-mm-dd): Start Date: <input type="text" size="10" value ={{ session['search_start_date'].date().isoformat() }} name="search_start_date">
             End Date: <input type="text" size="10" value ={{ session['search_end_date'].date().isoformat()  }} name="search_end_date">
         </li>
+        <li>Category: 
+            <select name="category_id">     
+                <option value="-1">Any</option>
+              {% for category in product_categories %}
+                <option value="{{ category.cat_id }}">{{ category.cat_name }}</option>
+              {% endfor %}
+            </select>
+            
+            Brand: 
+            <select name="brand_id">
+                <option value="-1">Any</option>
+              {% for brand in product_brands %}
+                <option value="{{ brand.brand_id }}">{{ brand.brand_name }}</option>
+              {% endfor %}
+            </select></li>
     </ul>
 
 
     <input type="submit" value="Filter/Modify Results">
 
-    {% for category in categories %}
+    {% for category in search_categories %}
     <h3>{{ category }}</h3>
         {% if products[category] %}
             <table border="1" cellpadding="5">

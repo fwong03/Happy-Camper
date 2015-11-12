@@ -249,7 +249,7 @@ def handle_tent_listing():
     return redirect('/product-detail/%d' % product.prod_id)
 
 
-@app.route('/searchresults')
+@app.route('/search-results')
 def show_results():
     """Search results page.
 
@@ -319,29 +319,29 @@ def show_results():
 
     # Get categories of interest
     if category_id < 0:
-        categories = Category.query.all()
+        search_categories = Category.query.all()
     else:
-        categories = [Category.query.get(category_id)]
+        search_categories = [Category.query.get(category_id)]
 
     # Then, using a helper function, we make a dictionary of available products
     # organized by category (the categories are the keys of the dictionary).
-    products_by_category = categorize_products(categories=categories,
+    products_by_category = categorize_products(categories=search_categories,
                                                products=filtered_products)
 
     # We then create a list of category names sorted in alphabetical order.
     sorted_category_names = sorted(products_by_category.keys())
 
-    # For the saerch filter on top of the page, we need categories (which we
-    # already have) and brands. Here we get brands.
-    brands = Brand.query.all()
+    # For the saerch filter on top of the page, we need all categories and brands.
+    all_categories = Category.query.all()
+    all_brands = Brand.query.all()
 
     return render_template("searchresults.html", location=search_area,
                            miles=search_miles,
-                           categories=sorted_category_names,
+                           search_categories=sorted_category_names,
                            products=products_by_category,
-                           # Below are for for search filter
-                           product_categories=categories,
-                           product_brands=brands)
+                           # Below are for for search filter,
+                           product_categories=all_categories,
+                           product_brands=all_brands)
 
 
 @app.route('/search-filter')
