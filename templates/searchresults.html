@@ -4,10 +4,10 @@
 
 {% block content %}
     <h1>Search Results</h1>
-    <p>Location: {{ location }}</p>
-    <p>Search radius: {{ miles }} miles</p>
-    <p>Dates: {{ session['search_start_date'].date().isoformat() }} to {{ session['search_end_date'].date().isoformat() }} </p>
-    <p>----------------------------------------</p>
+    <br>Location: {{ location }}
+    <br>Search radius: {{ miles }} miles<
+    <br>Dates: {{ session['search_start_date'].date().isoformat() }} to {{ session['search_end_date'].date().isoformat() }}
+    <br>----------------------------------------
 
     <form action="/search-filter">
 
@@ -26,9 +26,19 @@
           {% for brand in product_brands %}
             <option value="{{ brand.brand_id }}">{{ brand.brand_name }}</option>
           {% endfor %}
-        </select>
+        </select><br>
 
-    <input type="submit" value="Filter Results">
+    <br>You can also modify your original search criteria:
+    <ul>
+        <li>Search area: <input type="text" size="20" value={{ session['search_area'] }} name="search_area"> Search radius (miles): <input type="text" size="4" value="{{ session['search_radius'] }}" name="search_miles"></li>
+        <li>Search dates (format YYYY-mm-dd):
+            Start Date: <input type="text" size="10" value ={{ session['search_start_date'].date().isoformat() }} name="search_start_date">
+            End Date: <input type="text" size="10" value ={{ session['search_end_date'].date().isoformat()  }} name="search_end_date">
+        </li>
+    </ul>
+
+
+    <input type="submit" value="Filter/Modify Results">
 
     {% for category in categories %}
     <h3>{{ category }}</h3>

@@ -193,8 +193,7 @@ def list_item():
 
 @app.route('/list-tent')
 def list_tent():
-    # 11/9: Changed from return list of brand names to just use brand objects.
-    # This way can use brand_id has value returned from list-base template.
+    # Change this to general list item.
     # Also changed value of "add new brand" to -1. Per Drew rec.
     all_brands = Brand.query.all()
     dates = calc_default_dates(30)
@@ -208,6 +207,7 @@ def list_tent():
 
 @app.route('/handle-tent', methods=['POST'])
 def handle_tent_listing():
+    # Change this to general handle item.
     """Handle tent listing.
 
     First checks if it needs to make a new Brand. If so, makes a new Brand object.
@@ -342,20 +342,6 @@ def filter_results():
 
     return "this will show filtered results for brand_id %d and cat_id %d" % (
         brand_id, category_id)
-
-
-# @app.route('/product-detail/<int:prod_id>')
-# def show_item(prod_id):
-#     """Product detail page.
-
-#     Routes either from Search Results page or List Item page.
-#     If click on Borrow This, routes to Borrowed version of this page.
-#     """
-#     # Make a borrowed template version if available = False instead
-
-#     item = Product.query.get(prod_id)
-
-#     return render_template("product-detail.html", product=item)
 
 
 @app.route('/product-detail/<int:prod_id>')
