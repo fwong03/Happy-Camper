@@ -33,15 +33,14 @@ class User(db.Model):
     user_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
 
     # Per Bert rec: give user option to deactivate account.
-    # Make active false when user deactivates.
     active = db.Column(db.Boolean, default=True)
     fname = db.Column(db.String(32), nullable=False)
     lname = db.Column(db.String(32), nullable=False)
     street = db.Column(db.String(32), nullable=False)
     city = db.Column(db.String(32), nullable=False)
 
-    # Made this region_id instead of state per Drew recommendation.
-    # ENUM would also work but less flexible.
+    # Made this region_id instead of state since state so US-speicific. Per
+    # Drew rec. ENUM would also work but less flexible.
     region_id = db.Column(db.Integer, db.ForeignKey('regions.region_id'),
                           nullable=False)
 
@@ -129,8 +128,6 @@ class Product(db.Model):
     # flexibility.
     brand_id = db.Column(db.Integer, db.ForeignKey('brands.brand_id'),
                          nullable=False)
-
-    # Customer ID of item's owner.
     owner_user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'),
                               nullable=False)
 
@@ -140,10 +137,6 @@ class Product(db.Model):
     model = db.Column(db.String(16), nullable=False)
     condition = db.Column(db.String(128))
     description = db.Column(db.String(128))
-
-    # When user inputs check avail end date is after start date.
-    # When show product info, avail start date is later of today and user-inputted
-    # start date.
     avail_start_date = db.Column(db.DateTime, nullable=False)
     avail_end_date = db.Column(db.DateTime, nullable=False)
     price_per_day = db.Column(db.Float, nullable=False)
@@ -199,7 +192,6 @@ class FillType(db.Model):
 
     __tablename__ = 'filltypes'
 
-    # D for down, S for synthetic
     fill_code = db.Column(db.String(1), primary_key=True)
     fill_name = db.Column(db.String(16), unique=True)
 
@@ -212,6 +204,7 @@ class Gender(db.Model):
 
     """
     __tablename__ = 'genders'
+
     gender_code = db.Column(db.String(1), primary_key=True)
     gender_name = db.Column(db.String(8), nullable=False, unique=True)
 
@@ -258,10 +251,6 @@ class History(db.Model):
                         nullable=False)
     renter_user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'),
                                nullable=False)
-
-    # Bert rec: put this in to make search faster since wouldn't have to join.
-    # owner_user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'),
-    #                     nullable=False)
     start_date = db.Column(db.DateTime, nullable=False)
     end_date = db.Column(db.DateTime, nullable=False)
     total_cost = db.Column(db.Float, nullable=False)
