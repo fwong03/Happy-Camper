@@ -8,7 +8,8 @@ from flask_debugtoolbar import DebugToolbarExtension
 from model import connect_to_db, db
 from model import User, Region, Product, BestUse, Tent, SleepingBag
 from model import Brand, History, Category, Rating
-from helpers import get_lat_lngs, search_radius, get_users_in_area
+from helpers import make_user
+from helpers import search_radius, get_users_in_area
 from helpers import calc_default_dates, convert_string_to_datetime
 from helpers import make_product, categorize_products, get_products_within_dates
 from helpers import calc_avg_star_rating
@@ -17,7 +18,7 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-# Required to use Flask sessions and the debug toolbar
+# Required to use Flask sessions alongd the debug toolbar
 app.secret_key = "ABC"
 
 # If you use an undefined variable in Jinja2, it will fails silently. Put this
@@ -68,14 +69,14 @@ def handle_login():
         return redirect('/')
 
 
-@app.route('/createaccount')
+@app.route('/create-account')
 def create_account():
     """Where new users create an account"""
 
-    return render_template("createaccount.html")
+    return render_template("create-account.html")
 
 
-@app.route('/handle-createaccount', methods=['POST'])
+@app.route('/handle-create-account', methods=['POST'])
 def handle_createaccount():
     """Process create account form.
 
@@ -89,36 +90,15 @@ def handle_createaccount():
 
     if password != confirm_pword:
         flash("Passwords don't match. Try again.")
-        return redirect('/createaccount')
+        return redirect('/create-account')
     else:
-        firstname = request.form.get('firstname')
-        lastname = request.form.get('lastname')
-        staddress = request.form.get('staddress')
-        cty = request.form.get('cty')
-        state = request.form.get('state')
-        zipcode = request.form.get('zipcode')
-        phonenumber = int(request.form.get('phonenumber'))
-        username = request.form.get('username')
-
-        # Get region id from the Regions table
-        region = Region.query.filter(Region.abbr == state).one()
-        state_id = region.region_id
-
-        # Get latitude and longitude from helper function
-        lat_lng = get_lat_lngs(staddress + " " + zipcode)
-        latitude = lat_lng[0]
-        longitude = lat_lng[1]
-
-        user = User(fname=firstname, lname=lastname, street=staddress,
-                    city=cty, region_id=state_id, postalcode=zipcode,
-                    lat=latitude, lng=longitude, phone=phonenumber,
-                    email=username, password=password)
+        user = make_user(password)
 
         db.session.add(user)
         db.session.commit()
 
-        session['user'] = username
-        flash("Successfully created account! Logged in as %s" % username)
+        session['user'] = user.email
+        flash("Successfully created account! Logged in as %s" % user.email)
 
         return redirect('/success')
 
@@ -195,14 +175,14 @@ def deactivate_account():
     return redirect('/')
 
 
-@app.route('/list-item')
+@app.route('/list-item-choices')
 def list_item():
     """List an item page.
 
     Routes from signed in homepage, which has a button to List an Item.
     Routes to item detail page.
     """
-    return render_template("list-item.html")
+    return render_template("list-item-choices.html")
 
 
 @app.route('/list-tent')
@@ -368,7 +348,6 @@ def show_results():
                            # Below are for for search filter
                            product_categories=categories,
                            product_brands=brands)
-
 
 
 @app.route('/search-filter')

@@ -1,11 +1,40 @@
 # Helper functions for my routes in server.py
 from flask import request, session
-from model import User, Brand, Category, Product, Rating
+from model import User, Brand, Category, Product, Rating, Region
 from model import db
 from datetime import datetime, timedelta
 from geolocation.google_maps import GoogleMaps
 from geolocation.distance_matrix import const
 import os
+
+
+def make_user(password):
+    """Create User object. Called by route /handle-createaccount"""
+
+    firstname = request.form.get('firstname')
+    lastname = request.form.get('lastname')
+    staddress = request.form.get('staddress')
+    cty = request.form.get('cty')
+    state = request.form.get('state')
+    zipcode = request.form.get('zipcode')
+    phonenumber = int(request.form.get('phonenumber'))
+    username = request.form.get('username')
+
+    # Get region id from the Regions table
+    region = Region.query.filter(Region.abbr == state).one()
+    state_id = region.region_id
+
+    # Get latitude and longitude from helper function
+    lat_lng = get_lat_lngs(staddress + " " + zipcode)
+    latitude = lat_lng[0]
+    longitude = lat_lng[1]
+
+    user = User(fname=firstname, lname=lastname, street=staddress,
+                city=cty, region_id=state_id, postalcode=zipcode,
+                lat=latitude, lng=longitude, phone=phonenumber,
+                email=username, password=password)
+
+    return user
 
 
 def calc_avg_star_rating(ratings):
