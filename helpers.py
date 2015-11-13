@@ -24,15 +24,9 @@ def make_user(password):
     region = Region.query.filter(Region.abbr == state).one()
     state_id = region.region_id
 
-    # Get latitude and longitude from helper function
-    lat_lng = get_lat_lngs(staddress + " " + zipcode)
-    latitude = lat_lng[0]
-    longitude = lat_lng[1]
-
     user = User(fname=firstname, lname=lastname, street=staddress,
                 city=cty, region_id=state_id, postalcode=zipcode,
-                lat=latitude, lng=longitude, phone=phonenumber,
-                email=username, password=password)
+                phone=phonenumber, email=username, password=password)
 
     return user
 
@@ -65,22 +59,22 @@ def calc_avg_star_rating(ratings):
     return avg_star_rating
 
 
-# Get rid of this? Don't need in user table anymore?
-def get_lat_lngs(address):
-    """Takes address as string, returns a list of latitude and
-        longitude as floats.
-    """
+# # Get rid of this? Don't need in user table anymore?
+# def get_lat_lngs(address):
+#     """Takes address as string, returns a list of latitude and
+#         longitude as floats.
+#     """
 
-    google_maps = GoogleMaps(api_key=os.environ['GOOGLE_API_KEY'])
+#     google_maps = GoogleMaps(api_key=os.environ['GOOGLE_API_KEY'])
 
-    location = google_maps.search(location=address)
+#     location = google_maps.search(location=address)
 
-    user_location = location.first()
+#     user_location = location.first()
 
-    latitude = user_location.lat
-    longitude = user_location.lng
+#     latitude = user_location.lat
+#     longitude = user_location.lng
 
-    return [latitude, longitude]
+#     return [latitude, longitude]
 
 
 def search_radius(search_center, postalcodes, radius):

@@ -454,8 +454,13 @@ def show_product(prod_id):
 
     child_product = categories[category_id]
 
+    try:
+        search_start_date = session['search_start_date']
+    except KeyError:
+        search_start_date = 0
+
     return render_template(templates[category_id], product=parent_product,
-                           item=child_product)
+                           item=child_product, have_searched=search_start_date )
 
 ################# Renting stuff ###################################
 
@@ -555,6 +560,7 @@ def show_renter_ratings(renter_id):
                            average=avg_star_rating, username=renter_email)
 
 
+# TO DO: Product 9 has no best use??
 @app.route('/show-product-ratings/<int:prod_id>')
 def show_product_ratings(prod_id):
     """Show product star ratings and any comments.

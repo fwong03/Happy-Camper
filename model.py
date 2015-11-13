@@ -49,10 +49,6 @@ class User(db.Model):
     # option to accept nine-digit zip codes.
     postalcode = db.Column(db.String(10), nullable=False)
 
-    # Get rid of these? Don't need anymore?
-    lat = db.Column(db.Float)
-    lng = db.Column(db.Float)
-
     # Drew: phone presents another INT problem.
     # Store as user inputs and then clean up when pull out to use?
     # When make form strongly suggest input format with "()" and "-".

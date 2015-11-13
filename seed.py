@@ -3,8 +3,6 @@ from model import FillType, Gender, SleepingBag, History, Rating
 from model import connect_to_db, db
 from server import app
 from datetime import datetime
-from helpers import get_lat_lngs
-# from geolocation.google_maps import GoogleMaps
 import os
 
 
@@ -42,19 +40,13 @@ def load_users():
         cty = row[3]
         region = row[4]
         zcode = row[5]
-        latde = row[6]
-        lontde = row[7]
-        phn = int(row[8])
-        login = row[9]
-        pword = row[10]
-
-        lat_lngs = get_lat_lngs(staddress + " " + zcode)
-        latde = lat_lngs[0]
-        lontde = lat_lngs[1]
+        phn = int(row[6])
+        login = row[7]
+        pword = row[8]
 
         a = User(fname=firstn, lname=lastn, street=staddress,
-                 city=cty, region_id=region, postalcode=zcode, lat=latde,
-                 lng=lontde, phone=phn, email=login, password=pword)
+                 city=cty, region_id=region, postalcode=zcode, phone=phn,
+                 email=login, password=pword)
 
         db.session.add(a)
 
