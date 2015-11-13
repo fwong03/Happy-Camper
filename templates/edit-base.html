@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+<head>
+  <title>{% block title %}TITLE GOES HERE{% endblock %}</title>
+  <script src="http://code.jquery.com/jquery.js"></script>
+</head>
+
+<body>
+  <hr>
+    <ul>
+      {% for message in get_flashed_messages() %}
+        <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+
+      <form action="/handle-edit-listing/{{ parent.prod_id }}" method="POST">
+
+    <h3>Product Info</h3>
+      Brand: 
+        <select name="brand_id">
+          {% for brand in brands %}
+            {% if parent.brand_id == brand.brand_id %}
+              <option value="{{ brand.brand_id }}" selected>{{ brand.brand_name }}</option>
+            {% else %}
+              <option value="{{ brand.brand_id }}">{{ brand.brand_name }}</option>
+            {% endif %}
+          {% endfor %}
+          <option value="-1">Add new brand</option>
+        </select><br> <br>
+
+      Add new brand: (Show this only if adding new brand) 
+        <input type="text" size="50" name="new_brand_name"><br><br>
+
+      Model Name: <input type="text" size="50" name="modelname" value = {{ parent.model }} ><br><br>
+      Description: <textarea rows="4" cols="50" name="desc" maxlength="128" value = {{ parent.description }}></textarea><br><br>
+      Condition: <textarea rows="4" cols="50" name="cond" maxlength="128" value = {{ parent.condition }}></textarea><br><br>
+
+    <h3>Product Availability and Pricing</h3>
+      Available Start Date: <input type="text" size="10" value={{ parent.avail_start_date.date().isoformat() }} name="avail_start">
+        <br><br>
+      Available End Date: <input type="text" size="10" value={{ parent.avail_end_date.date().isoformat() }} name="avail_end">
+        <br><br>
+      <br>
+      Price per Day: $ <input type="text" size="4" maxlength="4" name="pricing" value = "{{  '{:,.2f}'.format(parent.price_per_day) }}">
+      <br><br>
+      Image URL: <input type="text" size="50" name="image" value = {{ parent.image_url }}><br><br>
+
+
+
+  {% block content %}PUT CATEGORY SPECIFIC STUFF HERE{% endblock %}
+
+    <input type="submit">
+
+</form>
+
+  <p>--------------------------------</p>
+ <p><a href="/success">Homepage</a>     |     <a href="/account-info">Your Account</a>     |     <a href="/logout">Log out</a></p>
+
+</body>
+</html>

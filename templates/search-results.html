@@ -4,9 +4,7 @@
 
 {% block content %}
     <h1>Search Results</h1>
-    <br>Location: {{ location }}
-    <br>Search radius: {{ miles }} miles
-    <br>Dates: {{ session['search_start_date'].date().isoformat() }} to {{ session['search_end_date'].date().isoformat() }}
+    Current Search: Location: {{ location }} || Search radius: {{ miles }} miles || Dates: {{ session['search_start_date'].date().isoformat() }} to {{ session['search_end_date'].date().isoformat() }}
     <br>----------------------------------------
 
     <form action="/search-results">
@@ -34,8 +32,7 @@
             </select></li>
     </ul>
 
-
-    <input type="submit" value="Filter/Modify Results">
+    <input type="submit" value="you know you want to">
 
     {% for category in search_categories %}
     <h3>{{ category }}</h3>

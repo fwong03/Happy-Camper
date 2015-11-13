@@ -210,6 +210,66 @@ def list_tent():
                            p_month=dates['future_string'])
 
 
+@app.route('/edit-listing/<int:prod_id>')
+def edit_listing(prod_id):
+
+    categories = {1: Tent.query.get(prod_id),
+                  2: SleepingBag.query.get(prod_id),
+                  # 3: SleepingPad.query.get(prod_id),
+                  # 4: Pack.query.get(prod_id),
+                  # 5: Stove.query.get(prod_id),
+                  # 6: WaterFilter.query.get(prod_id),
+                  }
+
+    templates = {1: 'edit-tent.html',
+                 2: 'edit-sleeping-bag.html',
+                 3: 'edit-sleeping-pad.html',
+                 4: 'edit-pack.html',
+                 5: 'edit-stove.html',
+                 6: 'edit-water-filter.html',
+                 }
+
+    parent_product = Product.query.get(prod_id)
+    category_id = parent_product.cat_id
+
+    child_product = categories[category_id]
+
+    all_brands = Brand.query.all()
+
+    return render_template(templates[category_id], parent=parent_product,
+                           child=child_product, brands=all_brands)
+
+
+@app.route('/handle-edit-listing/<int:prod_id>')
+def handle_edit_listing(prod_id):
+
+    categories = {1: Tent.query.get(prod_id),
+                  2: SleepingBag.query.get(prod_id),
+                  # 3: SleepingPad.query.get(prod_id),
+                  # 4: Pack.query.get(prod_id),
+                  # 5: Stove.query.get(prod_id),
+                  # 6: WaterFilter.query.get(prod_id),
+                  }
+
+    templates = {1: 'tent.html',
+                 2: 'sleeping-bag.html',
+                 3: 'sleeping-pad.html',
+                 4: 'pack.html',
+                 5: 'stove.html',
+                 6: 'water-filter.html',
+                 }
+
+    parent_product = Product.query.get(prod_id)
+    cat_id = parent_product.cat_id
+
+    child_item = categories[cat_id]
+
+    if cat_id == 1:
+        pass
+
+    return "This will handle a listing edit"
+
+
 @app.route('/handle-tent', methods=['POST'])
 def handle_tent_listing():
     # Change this to general handle item.
@@ -335,7 +395,7 @@ def show_results():
     all_categories = Category.query.all()
     all_brands = Brand.query.all()
 
-    return render_template("searchresults.html", location=search_area,
+    return render_template("search-results.html", location=search_area,
                            miles=search_miles,
                            search_categories=sorted_category_names,
                            products=products_by_category,
@@ -380,21 +440,21 @@ def show_product(prod_id):
                   # 6: WaterFilter.query.get(prod_id),
                   }
 
-    templates = {1: 'tent.html',
-                 2: 'sleeping-bag.html',
-                 3: 'sleeping-pad.html',
-                 4: 'pack.html',
-                 5: 'stove.html',
-                 6: 'water-filter.html',
+    templates = {1: 'show-tent.html',
+                 2: 'show-sleeping-bag.html',
+                 3: 'show-sleeping-pad.html',
+                 4: 'show-pack.html',
+                 5: 'show-stove.html',
+                 6: 'show-water-filter.html',
                  }
 
     parent_product = Product.query.get(prod_id)
-    cat_id = parent_product.cat_id
+    category_id = parent_product.cat_id
 
-    child_item = categories[cat_id]
+    child_product = categories[category_id]
 
-    return render_template(templates[cat_id], product=parent_product,
-                           item=child_item)
+    return render_template(templates[category_id], product=parent_product,
+                           item=child_product)
 
 
 @app.route('/rent-confirm/<int:prod_id>', methods=['POST'])
