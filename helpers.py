@@ -251,6 +251,7 @@ def update_product(prod_id, brand_id):
 
     product = Product.query.get(prod_id)
 
+    product.available = True
     product.brand_id = brand_id
     product.model = request.form.get("modelname")
     product.description = request.form.get("desc")
