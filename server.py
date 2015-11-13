@@ -8,7 +8,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.orm.exc import NoResultFound
 
 from model import connect_to_db, db
-from model import User, Region, Product, Tent, SleepingBag
+from model import User, Region, Product, Tent, SleepingBag, BestUse
 from model import Brand, History, Category, Rating
 from helpers import make_user
 from helpers import search_radius, get_users_in_area
@@ -201,13 +201,20 @@ def list_tent():
     # Change this to general list item.
     # Also changed value of "add new brand" to -1. Per Drew rec.
     all_brands = Brand.query.all()
+    all_best_uses = BestUse.query.all()
+    season_categories = {2: "2-season",
+                         3: "3-season",
+                         4: "4-season",
+                         5: "5-season"}
+
     dates = calc_default_dates(30)
 
     # Change so pass in BestUse objects and use best_use_id as value?
     return render_template("list-tent.html", brands=all_brands,
                            submit_route='/handle-tent',
                            p_today=dates['today_string'],
-                           p_month=dates['future_string'])
+                           p_month=dates['future_string'],
+                           best_uses=all_best_uses, seasons=season_categories)
 
 
 @app.route('/edit-listing/<int:prod_id>')
@@ -231,13 +238,22 @@ def edit_listing(prod_id):
 
     parent_product = Product.query.get(prod_id)
     category_id = parent_product.cat_id
-
     child_product = categories[category_id]
 
     all_brands = Brand.query.all()
 
-    return render_template(templates[category_id], parent=parent_product,
-                           child=child_product, brands=all_brands)
+    if category_id == 1:
+        all_best_uses = BestUse.query.all()
+        season_categories = {2: "2-season",
+                             3: "3-season",
+                             4: "4-season",
+                             5: "5-season"}
+
+        return render_template(templates[category_id], parent=parent_product,
+                               child=child_product, brands=all_brands,
+                               best_uses=all_best_uses, seasons=season_categories)
+    else:
+        return "Yet to be implemented."
 
 
 @app.route('/handle-edit-listing/<int:prod_id>')

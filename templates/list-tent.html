@@ -8,18 +8,21 @@
 
     Best Use: 
     <select name="bestuse">
-        <option value="1">Backpacking</option>
-        <option value="2">Car Camping</option>
-        <option value="3">Mountaineering</option>
+        {% for best_use in best_uses %}
+            <option value="{{ best_use.use_id }}">{{ best_use.use_name }}</option>
+        {% endfor %}
     </select><br>
       <br>
 
     Season Category: 
     <select name="seasoncat">
-        <option value="2">2-season</option>
-        <option value="3">3-season</option>
-        <option value="4">4-season</option>
-        <option value="5">5-season</option>
+        {% for season in seasons %}
+            {% if season == 3 %}
+                <option value="{{ season }}" selected>{{ seasons[season] }}</option>
+            {% else %}
+                <option value="{{ season }}">{{ seasons[season] }}</option>
+            {% endif %}
+        {% endfor %}
     </select><br>
     <br>
 
