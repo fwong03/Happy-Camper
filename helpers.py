@@ -181,6 +181,23 @@ def convert_string_to_datetime(date_string):
 
     return date
 
+def check_brand(brand_id):
+    """Takes int brand_id and returns int brand_id.
+
+        Check if need to add a new brand to database. If given brand_id is
+        less than zero, it makes a new brand and returns the brand_id of that
+        newly created brand.
+    """
+
+    if brand_id < 0:
+        new_brand_name = request.form.get("new_brand_name")
+        brand = Brand(brand_name=new_brand_name)
+        db.session.add(brand)
+        db.session.commit()
+        brand_id = brand.brand_id
+
+    return brand_id
+
 
 def make_brand(brandname):
     """Adds a new brand to the database."""
@@ -199,7 +216,7 @@ def get_brand_id(brandname):
 
 
 def make_product(brand_id, category_id):
-    """Takes no arguments and returns a Product object.
+    """Takes ints brand_id and category_id and returns Product object.
 
     Will take a listing form submission to make a parent Product object.
     Make this before a child (e.g. Tent, Sleeping Bag) object.
@@ -225,6 +242,37 @@ def make_product(brand_id, category_id):
                       price_per_day=pricing, image_url=image)
 
     return product
+
+
+
+def update_product(prod_id, brand_id, category_id):
+    """Takes ints brand_id and category_id and updates Product object.
+
+    """
+
+    product = Product.query.get(prod_id)
+
+    product.brand_id = brand_id
+    product.model = request.form.get("modelname")
+    product.description = request.form.get("desc")
+    product.condition = request.form.get("cond")
+    product.price_per_day = float(request.form.get("pricing"))
+    prodcut.image_url = request.form.get("image")
+
+    avail_start = request.form.get("avail_start")
+    avail_end = request.form.get("avail_end")
+
+    avail_start = datetime.strptime(avail_start, "%Y-%m-%d")
+    avail_end = datetime.strptime(avail_end, "%Y-%m-%d")
+
+    product.avail_start_date = avail_start
+    product.avail_end_end = avail_end
+
+    db.session.commit()
+
+    return "Product updated: id=%d name= %s %s" % (product.prod_id,
+                                                   product.brand.brand_name,
+                                                   product.model)
 
 
 def make_tent(prod_id):

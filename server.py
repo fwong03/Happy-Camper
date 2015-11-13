@@ -13,7 +13,7 @@ from model import Brand, History, Category, Rating
 from helpers import make_user
 from helpers import search_radius, get_users_in_area
 from helpers import calc_default_dates, convert_string_to_datetime
-from helpers import make_product, make_tent, filter_products, categorize_products, get_products_within_dates
+from helpers import make_product, make_tent, check_brand, filter_products, categorize_products, get_products_within_dates
 from helpers import calc_avg_star_rating
 from datetime import datetime
 
@@ -281,7 +281,7 @@ def handle_edit_listing(prod_id):
     child_item = categories[cat_id]
 
     if cat_id == 1:
-        pass
+        i[date]
 
     return "This will handle a listing edit"
 
@@ -301,15 +301,10 @@ def handle_tent_listing():
     """
     # Tent category ID is 1
     cat_id = 1
+
     # Check if new brand. If so make new brand and add to database.
     brand_num = int(request.form.get("brand_id"))
-
-    if brand_num < 0:
-        new_brand_name = request.form.get("new_brand_name")
-        brand = Brand(brand_name=new_brand_name)
-        db.session.add(brand)
-        db.session.commit()
-        brand_num = brand.brand_id
+    brand_num = check_brand(brand_num)
 
     product = make_product(brand_id=brand_num, category_id=cat_id)
 
