@@ -4,8 +4,17 @@
 
 {% block content %}
 
-    <h2>Your Options</h2>
-    <p><a href="/login">Login Here</a></p>
-    <p><a href="create-account">Create an Account</a></p>
+    <h2>Welcome to Happy Camper!</h2>
+
+    <form action="/handle-login" method="POST">
+        <p><b>Login Here</b></p>
+        Email: <input type="text" name="email">
+        <br><br>
+        Password:<input type="password" name="password">
+        <br><br>
+        <input type="submit">
+    </form>
+    
+    <p><a href="create-account">Or Create an Account</a></p>
   
 {% endblock %}

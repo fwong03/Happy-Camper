@@ -2,11 +2,11 @@
 
 {% block title %}Rate Owner Form{% endblock %}
 
-{% block page_heading %} Rating for {{ session['owner_username_for_rating'] }} {% endblock %}
+{% block page_heading %} Rating for {{ session['username_for_rating'] }} {% endblock %}
 
  {% block star_instructions %}
 
-     How many stars would you rate your experience with this owner?
+     How many stars would you rate your experience with this person?
 
 {% endblock %}
 
@@ -23,11 +23,12 @@
 {% endblock %}
 
 {% block comments_instructions %}
-    Please describe your experience with this owner.
+    Please provide your reasoning for your star feedback.
 {% endblock %}
 
 {% block comments_text %}
 
  <textarea rows="4" cols="50" maxlength="128" name="comments"></textarea><br><br>
+ <input type="hidden" name="is_owner" value="{{ is_owner }}">
 
  {% endblock %}

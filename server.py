@@ -33,18 +33,9 @@ app.jinja_env.undefined = StrictUndefined
 def index():
     """Signed out homepage."""
 
-    # Is there a way to deal with login with if/else Get vs Post request?
     return render_template("signedout.html")
 
 ################# User stuff ###################################
-
-@app.route('/login')
-def login():
-    """User login page."""
-
-    # Make username can display for ratings?
-    return render_template("login.html")
-
 
 @app.route('/logout')
 def handle_logout():
@@ -64,7 +55,6 @@ def handle_login():
     # http://docs.sqlalchemy.org/en/latest/orm/exceptions.html
     try:
         user = User.query.filter(User.email == username).one()
-
     except NoResultFound:
         flash("The email %s does not exist in our records. Please try again." % username)
         return redirect("/")
@@ -431,25 +421,6 @@ def show_results():
                            product_brands=all_brands)
 
 
-@app.route('/search-filter')
-def filter_results():
-    """Filter results page.
-
-    Routes from search page.
-
-    """
-    category_id = int(request.args.get("category_id"))
-    brand_id = int(request.args.get("brand_id"))
-
-    search_start_date = session['search_start_date']
-    search_end_date = session['search_end_date']
-    search_area = session['search_area']
-    search_radius = session['search_radius']
-
-    return "this will show filtered results for brand_id %d and cat_id %d" % (
-        brand_id, category_id)
-
-
 ################# Showing stuff ###################################
 
 
@@ -607,27 +578,38 @@ def show_product_ratings(prod_id):
                            average=avg_star_rating, product=item)
 
 
-@app.route('/rate-owner/<int:owner_id>-<int:history_id>')
-def rate_owner(owner_id, history_id):
-    """Page to rate owner.
+@app.route('/rate-user/<int:user_id>-<int:history_id>-<int:owner_is_true>-<int:default_star>')
+def rate_user(user_id, history_id, owner_is_true, default_star):
+    """Page to rate owner or renter.
 
     """
 
-    star_categories = {1: "1: Awful. Would not rent from this person again.",
-                    2: "2: Not as good as expected, but might rent from again.",
-                    3: "3: As expected. Would rent from again.",
-                    4: "4: Awesome! Would rent from again."}
+    # 0 is renter, 1 is owner
+    star_categories = [{1: "1: Awful. Would not rent to this person again.",
+                        2: "2: Worse than expected, but not awful. Might rent to this person again.",
+                        3: "3: As expected. Would rent to this person again.",
+                        4: "4: Awesome! Would be happy to rent to this person again."
+                        },
 
-    owner = User.query.get(owner_id)
-    default_star = 3
+                        {1: "1: Awful. Would not rent from this person again.",
+                        2: "2: Not as good as expected, but might rent from again.",
+                        3: "3: As expected. Would rent from again.",
+                        4: "4: Awesome! Would rent from again.",
+                        }]
+
+    user = User.query.get(user_id)
+
+    print "\n\n User: %d \n\n" % user_id
 
     session['history_id_for_rating'] = history_id
-    session['owner_username_for_rating'] = owner.email
+    session['username_for_rating'] = User.query.get(user_id).email
+    session['user_id_for_rating'] = user_id
 
-    return render_template("rate-owner.html",
-                           submit_route='/rate-owner-confirm/',
-                           star_ratings=star_categories,
-                           default_star_rating=default_star)
+    return render_template("rate-user.html",
+                           submit_route='/rate-user-confirm/',
+                           star_ratings=star_categories[owner_is_true],
+                           default_star_rating=default_star,
+                           is_owner=owner_is_true)
 
 
 @app.route('/rate-owner-edit/')
@@ -640,19 +622,20 @@ def edit_owner_rating():
                            submit_route='/rate-owner-confirm/')
 
 
-@app.route('/rate-owner-confirm/', methods=['POST'])
+@app.route('/rate-user-confirm/', methods=['POST'])
 def confirm_owner_rating():
-    """Confirm owner rating before adding to database"""
+    """Confirm user rating before adding to database"""
 
     stars = request.form.get("stars")
     comments = request.form.get("comments")
+    is_owner_true = int(request.form.get("is_owner"))
 
-    return render_template("rate-owner-confirm.html", num_stars=stars,
-                           comments_text=comments,
-                           submit_route='/handle-owner-rating')
+    return render_template("rate-user-confirm.html", num_stars=stars,
+                           comments_text=comments, is_owner=is_owner_true,
+                           submit_route='/handle-user-rating')
 
 
-@app.route('/handle-owner-rating', methods=['POST'])
+@app.route('/handle-user-rating', methods=['POST'])
 def handle_owner_rating():
     """Handle owner rating form submission.
 
@@ -662,18 +645,26 @@ def handle_owner_rating():
 
     number_stars = int(request.form.get("number_stars"))
     comments_text = request.form.get("comments_text")
+    is_owner = int(request.form.get("is_owner"))
 
-    owner_rating = Rating(stars=number_stars, comments=comments_text)
-    db.session.add(owner_rating)
+    rating = Rating(stars=number_stars, comments=comments_text)
+
+    db.session.add(rating)
     db.session.commit()
 
     history = History.query.get(session['history_id_for_rating'])
-    history.owner_rating_id = owner_rating.rating_id
+
+    if is_owner:
+      history.owner_rating_id = rating.rating_id
+    else:
+        history.renter_rating_id = rating.rating_id
 
     db.session.commit()
 
+
     session.pop('history_id_for_rating')
-    session.pop('owner_username_for_rating')
+    session.pop('username_for_rating')
+    session.pop('user_id_for_rating')
 
     flash("Thank you for your rating!")
 
@@ -746,69 +737,69 @@ def handle_product_rating():
     return redirect('/account-info')
 
 
-@app.route('/rate-renter/<int:renter_id>-<int:history_id>')
-def rate_renter(renter_id, history_id):
-    """Page to rate renter.
+# @app.route('/rate-renter/<int:renter_id>-<int:history_id>')
+# def rate_renter(renter_id, history_id):
+#     """Page to rate renter.
 
-    """
+#     """
 
-    renter = User.query.get(renter_id)
+#     renter = User.query.get(renter_id)
 
-    session['history_id_for_rating'] = history_id
-    session['renter_username_for_rating'] = renter.email
+#     session['history_id_for_rating'] = history_id
+#     session['renter_username_for_rating'] = renter.email
 
-    return render_template("rate-renter.html",
-                           submit_route='/rate-renter-confirm/')
-
-
-@app.route('/rate-renter-edit/')
-def edit_renter_rating():
-    """Page to edit rating of renter.
-
-    """
-
-    return render_template("rate-renter.html",
-                           submit_route='/rate-renter-confirm/')
+#     return render_template("rate-renter.html",
+#                            submit_route='/rate-renter-confirm/')
 
 
-@app.route('/rate-renter-confirm/', methods=['POST'])
-def confirm_renter_rating():
-    """Confirm renter rating before adding to database"""
+# @app.route('/rate-renter-edit/')
+# def edit_renter_rating():
+#     """Page to edit rating of renter.
 
-    stars = request.form.get("stars")
-    comments = request.form.get("comments")
+#     """
 
-    return render_template("rate-renter-confirm.html", num_stars=stars,
-                           comments_text=comments,
-                           submit_route='/handle-renter-rating')
+#     return render_template("rate-renter.html",
+#                            submit_route='/rate-renter-confirm/')
 
 
-@app.route('/handle-renter-rating', methods=['POST'])
-def handle_renter_rating():
-    """Handle renter rating form submission.
+# @app.route('/rate-renter-confirm/', methods=['POST'])
+# def confirm_renter_rating():
+#     """Confirm renter rating before adding to database"""
 
-    Will (1) create rating object and (2) update associated history object's
-    renter_rating_id.
-    """
+#     stars = request.form.get("stars")
+#     comments = request.form.get("comments")
 
-    number_stars = int(request.form.get("number_stars"))
-    comments_text = request.form.get("comments_text")
+#     return render_template("rate-renter-confirm.html", num_stars=stars,
+#                            comments_text=comments,
+#                            submit_route='/handle-renter-rating')
 
-    renter_rating = Rating(stars=number_stars, comments=comments_text)
-    db.session.add(renter_rating)
-    db.session.commit()
 
-    history = History.query.get(session['history_id_for_rating'])
-    history.renter_rating_id = renter_rating.rating_id
+# @app.route('/handle-renter-rating', methods=['POST'])
+# def handle_renter_rating():
+#     """Handle renter rating form submission.
 
-    db.session.commit()
+#     Will (1) create rating object and (2) update associated history object's
+#     renter_rating_id.
+#     """
 
-    session.pop('history_id_for_rating')
-    session.pop('renter_username_for_rating')
+#     number_stars = int(request.form.get("number_stars"))
+#     comments_text = request.form.get("comments_text")
 
-    flash("Thank you for your rating!")
+#     renter_rating = Rating(stars=number_stars, comments=comments_text)
+#     db.session.add(renter_rating)
+#     db.session.commit()
 
-    return redirect('/account-info')
+#     history = History.query.get(session['history_id_for_rating'])
+#     history.renter_rating_id = renter_rating.rating_id
+
+#     db.session.commit()
+
+#     session.pop('history_id_for_rating')
+#     session.pop('renter_username_for_rating')
+
+#     flash("Thank you for your rating!")
+
+#     return redirect('/account-info')
 
 ################# Delisting stuff ###################################
 

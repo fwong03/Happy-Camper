@@ -55,7 +55,7 @@
                                         <td> <a href="/show-renter-ratings/{{ history.renter_user_id }}">Ratings of {{ history.renter.email }} </a></td>
                                         <td>
                                             {% if not history.renter_rating_id %}
-                                                <a href="/rate-renter/{{ history.renter_user_id }}-{{ history.history_id }}">Rate Renter</a>
+                                                <a href="/rate-user/{{ history.renter_user_id }}-{{ history.history_id }}-0-4">Rate Renter</a>
                                             {% else %}
                                                 You've already submitted a rating for this renter.
                                             {% endif %}
@@ -109,7 +109,7 @@
                                         <td> <a href="/show-renter-ratings/{{ history.renter_user_id }}">Ratings of {{ history.renter.email }} </a></td>
                                         <td>
                                             {% if not history.renter_rating_id %}
-                                                <a href="/rate-renter/{{ history.renter_user_id }}-{{ history.history_id }}">Rate Renter</a>
+                                                <a href="/rate-user/{{ history.renter_user_id }}-{{ history.history_id }}-0-4">Rate Renter</a>
                                             {% else %}
                                                 You've already submitted a rating for this renter.
                                             {% endif %}
@@ -154,7 +154,7 @@
                             <li><a href="mailto:{{ history.product.owner.email }}">Send owner an email</a></li>
                             <li> 
                                 {% if not history.owner_rating_id %}
-                                    <a href="/rate-owner/{{ history.product.owner_user_id }}-{{ history.history_id }}">Rate owner here</a>
+                                    <a href="/rate-user/{{ history.product.owner_user_id }}-{{ history.history_id }}-1-4">Rate owner here</a>
                                 {% else %}
                                     Owner rating already submitted.
                                 {% endif %}

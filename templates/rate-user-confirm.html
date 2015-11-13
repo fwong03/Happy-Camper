@@ -1,12 +1,12 @@
 {% extends 'rate-form-base.html' %}
 
-{% block title %}Rate Owner Confirmation{% endblock %}
+{% block title %}Rating Confirmation{% endblock %}
 
-{% block page_heading %}Confirmation: Product Owner Rating for {{ session['owner_username_for_rating'] }} {% endblock %}
+{% block page_heading %}Confirmation: Rating for {{ session['username_for_rating'] }} {% endblock %}
 
  {% block star_instructions %}{% endblock %}
 
-{% block star_dropdown %} You gave this owner a star rating of: 
+{% block star_dropdown %} You gave this user a star rating of: 
     <input type="hidden" name="number_stars" value="{{ num_stars }}">
         <i>{{ num_stars }}</i> out of 4
 
@@ -22,8 +22,9 @@
 
 <p><i>{{ comments_text }}</i></p>
 
-<br>
-<p>Submit below or <a href="/rate-owner-edit/">click here to redo your rating.</a></p>
+<input type="hidden" name="is_owner" value = "{{ is_owner }}">
+
+<p>Submit below or <a href="/rate-user/{{ session['user_id_for_rating'] }}-{{ session['history_id_for_rating'] }}-{{ is_owner }}-{{ num_stars }}">change rating here.</a>
 
  {% endblock %}
 
