@@ -613,13 +613,21 @@ def rate_owner(owner_id, history_id):
 
     """
 
+    star_categories = {1: "1: Awful. Would not rent from this person again.",
+                    2: "2: Not as good as expected, but might rent from again.",
+                    3: "3: As expected. Would rent from again.",
+                    4: "4: Awesome! Would rent from again."}
+
     owner = User.query.get(owner_id)
+    default_star = 3
 
     session['history_id_for_rating'] = history_id
     session['owner_username_for_rating'] = owner.email
 
     return render_template("rate-owner.html",
-                           submit_route='/rate-owner-confirm/')
+                           submit_route='/rate-owner-confirm/',
+                           star_ratings=star_categories,
+                           default_star_rating=default_star)
 
 
 @app.route('/rate-owner-edit/')

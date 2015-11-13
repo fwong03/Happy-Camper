@@ -12,10 +12,13 @@
 
 {% block star_dropdown %}
     <select name="stars">
-        <option value="4">4: Awesome! Would rent from again.</option>
-        <option value="3">3: As expected. Would rent from again.</option>
-        <option value="2">2: Not as good as expected, but might rent from again.</option>
-        <option value="1">1: Awful. Would not rent from this person again.</option>
+        {% for star_rating in star_ratings %}
+            {% if star_rating == default_star_rating %}
+                <option value="{{ star_rating }}" selected>{{ star_ratings[star_rating] }}</option>
+            {% else %}
+                <option value="{{ star_rating }}">{{ star_ratings[star_rating] }}</option>
+            {% endif %}
+        {% endfor %}
   </select>
 {% endblock %}
 
