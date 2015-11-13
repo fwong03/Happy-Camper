@@ -31,9 +31,9 @@
       Add new brand: (Show this only if adding new brand) 
         <input type="text" size="50" name="new_brand_name"><br><br>
 
-      Model Name: <input type="text" size="50" name="modelname" value = {{ parent.model }} ><br><br>
-      Description: <textarea rows="4" cols="50" name="desc" maxlength="128" value = {{ parent.description }}></textarea><br><br>
-      Condition: <textarea rows="4" cols="50" name="cond" maxlength="128" value = {{ parent.condition }}></textarea><br><br>
+      Model Name: <input type="text" size="50" name="modelname" value = "{{ parent.model }}" ><br><br>
+      Description: <textarea rows="4" cols="50" name="desc" maxlength="128">{{ parent.description }}</textarea><br><br>
+      Condition: <textarea rows="4" cols="50" name="cond" maxlength="128">{{ parent.condition }}</textarea><br><br>
 
     <h3>Product Availability and Pricing</h3>
       Available Start Date: <input type="text" size="10" value={{ parent.avail_start_date.date().isoformat() }} name="avail_start">

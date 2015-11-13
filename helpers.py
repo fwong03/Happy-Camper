@@ -269,9 +269,10 @@ def update_product(prod_id, brand_id):
 
     db.session.commit()
 
-    return "Product updated: id=%d name= %s %s" % (product.prod_id,
+    print "\n\nProduct updated: id=%d name= %s %s\n\n" % (product.prod_id,
                                                    product.brand.brand_name,
                                                    product.model)
+    return
 
 
 def make_tent(prod_id):
@@ -308,6 +309,46 @@ def make_tent(prod_id):
                 floor_width=width, floor_length=length, num_doors=doors,
                 num_poles=poles)
     return tent
+
+
+def update_tent(prod_id):
+    """Update tent object given product id"""
+
+    tent = Tent.query.get(prod_id)
+
+    tent.use_id = int(request.form.get("bestuse"))
+    tent.sleep_capacity = int(request.form.get("sleep"))
+    tent.seasons = int(request.form.get("seasoncat"))
+    tent.min_trail_weight = int(request.form.get("weight"))
+
+    # Deal with optional values.
+    try:
+        tent.floor_width = int(request.form.get("width"))
+    except ValueError:
+        tent.floor_width = None
+
+    try:
+        tent.floor_length = int(request.form.get("length"))
+    except ValueError:
+        tent.floor_length = None
+
+    try:
+        tent.num_doors = int(request.form.get("doors"))
+    except ValueError:
+        tent.num_doors = None
+
+    try:
+        tent.num_poles = int(request.form.get("poles"))
+    except ValueError:
+        tent.num_poles = None
+
+    db.session.commit()
+
+    print "\n\nTent updated: id=%d capacity=%d seasons=%d weight=%d\n\n" % (tent.prod_id,
+                                                   tent.sleep_capacity,
+                                                   tent.seasons,
+                                                   tent.min_trail_weight)
+    return
 
 
 def filter_products(products, category_id, brand_id):

@@ -13,7 +13,7 @@ from model import Brand, History, Category, Rating
 from helpers import make_user
 from helpers import search_radius, get_users_in_area
 from helpers import calc_default_dates, convert_string_to_datetime
-from helpers import make_product, make_tent, update_product, check_brand
+from helpers import make_product, make_tent, update_product, update_tent, check_brand
 from helpers import filter_products, categorize_products, get_products_within_dates
 from helpers import calc_avg_star_rating
 from datetime import datetime
@@ -36,6 +36,7 @@ def index():
     # Is there a way to deal with login with if/else Get vs Post request?
     return render_template("signedout.html")
 
+################# User stuff ###################################
 
 @app.route('/login')
 def login():
@@ -186,6 +187,8 @@ def deactivate_account():
 
     return redirect('/')
 
+################# Listing stuff ###################################
+
 
 @app.route('/list-item-choices')
 def list_item():
@@ -216,6 +219,43 @@ def list_tent():
                            p_today=dates['today_string'],
                            p_month=dates['future_string'],
                            best_uses=all_best_uses, seasons=season_categories)
+
+
+@app.route('/handle-tent', methods=['POST'])
+def handle_tent_listing():
+    # Change this to general handle item.
+    """Handle tent listing.
+
+    First checks if it needs to make a new Brand. If so, makes a new Brand object.
+
+    Then makes Product object. Calls a function where you need to pass it the
+    brand_id and cat_id. For tents, cat_id==1.
+
+    Then makes a Tent object. Need to pass it the same primary key of the parent
+    Product object.
+    """
+    # Tent category ID is 1
+    cat_id = 1
+
+    # Check if new brand. If so make new brand and add to database.
+    brand_num = int(request.form.get("brand_id"))
+    brand_num = check_brand(brand_num)
+
+    product = make_product(brand_id=brand_num, category_id=cat_id)
+
+    db.session.add(product)
+    db.session.commit()
+
+    tent = make_tent(product.prod_id)
+
+    db.session.add(tent)
+    db.session.commit()
+
+    flash("Listing successfully posted!")
+    return redirect('/product-detail/%d' % product.prod_id)
+
+
+################# Editing Listing stuff ###################################
 
 
 @app.route('/edit-listing/<int:prod_id>')
@@ -258,42 +298,6 @@ def edit_listing(prod_id):
 
 
 
-
-
-@app.route('/handle-tent', methods=['POST'])
-def handle_tent_listing():
-    # Change this to general handle item.
-    """Handle tent listing.
-
-    First checks if it needs to make a new Brand. If so, makes a new Brand object.
-
-    Then makes Product object. Calls a function where you need to pass it the
-    brand_id and cat_id. For tents, cat_id==1.
-
-    Then makes a Tent object. Need to pass it the same primary key of the parent
-    Product object.
-    """
-    # Tent category ID is 1
-    cat_id = 1
-
-    # Check if new brand. If so make new brand and add to database.
-    brand_num = int(request.form.get("brand_id"))
-    brand_num = check_brand(brand_num)
-
-    product = make_product(brand_id=brand_num, category_id=cat_id)
-
-    db.session.add(product)
-    db.session.commit()
-
-    tent = make_tent(product.prod_id)
-
-    db.session.add(tent)
-    db.session.commit()
-
-    flash("Listing successfully posted!")
-    return redirect('/product-detail/%d' % product.prod_id)
-
-
 @app.route('/handle-edit-listing/<int:prod_id>', methods=['POST'])
 def handle_edit_listing(prod_id):
 
@@ -323,9 +327,13 @@ def handle_edit_listing(prod_id):
     update_product(prod_id=prod_id, brand_id=brand_num)
 
     if cat_id == 1:
-        pass
+        update_tent(prod_id)
+        flash("Tent listing updated!")
+        return redirect("/account-info")
+    else:
+        return "This is unimplemented"
 
-    return "This will handle a listing edit"
+################# Searching stuff ###################################
 
 
 @app.route('/search-results')
@@ -442,6 +450,9 @@ def filter_results():
         brand_id, category_id)
 
 
+################# Showing stuff ###################################
+
+
 @app.route('/product-detail/<int:prod_id>')
 def show_product(prod_id):
     """Product detail page.
@@ -474,6 +485,8 @@ def show_product(prod_id):
 
     return render_template(templates[category_id], product=parent_product,
                            item=child_product)
+
+################# Renting stuff ###################################
 
 
 @app.route('/rent-confirm/<int:prod_id>', methods=['POST'])
@@ -519,6 +532,8 @@ def rent_item():
     """Show rental confirmation page to user."""
 
     return render_template("rent-final.html")
+
+################# Rating stuff ###################################
 
 
 @app.route('/show-owner-ratings/<int:user_id>')
@@ -787,6 +802,8 @@ def handle_renter_rating():
 
     return redirect('/account-info')
 
+################# Delisting stuff ###################################
+
 
 @app.route('/confirm-delist-product/<int:prod_id>')
 def confirm_delist_product(prod_id):
@@ -811,6 +828,9 @@ def delist_product():
     flash("This product has been delisted.")
 
     return redirect('/account-info')
+
+
+################# Stuff to implement ###################################
 
 
 @app.route('/relist-product/<int:prod_id>')
