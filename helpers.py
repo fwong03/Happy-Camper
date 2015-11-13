@@ -244,8 +244,7 @@ def make_product(brand_id, category_id):
     return product
 
 
-
-def update_product(prod_id, brand_id, category_id):
+def update_product(prod_id, brand_id):
     """Takes ints brand_id and category_id and updates Product object.
 
     """
@@ -257,7 +256,7 @@ def update_product(prod_id, brand_id, category_id):
     product.description = request.form.get("desc")
     product.condition = request.form.get("cond")
     product.price_per_day = float(request.form.get("pricing"))
-    prodcut.image_url = request.form.get("image")
+    product.image_url = request.form.get("image")
 
     avail_start = request.form.get("avail_start")
     avail_end = request.form.get("avail_end")

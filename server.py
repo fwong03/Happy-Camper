@@ -13,7 +13,8 @@ from model import Brand, History, Category, Rating
 from helpers import make_user
 from helpers import search_radius, get_users_in_area
 from helpers import calc_default_dates, convert_string_to_datetime
-from helpers import make_product, make_tent, check_brand, filter_products, categorize_products, get_products_within_dates
+from helpers import make_product, make_tent, update_product, check_brand
+from helpers import filter_products, categorize_products, get_products_within_dates
 from helpers import calc_avg_star_rating
 from datetime import datetime
 
@@ -256,34 +257,7 @@ def edit_listing(prod_id):
         return "Yet to be implemented."
 
 
-@app.route('/handle-edit-listing/<int:prod_id>')
-def handle_edit_listing(prod_id):
 
-    categories = {1: Tent.query.get(prod_id),
-                  2: SleepingBag.query.get(prod_id),
-                  # 3: SleepingPad.query.get(prod_id),
-                  # 4: Pack.query.get(prod_id),
-                  # 5: Stove.query.get(prod_id),
-                  # 6: WaterFilter.query.get(prod_id),
-                  }
-
-    templates = {1: 'tent.html',
-                 2: 'sleeping-bag.html',
-                 3: 'sleeping-pad.html',
-                 4: 'pack.html',
-                 5: 'stove.html',
-                 6: 'water-filter.html',
-                 }
-
-    parent_product = Product.query.get(prod_id)
-    cat_id = parent_product.cat_id
-
-    child_item = categories[cat_id]
-
-    if cat_id == 1:
-        i[date]
-
-    return "This will handle a listing edit"
 
 
 @app.route('/handle-tent', methods=['POST'])
@@ -318,6 +292,40 @@ def handle_tent_listing():
 
     flash("Listing successfully posted!")
     return redirect('/product-detail/%d' % product.prod_id)
+
+
+@app.route('/handle-edit-listing/<int:prod_id>', methods=['POST'])
+def handle_edit_listing(prod_id):
+
+    categories = {1: Tent.query.get(prod_id),
+                  2: SleepingBag.query.get(prod_id),
+                  # 3: SleepingPad.query.get(prod_id),
+                  # 4: Pack.query.get(prod_id),
+                  # 5: Stove.query.get(prod_id),
+                  # 6: WaterFilter.query.get(prod_id),
+                  }
+
+    templates = {1: 'tent.html',
+                 2: 'sleeping-bag.html',
+                 3: 'sleeping-pad.html',
+                 4: 'pack.html',
+                 5: 'stove.html',
+                 6: 'water-filter.html',
+                 }
+
+    parent_product = Product.query.get(prod_id)
+    cat_id = parent_product.cat_id
+    child_item = categories[cat_id]
+
+    brand_num = int(request.form.get("brand_id"))
+    brand_num = check_brand(brand_num)
+
+    update_product(prod_id=prod_id, brand_id=brand_num)
+
+    if cat_id == 1:
+        pass
+
+    return "This will handle a listing edit"
 
 
 @app.route('/search-results')
