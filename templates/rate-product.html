@@ -12,10 +12,13 @@
 
 {% block star_dropdown %}
     <select name="stars">
-        <option value="4">4: Great! Even better than expected. Would be happy to rent again if needed. </option>
-        <option value="3">3: As expected. Would not mind renting again if needed. </option>
-        <option value="2">2: Not as good as expected. Might rent again if in a pinch.</option>
-        <option value="1">1: Awful. Would not rent again.</option>
+        {% for star_rating in star_ratings %}
+            {% if star_rating == default_star_rating %}
+                <option value="{{ star_rating }}" selected>{{ star_ratings[star_rating] }}</option>
+            {% else %}
+                <option value="{{ star_rating }}">{{ star_ratings[star_rating] }}</option>
+            {% endif %}
+        {% endfor %}
   </select>
 {% endblock %}
 
@@ -25,6 +28,6 @@
 
 {% block comments_text %}
 
- <textarea rows="4" cols="50" name="comments"></textarea><br><br>
+ <textarea rows="4" cols="50" name="comments">{{ default_comments_text }}</textarea><br><br>
 
  {% endblock %}

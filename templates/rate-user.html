@@ -28,7 +28,8 @@
 
 {% block comments_text %}
 
- <textarea rows="4" cols="50" maxlength="128" name="comments"></textarea><br><br>
+ <textarea rows="4" cols="50" maxlength="128" name="comments">{{ default_comments_text }}</textarea><br><br>
+
  <input type="hidden" name="is_owner" value="{{ is_owner }}">
 
  {% endblock %}

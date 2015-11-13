@@ -23,7 +23,7 @@
 <p><i>{{ comments_text }}</i></p>
 
 <br>
-<p>Submit below or <a href="/rate-product-edit/">click here to redo your rating.</a></p>
+<p>Submit below or <a href="/rate-product/{{ session['prod_id_for_rating'] }}-{{ session['history_id_for_rating'] }}-{{ num_stars }}">click here to edit your rating.</a></p>
 
  {% endblock %}
 
