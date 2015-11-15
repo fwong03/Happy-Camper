@@ -187,28 +187,47 @@ def list_item():
     Routes from signed in homepage, which has a button to List an Item.
     Routes to item detail page.
     """
-    return render_template("list-item-choices.html")
+    all_categories = Category.query.all()
+
+    return render_template("list-item-choices.html", categories=all_categories)
 
 
-@app.route('/list-tent')
-def list_tent():
-    # Change this to general list item.
+@app.route('/list-product/<int:category_id>')
+def list_product(category_id):
     # Also changed value of "add new brand" to -1. Per Drew rec.
-    all_brands = Brand.query.all()
-    all_best_uses = BestUse.query.all()
-    season_categories = {2: "2-season",
-                         3: "3-season",
-                         4: "4-season",
-                         5: "5-season"}
 
+    all_brands = Brand.query.all()
     dates = calc_default_dates(30)
 
-    # Change so pass in BestUse objects and use best_use_id as value?
-    return render_template("list-tent.html", brands=all_brands,
-                           submit_route='/handle-tent',
-                           p_today=dates['today_string'],
-                           p_month=dates['future_string'],
-                           best_uses=all_best_uses, seasons=season_categories)
+    if category_id == 1:
+        all_best_uses = BestUse.query.all()
+        season_categories = {2: "2-season",
+                             3: "3-season",
+                             4: "4-season",
+                             5: "5-season"}
+
+        return render_template("list-product/%d.html" % category_id,
+                               brands=all_brands,
+                               submit_route='/handle-product/%d' % category_id,
+                               p_today=dates['today_string'],
+                               p_month=dates['future_string'],
+                               best_uses=all_best_uses,
+                               seasons=season_categories)
+    elif category_id == 2:
+        all_fill_types = FillType.query.all()
+        all_gender_types = Gender.query.all()
+
+        return render_template("list-product/%d.html" % category_id,
+                               brands=all_brands,
+                               submit_route='/handle-product/%d' % category_id,
+                               p_today=dates['today_string'],
+                               p_month=dates['future_string'],
+                               fill_types=all_fill_types,
+                               genders=all_gender_types)
+    else:
+        return render_template("list-product/%d.html" % category_id)
+ )
+
 
 
 @app.route('/handle-tent', methods=['POST'])
@@ -285,7 +304,6 @@ def edit_listing(prod_id):
                                best_uses=all_best_uses, seasons=season_categories)
     else:
         return "Yet to be implemented."
-
 
 
 @app.route('/handle-edit-listing/<int:prod_id>', methods=['POST'])
@@ -371,26 +389,22 @@ def show_results():
     session['search_area'] = search_area
     session['search_radius'] = search_miles
 
-    # Find distinct postal codes in the database. We'll use this to determine
-    # which users (and products) are within the search radius. It didn't like
-    # it when I stuck the ".all()" at the end of the query and I was too lazy,
-    # to look into why, so I just did the".all()" separately.
+    # Find distinct postal codes in the database.
     query = db.session.query(User.postalcode).distinct()
     postalcodes = query.all()
 
-    # Use helper function to get which zipcodes in the database are within the
-    # search radius. Then use another helper function to get users with
-    # those zipcodes.
+    # Get zipcodes in the database that are within the search radius.
     postal_codes = search_radius(search_center=search_area,
                                  postalcodes=postalcodes, radius=search_miles)
+    # Get users are in those zipcodes.
     users_in_area = get_users_in_area(postal_codes)
 
-    # We then use a helper function to get products of those users who have
-    #products available for rent during the search dates.
+    # Get products those users have listed for rent and are currently available
+    # within the search dates.
     available_products = get_products_within_dates(start_date=search_start_date,
                                                    end_date=search_end_date,
                                                    users=users_in_area)
-
+    # Filter out products based on selected category and brand filters.
     filtered_products = filter_products(available_products, category_id=category_id,
                                         brand_id=brand_id)
 
@@ -400,12 +414,13 @@ def show_results():
     else:
         search_categories = [Category.query.get(category_id)]
 
-    # Then, using a helper function, we make a dictionary of available products
-    # organized by category (the categories are the keys of the dictionary).
+    # Make a dictionary of available products with categories as the keys of the
+    # dictionary).
     products_by_category = categorize_products(categories=search_categories,
                                                products=filtered_products)
 
-    # We then create a list of category names sorted in alphabetical order.
+    # Create a list of sorted category names to display categories on the page
+    # in some kind of consisent order.
     sorted_category_names = sorted(products_by_category.keys())
 
     # For the saerch filter on top of the page, we need all categories and brands.
@@ -526,6 +541,9 @@ def show_owner_ratings(user_id):
 
     for product in products:
         # Can do something along lines of .filter(owner_rating.isnot(None))?
+        # Get error: AttributeError: type object 'History' has no attribute 
+        # 'owner_ratings'
+
         for history in product.histories:
             if history.owner_rating:
                 owner_ratings.append(history.owner_rating)
@@ -560,7 +578,6 @@ def show_renter_ratings(renter_id):
                            average=avg_star_rating, username=renter_email)
 
 
-# TO DO: Product 9 has no best use??
 @app.route('/show-product-ratings/<int:prod_id>')
 def show_product_ratings(prod_id):
     """Show product star ratings and any comments.
@@ -590,7 +607,7 @@ def rate_user(user_id, history_id, owner_is_true, default_star):
 
     """
 
-    # 0 is renter, 1 is owner
+    # owner_is_true: 0 is renter, 1 is owner
     star_categories = [{1: "1: Awful. Would not rent to this person again.",
                         2: "2: Worse than expected, but not awful. Might rent to this person again.",
                         3: "3: As expected. Would rent to this person again.",

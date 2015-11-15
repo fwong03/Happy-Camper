@@ -4,7 +4,7 @@
 
 {% block content %}
     <h1> Rental confirmation</h1>
-    <h2>When you click submit, you are committing to pay for this rental! Don't be a dick and flake!</h2>
+    <h2>When you click submit, you are committing to pay for this rental!</h2>
     <p><b>Rental Detail:</b></p>
     <ul>
         <li>Product: {{ product.brand.brand_name }} {{ product.model }}</li>
@@ -21,8 +21,8 @@
         <li>TOTAL COST: ${{ '{:,.2f}'.format(session['num_days'] * product.price_per_day) }}</li>
     </ul>
 
-    <p>You are about to rent this item for {{ session['num_days'] }} days with a total cost of ${{ '{:,.2f}'.format(session['num_days'] * product.price_per_day) }}.<br><br>
-    <b>Are you sure this is what you want to do?</b></p>
+    <p><b>You are about to rent this item for {{ session['num_days'] }} days with a total cost of ${{ '{:,.2f}'.format(session['num_days'] * product.price_per_day) }}.<br><br>
+    Is what you want to do?</b></p>
     <form action="/handle-rental/{{ product.prod_id }}" method="POST">
         <input type="submit" value="Fo shizzle."><br><br>
 
