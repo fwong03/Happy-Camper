@@ -184,7 +184,7 @@ class Tent(db.Model):
 
 
 class FillType(db.Model):
-    """Fill types for sleeping bags and sleeping pads."""
+    """Fill types for sleeping bags."""
 
     __tablename__ = 'filltypes'
 
@@ -232,6 +232,40 @@ class SleepingBag(db.Model):
         return "<Sleeping Bag prod_id=%d, fill_code=%s, temp_rating=%d, weight=%d, length=%d, gender=%s>" % (
             self.prod_id, self.fill_code, self.temp_rating, self.weight,
             self.length, self.gender_code)
+
+
+class PadType(db.Model):
+    """Pad types for sleeping pads."""
+
+    __tablename__ = 'padtypes'
+
+    pad_type_code = db.Column(db.String(1), primary_key=True)
+    pad_type_name = db.Column(db.String(16), unique=True)
+
+    sleepingpad = db.relationship('SleepingPad', backref='padtype')
+
+
+class SleepingPad(db.Model):
+    """Sleeping pads is one of the subset tables of Product"""
+
+    __tablename__ = 'sleepingpads'
+
+    prod_id = db.Column(db.Integer, db.ForeignKey('products.prod_id'),
+                        primary_key=True)
+    type_code = db.Column(db.String(1), db.ForeignKey('padtypes.pad_type_code'),
+                          nullable=False)
+    use_id = db.Column(db.Integer, db.ForeignKey('bestuses.use_id'),
+                       nullable=False)
+    r_value = db.Column(db.Float, nullable=False)
+    length = db.Column(db.Integer, nullable=False)
+    weight = db.Column(db.Integer)
+    # Optional.
+    width = db.Column(db.Integer)
+
+    def __repr__(self):
+        return "<Sleeping Pad prod_id=%d, type_code=%s, bestuse_id=%d, r-value=%r, length=%d, weight=%d, width=%r>" % (
+            self.prod_id, self.type_code, self.use_id, self.r_value,
+            self.length, self.weight, self.width)
 
 
 class History(db.Model):
