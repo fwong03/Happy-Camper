@@ -143,6 +143,7 @@ class Product(db.Model):
     # Put subset table backrefs here
     tent = db.relationship('Tent', uselist=False, backref='product')
     sleepingbag = db.relationship('SleepingBag', uselist=False, backref='product')
+    sleepingpad = db.relationship('SleepingPad', uselist=False, backref='product')
 
     # Other backrefs
     owner = db.relationship('User', backref='products')

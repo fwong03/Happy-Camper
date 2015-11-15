@@ -1,5 +1,6 @@
 from model import Region, User, BestUse, Category, Brand, Product, Tent
-from model import FillType, Gender, SleepingBag, History, Rating
+from model import FillType, Gender, SleepingBag, PadType, SleepingPad
+from model import History, Rating
 from model import connect_to_db, db
 from server import app
 from datetime import datetime
@@ -122,6 +123,7 @@ def load_products():
         date1 = row[6]
         date2 = row[7]
         dollarz = float(row[8])
+        image = row[9]
 
         date1 = datetime.strptime(date1, "%Y-%m-%d")
         date2 = datetime.strptime(date2, "%Y-%m-%d")
@@ -129,7 +131,7 @@ def load_products():
         a = Product(cat_id=category, brand_id=brand, owner_user_id=owner,
                     model=mname, condition=con, description=desc,
                     avail_start_date=date1, avail_end_date=date2,
-                    price_per_day=dollarz)
+                    price_per_day=dollarz, image_url=image)
 
         db.session.add(a)
 
@@ -223,6 +225,50 @@ def load_sleepingbags():
 
     db.session.commit()
 
+
+def load_padtypes():
+    """Load pad types"""
+
+    print "Pad Types"
+    PadType.query.delete()
+
+    for row in open("data/padtypesdata"):
+        row = row.strip()
+        code, name = row.split("|")
+
+        a = PadType(pad_type_code=code, pad_type_name=name)
+
+        db.session.add(a)
+
+    db.session.commit()
+
+
+def load_sleepingpads():
+    """Load sleeping pads data"""
+
+    print "Sleeping Pads"
+    SleepingPad.query.delete()
+
+    for row in open("data/sleepingpadsdata"):
+        row = row.strip()
+        row = row.split("|")
+
+        product = int(row[0])
+        pad_type = row[1]
+        use = int(row[2])
+        rval = float(row[3])
+        lgth = int(row[4])
+        wt = int(row[5])
+        wdth = int(row[6])
+
+        a = SleepingPad(prod_id=product, type_code=pad_type, use_id=use,
+                        r_value=rval, length=lgth, weighjt=wt, width=wdth)
+
+        db.session.add(a)
+
+    db.session.commit()
+
+
 def load_histories():
     """Load history data"""
 
@@ -256,8 +302,8 @@ def load_histories():
         date2 = datetime.strptime(date2, "%Y-%m-%d")
 
         a = History(prod_id=product, renter_user_id=renter, start_date=date1,
-                 end_date=date2, total_cost=cost, owner_rating_id=owner_rate,
-                 renter_rating_id=renter_rate, prod_rating_id=prod_rate)
+                    end_date=date2, total_cost=cost, owner_rating_id=owner_rate,
+                    renter_rating_id=renter_rate, prod_rating_id=prod_rate)
 
         db.session.add(a)
 
@@ -302,5 +348,6 @@ if __name__ == "__main__":
     load_filltypes()
     load_gendertypes()
     load_sleepingbags()
+    load_padtypes()
     load_ratings()
     load_histories()
