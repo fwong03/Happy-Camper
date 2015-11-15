@@ -9,11 +9,11 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from model import connect_to_db, db
 from model import User, Region, Product, Tent, SleepingBag, BestUse
-from model import Brand, History, Category, Rating
+from model import Brand, History, Category, Rating, Gender, FillType
 from helpers import make_user
 from helpers import search_radius, get_users_in_area
 from helpers import calc_default_dates, convert_string_to_datetime
-from helpers import make_product, make_tent, update_product, update_tent, check_brand
+from helpers import make_parent_product, make_tent, update_parent_product, update_tent, check_brand
 from helpers import filter_products, categorize_products, get_products_within_dates
 from helpers import calc_avg_star_rating
 from datetime import datetime
@@ -36,6 +36,7 @@ def index():
     return render_template("signedout.html")
 
 ################# User stuff ###################################
+
 
 @app.route('/logout')
 def handle_logout():
@@ -199,6 +200,15 @@ def list_product(category_id):
     all_brands = Brand.query.all()
     dates = calc_default_dates(30)
 
+    templates = {1: 'list-tent.html',
+                 2: 'list-sleeping-bag.html',
+                 # 3: 'list-sleeping-pad.html',
+                 # 4: 'list-pack.html',
+                 # 5: 'list-stove.html',
+                 # 6: 'list-water-filter.html',
+                 }
+
+    # Tent
     if category_id == 1:
         all_best_uses = BestUse.query.all()
         season_categories = {2: "2-season",
@@ -206,9 +216,9 @@ def list_product(category_id):
                              4: "4-season",
                              5: "5-season"}
 
-        return render_template("list-product/%d.html" % category_id,
+        return render_template(templates[1],
                                brands=all_brands,
-                               submit_route='/handle-product/%d' % category_id,
+                               submit_route='/handle-listing/%d' % category_id,
                                p_today=dates['today_string'],
                                p_month=dates['future_string'],
                                best_uses=all_best_uses,
@@ -217,51 +227,48 @@ def list_product(category_id):
         all_fill_types = FillType.query.all()
         all_gender_types = Gender.query.all()
 
-        return render_template("list-product/%d.html" % category_id,
+        return render_template(templates[2],
                                brands=all_brands,
-                               submit_route='/handle-product/%d' % category_id,
+                               submit_route='/handle-listing/%d' % category_id,
                                p_today=dates['today_string'],
                                p_month=dates['future_string'],
                                fill_types=all_fill_types,
                                genders=all_gender_types)
     else:
-        return render_template("list-product/%d.html" % category_id)
- )
+        return "not yet implemented"
 
 
-
-@app.route('/handle-tent', methods=['POST'])
-def handle_tent_listing():
+@app.route('/handle-listing/<int:category_id>', methods=['POST'])
+def handle_listing(category_id):
     # Change this to general handle item.
-    """Handle tent listing.
+    """Handle listing.
 
     First checks if it needs to make a new Brand. If so, makes a new Brand object.
+    Then makes parent Product object and then child category object.
 
-    Then makes Product object. Calls a function where you need to pass it the
-    brand_id and cat_id. For tents, cat_id==1.
-
-    Then makes a Tent object. Need to pass it the same primary key of the parent
+    Need to pass it the same primary key of the parent
     Product object.
     """
-    # Tent category ID is 1
-    cat_id = 1
 
     # Check if new brand. If so make new brand and add to database.
     brand_num = int(request.form.get("brand_id"))
     brand_num = check_brand(brand_num)
 
-    product = make_product(brand_id=brand_num, category_id=cat_id)
+    parent_product = make_parent_product(brand_id=brand_num, category_id=category_id)
 
-    db.session.add(product)
+    db.session.add(parent_product)
     db.session.commit()
 
-    tent = make_tent(product.prod_id)
+    if category_id == 1:
+        child_product = make_tent(parent_product.prod_id)
+    else:
+        pass
 
-    db.session.add(tent)
+    db.session.add(child_product)
     db.session.commit()
 
     flash("Listing successfully posted!")
-    return redirect('/product-detail/%d' % product.prod_id)
+    return redirect('/product-detail/%d' % parent_product.prod_id)
 
 
 ################# Editing Listing stuff ###################################
@@ -332,7 +339,7 @@ def handle_edit_listing(prod_id):
     brand_num = int(request.form.get("brand_id"))
     brand_num = check_brand(brand_num)
 
-    update_product(prod_id=prod_id, brand_id=brand_num)
+    update_parent_product(prod_id=prod_id, brand_id=brand_num)
 
     if cat_id == 1:
         update_tent(prod_id)

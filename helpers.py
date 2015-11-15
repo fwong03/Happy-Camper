@@ -209,7 +209,7 @@ def get_brand_id(brandname):
     return brand.brand_id
 
 
-def make_product(brand_id, category_id):
+def make_parent_product(brand_id, category_id):
     """Takes ints brand_id and category_id and returns Product object.
 
     Will take a listing form submission to make a parent Product object.
@@ -238,7 +238,7 @@ def make_product(brand_id, category_id):
     return product
 
 
-def update_product(prod_id, brand_id):
+def update_parent_product(prod_id, brand_id):
     """Takes ints brand_id and category_id and updates Product object.
 
     """
@@ -270,7 +270,7 @@ def update_product(prod_id, brand_id):
     return
 
 
-def make_tent(prod_id):
+def make_child_product(prod_id):
     """Make tent object given the corresponding product id"""
 
     best_use_id = int(request.form.get("bestuse"))
@@ -368,6 +368,8 @@ def filter_products(products, category_id, brand_id):
             for product in products:
                 if (product.cat_id == category_id) and (product.brand_id == brand_id):
                     filtered_products.append(product)
+
+                    
 
     return filtered_products
 
