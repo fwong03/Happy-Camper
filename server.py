@@ -13,7 +13,7 @@ from model import Brand, History, Category, Rating, Gender, FillType
 from helpers import make_user
 from helpers import search_radius, get_users_in_area
 from helpers import calc_default_dates, convert_string_to_datetime
-from helpers import make_parent_product, make_tent, update_parent_product, update_tent, check_brand
+from helpers import make_parent_product, make_tent, make_sleeping_bag, update_parent_product, update_tent, check_brand
 from helpers import filter_products, categorize_products, get_products_within_dates
 from helpers import calc_avg_star_rating
 from datetime import datetime
@@ -261,6 +261,8 @@ def handle_listing(category_id):
 
     if category_id == 1:
         child_product = make_tent(parent_product.prod_id)
+    elif category_id == 2:
+        child_product = make_sleeping_bag(parent_product.prod_id)
     else:
         pass
 

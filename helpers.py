@@ -1,6 +1,7 @@
 # Helper functions for my routes in server.py
 from flask import request, session
 from model import User, Brand, Category, Product, Tent, Rating, Region
+from model import SleepingBag
 from model import db
 from datetime import datetime, timedelta
 from geolocation.google_maps import GoogleMaps
@@ -270,9 +271,10 @@ def update_parent_product(prod_id, brand_id):
     return
 
 
-def make_child_product(prod_id):
-    """Make tent object given the corresponding product id"""
+def make_tent(product_id):
+    """Make child tent object given the corresponding product ID.
 
+    """
     best_use_id = int(request.form.get("bestuse"))
     sleep = int(request.form.get("sleep"))
     seasoncat = int(request.form.get("seasoncat"))
@@ -283,27 +285,48 @@ def make_child_product(prod_id):
         width = int(request.form.get("width"))
     except ValueError:
         width = None
-
     try:
         length = int(request.form.get("length"))
     except ValueError:
         length = None
-
     try:
         doors = int(request.form.get("doors"))
     except ValueError:
         doors = None
-
     try:
         poles = int(request.form.get("poles"))
     except ValueError:
         poles = None
 
-    tent = Tent(prod_id=prod_id, use_id=best_use_id,
+    tent = Tent(prod_id=product_id, use_id=best_use_id,
                 sleep_capacity=sleep, seasons=seasoncat, min_trail_weight=weight,
                 floor_width=width, floor_length=length, num_doors=doors,
                 num_poles=poles)
     return tent
+
+def make_sleeping_bag(product_id):
+    """Make child sleeping bag object given the corresponding product ID.
+
+    """
+    filltype = request.form.get("filltype")
+    temp = int(request.form.get("temp"))
+    bag_weight = int(request.form.get("bag_weight"))
+
+    # Deal with optional values.
+    try:
+        length = int(request.form.get("length"))
+    except ValueError:
+        length = None
+    try:
+        gender = request.form.get("gender")
+    except ValueError:
+        gender = None
+
+    sleeping_bag = SleepingBag(prod_id=product_id, fill_code=filltype,
+                temp_rating=temp, weight=bag_weight, length=length,
+                gender_code=gender)
+    return sleeping_bag
+
 
 
 def update_tent(prod_id):
