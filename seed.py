@@ -262,7 +262,7 @@ def load_sleepingpads():
         wdth = int(row[6])
 
         a = SleepingPad(prod_id=product, type_code=pad_type, use_id=use,
-                        r_value=rval, length=lgth, weighjt=wt, width=wdth)
+                        r_value=rval, length=lgth, weight=wt, width=wdth)
 
         db.session.add(a)
 
@@ -349,5 +349,6 @@ if __name__ == "__main__":
     load_gendertypes()
     load_sleepingbags()
     load_padtypes()
+    load_sleepingpads()
     load_ratings()
     load_histories()
