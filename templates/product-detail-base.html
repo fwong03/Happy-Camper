@@ -19,7 +19,7 @@
     <br>
     <br>General Product Info:
     {% if product.image_url %}
-        <p><img src="{{ product.image_url }}" alt="{{ product.brand.brand_name }} {{ product.model }}"></p>
+        <p><img src="{{ "../" + product.image_url }}" alt="{{ product.brand.brand_name }} {{ product.model }}"></p>
     {% endif %}
 
         <ul>

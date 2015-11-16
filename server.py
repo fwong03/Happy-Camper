@@ -14,7 +14,8 @@ from helpers import make_user
 from helpers import search_radius, get_users_in_area
 from helpers import calc_default_dates, convert_string_to_datetime
 from helpers import make_parent_product, make_tent, make_sleeping_bag, make_sleeping_pad
-from helpers import update_parent_product, update_tent, update_sleeping_bag, check_brand
+from helpers import update_parent_product, update_tent, update_sleeping_bag, update_sleeping_pad
+from helpers import check_brand
 from helpers import filter_products, categorize_products, get_products_within_dates
 from helpers import calc_avg_star_rating
 from datetime import datetime
@@ -30,13 +31,12 @@ app.secret_key = "ABC"
 app.jinja_env.undefined = StrictUndefined
 
 
+######################## User stuff ###################################
 @app.route('/')
 def index():
     """Signed out homepage."""
 
     return render_template("signedout.html")
-
-################# User stuff ###################################
 
 
 @app.route('/logout')
@@ -179,9 +179,8 @@ def deactivate_account():
 
     return redirect('/')
 
-################# Listing stuff ###################################
 
-
+######################## Listing stuff ###################################
 @app.route('/list-item-choices')
 def list_item():
     """List an item page.
@@ -254,8 +253,7 @@ def list_product(category_id):
 
 @app.route('/handle-listing/<int:category_id>', methods=['POST'])
 def handle_listing(category_id):
-    # Change this to general handle item.
-    """Handle listing.
+    """Handle rental listing.
 
     First checks if it needs to make a new Brand. If so, makes a new Brand object.
     Then makes parent Product object and then child category object.
@@ -289,9 +287,7 @@ def handle_listing(category_id):
     return redirect('/product-detail/%d' % parent_product.prod_id)
 
 
-################# Editing Listing stuff ###################################
-
-
+###################### Editing stuff ################################
 @app.route('/edit-listing/<int:prod_id>')
 def edit_listing(prod_id):
 
@@ -334,6 +330,13 @@ def edit_listing(prod_id):
         return render_template(templates[category_id], parent=parent_product,
                                child=child_product, brands=all_brands,
                                fill_types=all_fill_types, genders=all_genders)
+    elif category_id == 3:
+        all_pad_types = PadType.query.all()
+        all_best_uses = BestUse.query.all()
+
+        return render_template(templates[category_id], parent=parent_product,
+                               child=child_product, brands=all_brands,
+                               pad_types=all_pad_types, best_uses=all_best_uses)
 
     else:
         return "Yet to be implemented."
@@ -342,25 +345,25 @@ def edit_listing(prod_id):
 @app.route('/handle-edit-listing/<int:prod_id>', methods=['POST'])
 def handle_edit_listing(prod_id):
 
-    categories = {1: Tent.query.get(prod_id),
-                  2: SleepingBag.query.get(prod_id),
-                  3: SleepingPad.query.get(prod_id),
-                  # 4: Pack.query.get(prod_id),
-                  # 5: Stove.query.get(prod_id),
-                  # 6: WaterFilter.query.get(prod_id),
-                  }
+    # categories = {1: Tent.query.get(prod_id),
+    #               2: SleepingBag.query.get(prod_id),
+    #               3: SleepingPad.query.get(prod_id),
+    #               # 4: Pack.query.get(prod_id),
+    #               # 5: Stove.query.get(prod_id),
+    #               # 6: WaterFilter.query.get(prod_id),
+    #               }
 
-    templates = {1: 'tent.html',
-                 2: 'sleeping-bag.html',
-                 3: 'sleeping-pad.html',
-                 # 4: 'pack.html',
-                 # 5: 'stove.html',
-                 # 6: 'water-filter.html',
-                 }
+    # templates = {1: 'tent.html',
+    #              2: 'sleeping-bag.html',
+    #              3: 'sleeping-pad.html',
+    #              # 4: 'pack.html',
+    #              # 5: 'stove.html',
+    #              # 6: 'water-filter.html',
+    #              }
 
     parent_product = Product.query.get(prod_id)
     category_id = parent_product.cat_id
-    child_item = categories[category_id]
+    # child_item = categories[category_id]
 
     brand_num = int(request.form.get("brand_id"))
     brand_num = check_brand(brand_num)
@@ -369,19 +372,20 @@ def handle_edit_listing(prod_id):
 
     if category_id == 1:
         update_tent(prod_id)
-        flash("Tent listing updated!")
-        return redirect("/account-info")
+        flash("Your tent listing has been updated!")
     elif category_id == 2:
         update_sleeping_bag(prod_id)
-        flash("Sleeping bag listing updated!")
-        return redirect("/account-info")
-
+        flash("Your sleeping bag listing has been updated!")
+    elif category_id == 3:
+        update_sleeping_pad(prod_id)
+        flash("Your sleeping pad listing has been updated!")
     else:
         return "This is unimplemented"
 
-################# Searching stuff ###################################
+    return redirect("/account-info")
 
 
+######################## Searching stuff ###################################
 @app.route('/search-results')
 def show_results():
     """Search results page.
@@ -476,9 +480,7 @@ def show_results():
                            product_brands=all_brands)
 
 
-################# Showing stuff ###################################
-
-
+######################## Showing stuff ###################################
 @app.route('/product-detail/<int:prod_id>')
 def show_product(prod_id):
     """Product detail page.
@@ -505,9 +507,12 @@ def show_product(prod_id):
                  }
 
     parent_product = Product.query.get(prod_id)
+
+    print "\n\nurl: %s\n\n" % parent_product.image_url
     category_id = parent_product.cat_id
 
     child_product = categories[category_id]
+    print "Template: ", templates[category_id]
 
     try:
         search_start_date = session['search_start_date']
@@ -515,11 +520,10 @@ def show_product(prod_id):
         search_start_date = 0
 
     return render_template(templates[category_id], product=parent_product,
-                           item=child_product, have_searched=search_start_date )
-
-################# Renting stuff ###################################
+                           item=child_product, have_searched=search_start_date)
 
 
+######################## Renting stuff ###################################
 @app.route('/rent-confirm/<int:prod_id>', methods=['POST'])
 def confirm_rental(prod_id):
     """When a user clicks to rent on object, this page
@@ -564,9 +568,8 @@ def rent_item():
 
     return render_template("rent-final.html")
 
-################# Rating stuff ###################################
 
-
+######################## Rating stuff ###################################
 @app.route('/show-owner-ratings/<int:user_id>')
 def show_owner_ratings(user_id):
     """Show owner star ratings and any comments.
@@ -581,7 +584,7 @@ def show_owner_ratings(user_id):
 
     for product in products:
         # Can do something along lines of .filter(owner_rating.isnot(None))?
-        # Get error: AttributeError: type object 'History' has no attribute 
+        # Get error: AttributeError: type object 'History' has no attribute
         # 'owner_ratings'
 
         for history in product.histories:
@@ -608,7 +611,6 @@ def show_renter_ratings(renter_id):
     renter_ratings = []
 
     for history in histories:
-        # Can filter out null renter_ratings in line above?
         if history.renter_rating:
             renter_ratings.append(history.renter_rating)
 
@@ -631,7 +633,6 @@ def show_product_ratings(prod_id):
     product_ratings = []
 
     for history in histories:
-        # Can filter out null renter_ratings in line above?
         if history.product_rating:
             product_ratings.append(history.product_rating)
 
@@ -647,7 +648,8 @@ def rate_user(user_id, history_id, owner_is_true, default_star):
 
     """
 
-    # owner_is_true: 0 is renter, 1 is owner
+    # owner_is_true used to determine if show rate owner or rate renter
+    # forms. 0 is renter, 1 is owner
     star_categories = [{1: "1: Awful. Would not rent to this person again.",
                         2: "2: Worse than expected, but not awful. Might rent to this person again.",
                         3: "3: As expected. Would rent to this person again.",
@@ -803,9 +805,7 @@ def handle_product_rating():
     return redirect('/account-info')
 
 
-################# Delisting stuff ###################################
-
-
+######################## Delisting stuff ###################################
 @app.route('/confirm-delist-product/<int:prod_id>')
 def confirm_delist_product(prod_id):
     """Confirm the user wants to delist product"""
@@ -831,46 +831,7 @@ def delist_product():
     return redirect('/account-info')
 
 
-################# Stuff to implement ###################################
-
-
-@app.route('/relist-product/<int:prod_id>')
-def relist_product(prod_id):
-    """Relist product"""
-
-    # product = Product.query.get(prod_id)
-    # product.available = 1
-    # db.session.commit()
-
-    return render_template("relist.html")
-
-
-@app.route('/list-sleepingbag')
-def list_sleepingbag():
-    return "This is where you'll list a sleeping bag."
-
-
-@app.route('/list-sleepingpad')
-def list_sleepingpad():
-    return "This is where you'll list a sleeping pad."
-
-
-@app.route('/list-pack')
-def list_pack():
-    return "This is where you'll list a pack."
-
-
-@app.route('/list-stove')
-def list_stove():
-    return "This is where you'll list a stove."
-
-
-@app.route('/list-waterfilter')
-def list_waterfilter():
-    return "This is where you'll list a water filter."
-
-
-
+######################################################################
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the point
     # that we invoke the DebugToolbarExtension
