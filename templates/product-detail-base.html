@@ -18,6 +18,10 @@
     <br> Status: {% if product.available %} Available {% else %} Unavailable {% endif %}
     <br>
     <br>General Product Info:
+    {% if product.image_url %}
+        <p><img src="{{ product.image_url }}" alt="{{ product.brand.brand_name }} {{ product.model }}"></p>
+    {% endif %}
+
         <ul>
             <li>Product location: {{ product.owner.city }}, {{ product.owner.region.full }}</li>
             <li>Available start date: {{ product.avail_start_date.date().isoformat() }}</li>

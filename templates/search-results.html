@@ -40,6 +40,7 @@
             <table border="1" cellpadding="5">
                 <tr>
                     <th>Brand and Model</th>
+                    <th>Image</th>
                     <th>Price Per Day</th>
                     <th>Cost for {{ session['num_days'] }} days</th>
                     <th>product location</th>
@@ -48,6 +49,7 @@
                     <tr>
                         <td><a href="/product-detail/{{ product.prod_id }}">
                              {{ product.brand.brand_name }} {{ product.model }} </td>
+                        <td><img src="{{ product.image_url }}" alt="{{ product.brand.brand_name }} {{ product.model }}" style="height:128px;"></td>
                         <td>${{ '{:,.2f}'.format(product.price_per_day) }}</td>
                         <td>${{ '{:,.2f}'.format(session['num_days'] * product.price_per_day) }}</td>
                         <td>{{ product.owner.city }}</td>

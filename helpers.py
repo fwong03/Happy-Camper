@@ -304,6 +304,7 @@ def make_tent(product_id):
                 num_poles=poles)
     return tent
 
+
 def make_sleeping_bag(product_id):
     """Make child sleeping bag object given the corresponding product ID.
 
