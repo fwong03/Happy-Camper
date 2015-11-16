@@ -393,6 +393,42 @@ def update_tent(prod_id):
     return
 
 
+def update_sleeping_bag(prod_id):
+    """Update sleeping bag object given product id"""
+
+    sleeping_bag = SleepingBag.query.get(prod_id)
+
+    sleeping_bag.fill_code = request.form.get("filltype")
+    sleeping_bag.temp_rating = int(request.form.get("temp"))
+
+    # Deal with optional values.
+    try:
+        sleeping_bag.weight = int(request.form.get("bag_weight"))
+    except ValueError:
+        sleeping_bag.weight = None
+
+    try:
+        sleeping_bag.length = int(request.form.get("length"))
+    except ValueError:
+        sleeping_pad.length = None
+
+    gender = request.form.get("gender")
+
+    if gender == "Z":
+        sleeping_bag.gender_code = None
+    else:
+        sleeping_bag.gender_code = gender
+
+    db.session.commit()
+
+    print "\n\nSleeping Bag updated: id=%d fill_type=%s temp=%d weight=%r\n\n" % (
+                                                   sleeping_bag.prod_id,
+                                                   sleeping_bag.fill_code,
+                                                   sleeping_bag.temp_rating,
+                                                   sleeping_bag.weight)
+    return
+
+
 def filter_products(products, category_id, brand_id):
     """Takes in list of products, category_id as int and brand_id as int and
         returns products with those category and brand IDs.

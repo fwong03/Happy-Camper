@@ -14,7 +14,7 @@ from helpers import make_user
 from helpers import search_radius, get_users_in_area
 from helpers import calc_default_dates, convert_string_to_datetime
 from helpers import make_parent_product, make_tent, make_sleeping_bag, make_sleeping_pad
-from helpers import update_parent_product, update_tent, check_brand
+from helpers import update_parent_product, update_tent, update_sleeping_bag, check_brand
 from helpers import filter_products, categorize_products, get_products_within_dates
 from helpers import calc_avg_star_rating
 from datetime import datetime
@@ -297,7 +297,7 @@ def edit_listing(prod_id):
 
     categories = {1: Tent.query.get(prod_id),
                   2: SleepingBag.query.get(prod_id),
-                  # 3: SleepingPad.query.get(prod_id),
+                  3: SleepingPad.query.get(prod_id),
                   # 4: Pack.query.get(prod_id),
                   # 5: Stove.query.get(prod_id),
                   # 6: WaterFilter.query.get(prod_id),
@@ -327,6 +327,14 @@ def edit_listing(prod_id):
         return render_template(templates[category_id], parent=parent_product,
                                child=child_product, brands=all_brands,
                                best_uses=all_best_uses, seasons=season_categories)
+    elif category_id == 2:
+        all_fill_types = FillType.query.all()
+        all_genders = Gender.query.all()
+
+        return render_template(templates[category_id], parent=parent_product,
+                               child=child_product, brands=all_brands,
+                               fill_types=all_fill_types, genders=all_genders)
+
     else:
         return "Yet to be implemented."
 
@@ -336,7 +344,7 @@ def handle_edit_listing(prod_id):
 
     categories = {1: Tent.query.get(prod_id),
                   2: SleepingBag.query.get(prod_id),
-                  # 3: SleepingPad.query.get(prod_id),
+                  3: SleepingPad.query.get(prod_id),
                   # 4: Pack.query.get(prod_id),
                   # 5: Stove.query.get(prod_id),
                   # 6: WaterFilter.query.get(prod_id),
@@ -345,24 +353,29 @@ def handle_edit_listing(prod_id):
     templates = {1: 'tent.html',
                  2: 'sleeping-bag.html',
                  3: 'sleeping-pad.html',
-                 4: 'pack.html',
-                 5: 'stove.html',
-                 6: 'water-filter.html',
+                 # 4: 'pack.html',
+                 # 5: 'stove.html',
+                 # 6: 'water-filter.html',
                  }
 
     parent_product = Product.query.get(prod_id)
-    cat_id = parent_product.cat_id
-    child_item = categories[cat_id]
+    category_id = parent_product.cat_id
+    child_item = categories[category_id]
 
     brand_num = int(request.form.get("brand_id"))
     brand_num = check_brand(brand_num)
 
     update_parent_product(prod_id=prod_id, brand_id=brand_num)
 
-    if cat_id == 1:
+    if category_id == 1:
         update_tent(prod_id)
         flash("Tent listing updated!")
         return redirect("/account-info")
+    elif category_id == 2:
+        update_sleeping_bag(prod_id)
+        flash("Sleeping bag listing updated!")
+        return redirect("/account-info")
+
     else:
         return "This is unimplemented"
 
