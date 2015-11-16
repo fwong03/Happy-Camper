@@ -202,7 +202,7 @@ def list_product(category_id):
 
     templates = {1: 'list-tent.html',
                  2: 'list-sleeping-bag.html',
-                 # 3: 'list-sleeping-pad.html',
+                 3: 'list-sleeping-pad.html',
                  # 4: 'list-pack.html',
                  # 5: 'list-stove.html',
                  # 6: 'list-water-filter.html',
@@ -216,24 +216,37 @@ def list_product(category_id):
                              4: "4-season",
                              5: "5-season"}
 
-        return render_template(templates[1],
+        return render_template(templates[category_id],
                                brands=all_brands,
                                submit_route='/handle-listing/%d' % category_id,
                                p_today=dates['today_string'],
                                p_month=dates['future_string'],
                                best_uses=all_best_uses,
                                seasons=season_categories)
+    # Sleeping Bag
     elif category_id == 2:
         all_fill_types = FillType.query.all()
         all_gender_types = Gender.query.all()
 
-        return render_template(templates[2],
+        return render_template(templates[category_id],
                                brands=all_brands,
                                submit_route='/handle-listing/%d' % category_id,
                                p_today=dates['today_string'],
                                p_month=dates['future_string'],
                                fill_types=all_fill_types,
                                genders=all_gender_types)
+     # Sleeping Pad
+    elif category_id == 3:
+        all_pad_types = PadType.query.all()
+        all_best_uses = BestUse.query.all()
+
+        return render_template(templates[category_id],
+                               brands=all_brands,
+                               submit_route='/handle-listing/%d' % category_id,
+                               p_today=dates['today_string'],
+                               p_month=dates['future_string'],
+                               pad_types=all_pad_types,
+                               best_uses=all_best_uses)
     else:
         return "not yet implemented"
 
