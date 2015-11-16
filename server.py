@@ -290,9 +290,9 @@ def edit_listing(prod_id):
     templates = {1: 'edit-tent.html',
                  2: 'edit-sleeping-bag.html',
                  3: 'edit-sleeping-pad.html',
-                 4: 'edit-pack.html',
-                 5: 'edit-stove.html',
-                 6: 'edit-water-filter.html',
+                 # 4: 'edit-pack.html',
+                 # 5: 'edit-stove.html',
+                 # 6: 'edit-water-filter.html',
                  }
 
     parent_product = Product.query.get(prod_id)
@@ -468,9 +468,9 @@ def show_product(prod_id):
     templates = {1: 'show-tent.html',
                  2: 'show-sleeping-bag.html',
                  3: 'show-sleeping-pad.html',
-                 4: 'show-pack.html',
-                 5: 'show-stove.html',
-                 6: 'show-water-filter.html',
+                 # 4: 'show-pack.html',
+                 # 5: 'show-stove.html',
+                 # 6: 'show-water-filter.html',
                  }
 
     parent_product = Product.query.get(prod_id)
