@@ -132,8 +132,8 @@ class Product(db.Model):
     # deactivates account.
     available = db.Column(db.Boolean, default=True)
     model = db.Column(db.String(16), nullable=False)
-    condition = db.Column(db.String(128))
-    description = db.Column(db.String(128))
+    condition = db.Column(db.String(356))
+    description = db.Column(db.String(384))
     avail_start_date = db.Column(db.DateTime, nullable=False)
     avail_end_date = db.Column(db.DateTime, nullable=False)
     price_per_day = db.Column(db.Float, nullable=False)

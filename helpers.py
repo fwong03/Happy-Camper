@@ -1,7 +1,7 @@
 # Helper functions for my routes in server.py
 from flask import request, session
 from model import User, Brand, Category, Product, Tent, Rating, Region
-from model import SleepingBag
+from model import SleepingBag, SleepingPad
 from model import db
 from datetime import datetime, timedelta
 from geolocation.google_maps import GoogleMaps
@@ -326,8 +326,31 @@ def make_sleeping_bag(product_id):
     sleeping_bag = SleepingBag(prod_id=product_id, fill_code=filltype,
                 temp_rating=temp, weight=bag_weight, length=length,
                 gender_code=gender)
+
     return sleeping_bag
 
+
+def make_sleeping_pad(product_id):
+    """Make child sleeping pad object given the corresponding product ID.
+
+    """
+    padtype = request.form.get("padtype")
+    best_use_id = int(request.form.get("bestuse"))
+    r_val = float(request.form.get("r_val"))
+    pad_weight = int(request.form.get("pad_weight"))
+    pad_length = int(request.form.get("pad_length"))
+
+    # Deal with optional values.
+    try:
+        pad_width = int(request.form.get("pad_length"))
+    except ValueError:
+        pad_width = None
+
+    sleeping_pad = SleepingPad(prod_id=product_id, type_code=padtype,
+                   use_id=best_use_id, r_value=r_val, weight=pad_weight,
+                   length=pad_length, width=pad_width)
+
+    return sleeping_pad
 
 
 def update_tent(prod_id):
