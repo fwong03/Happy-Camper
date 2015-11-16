@@ -8,8 +8,8 @@ from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.orm.exc import NoResultFound
 
 from model import connect_to_db, db
-from model import User, Region, Product, Tent, SleepingBag, BestUse
-from model import Brand, History, Category, Rating, Gender, FillType
+from model import User, Region, Product, Tent, SleepingBag, SleepingPad, BestUse
+from model import Brand, History, Category, Rating, Gender, FillType, PadType
 from helpers import make_user
 from helpers import search_radius, get_users_in_area
 from helpers import calc_default_dates, convert_string_to_datetime
@@ -397,6 +397,8 @@ def show_results():
     session['num_days'] = days
     session['search_area'] = search_area
     session['search_radius'] = search_miles
+    session['search_category_id'] = category_id
+    session['search_brand_id'] = brand_id
 
     # Find distinct postal codes in the database.
     query = db.session.query(User.postalcode).distinct()
@@ -459,7 +461,7 @@ def show_product(prod_id):
 
     categories = {1: Tent.query.get(prod_id),
                   2: SleepingBag.query.get(prod_id),
-                  # 3: SleepingPad.query.get(prod_id),
+                  3: SleepingPad.query.get(prod_id),
                   # 4: Pack.query.get(prod_id),
                   # 5: Stove.query.get(prod_id),
                   # 6: WaterFilter.query.get(prod_id),

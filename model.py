@@ -90,6 +90,7 @@ class BestUse(db.Model):
     use_name = db.Column(db.String(16), nullable=False, unique=True)
 
     tent = db.relationship('Tent', backref='bestuse')
+    sleepingpad = db.relationship('SleepingPad', backref='bestuse')
 
     def __repr__(self):
         return "<BestUse use_id=%d, use_name=%s>" % (self.use_id, self.use_name)
