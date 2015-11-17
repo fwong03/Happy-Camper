@@ -674,6 +674,7 @@ def rate_user(user_id, history_id, owner_is_true, default_star):
         default_comments = session['rating_comments']
     except KeyError:
         default_comments = ""
+        session['rating_comments'] = default_comments
 
     return render_template("rate-user.html",
                            submit_route='/handle-user-rating',
@@ -728,9 +729,10 @@ def handle_owner_rating():
     session.pop('user_id_for_rating')
     session.pop('rating_comments')
 
-    flash("Thank you for your rating!")
+    # flash("Thank you for your rating!")
 
-    return redirect('/account-info')
+    # return redirect('/account-info')
+    return
 
 
 @app.route('/rate-product/<int:prod_id>-<int:history_id>-<int:default_star>')
