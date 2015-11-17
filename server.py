@@ -2,7 +2,7 @@
 
 from jinja2 import StrictUndefined
 
-from flask import Flask, render_template, redirect, request, flash, session
+from flask import Flask, render_template, redirect, request, flash, session, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 
 from sqlalchemy.orm.exc import NoResultFound
@@ -652,60 +652,60 @@ def show_product_ratings(prod_id):
                            average=avg_star_rating, product=item)
 
 
-@app.route('/rate-user/<int:user_id>-<int:history_id>-<int:owner_is_true>-<int:default_star>')
-def rate_user(user_id, history_id, owner_is_true, default_star):
-    """Page to rate owner or renter.
+# @app.route('/rate-user/<int:user_id>-<int:history_id>-<int:owner_is_true>-<int:default_star>')
+# def rate_user(user_id, history_id, owner_is_true, default_star):
+#     """Page to rate owner or renter.
 
-    """
+#     """
 
-    # owner_is_true used to determine if show rate owner or rate renter
-    # forms. 0 is renter, 1 is owner
-    star_categories = [{1: "1: Awful. Would not rent to this person again.",
-                        2: "2: Worse than expected, but not awful. Might rent to this person again.",
-                        3: "3: As expected. Would rent to this person again.",
-                        4: "4: Awesome! Would be happy to rent to this person again."
-                        },
+#     # owner_is_true used to determine if show rate owner or rate renter
+#     # forms. 0 is renter, 1 is owner
+#     star_categories = [{1: "1: Awful. Would not rent to this person again.",
+#                         2: "2: Worse than expected, but not awful. Might rent to this person again.",
+#                         3: "3: As expected. Would rent to this person again.",
+#                         4: "4: Awesome! Would be happy to rent to this person again."
+#                         },
 
-                        {1: "1: Awful. Would not rent from this person again.",
-                        2: "2: Not as good as expected, but might rent from again.",
-                        3: "3: As expected. Would rent from again.",
-                        4: "4: Awesome! Would rent from again.",
-                        }]
+#                         {1: "1: Awful. Would not rent from this person again.",
+#                         2: "2: Not as good as expected, but might rent from again.",
+#                         3: "3: As expected. Would rent from again.",
+#                         4: "4: Awesome! Would rent from again.",
+#                         }]
 
-    user = User.query.get(user_id)
+#     user = User.query.get(user_id)
 
-    print "\n\n User: %d \n\n" % user_id
+#     print "\n\n User: %d \n\n" % user_id
 
-    session['history_id_for_rating'] = history_id
-    session['username_for_rating'] = User.query.get(user_id).email
-    session['user_id_for_rating'] = user_id
+#     session['history_id_for_rating'] = history_id
+#     session['username_for_rating'] = User.query.get(user_id).email
+#     session['user_id_for_rating'] = user_id
 
-    try:
-        default_comments = session['rating_comments']
-    except KeyError:
-        default_comments = ""
-        session['rating_comments'] = default_comments
+#     try:
+#         default_comments = session['rating_comments']
+#     except KeyError:
+#         default_comments = ""
+#         session['rating_comments'] = default_comments
 
-    return render_template("rate-user.html",
-                           submit_route='/handle-user-rating',
-                           star_ratings=star_categories[owner_is_true],
-                           default_star_rating=default_star,
-                           default_comments_text=default_comments,
-                           is_owner=owner_is_true)
+#     return render_template("rate-user.html",
+#                            submit_route='/handle-user-rating',
+#                            star_ratings=star_categories[owner_is_true],
+#                            default_star_rating=default_star,
+#                            default_comments_text=default_comments,
+#                            is_owner=owner_is_true)
 
 
-@app.route('/rate-user-confirm/', methods=['POST'])
-def confirm_owner_rating():
-    """Confirm user rating before adding to database"""
+# @app.route('/rate-user-confirm/', methods=['POST'])
+# def confirm_owner_rating():
+#     """Confirm user rating before adding to database"""
 
-    stars = request.form.get("stars")
-    comments = request.form.get("comments")
-    is_owner_true = int(request.form.get("is_owner"))
-    session['rating_comments'] = comments
+#     stars = request.form.get("stars")
+#     comments = request.form.get("comments")
+#     is_owner_true = int(request.form.get("is_owner"))
+#     session['rating_comments'] = comments
 
-    return render_template("rate-user-confirm.html", num_stars=stars,
-                           comments_text=comments, is_owner=is_owner_true,
-                           submit_route='/handle-user-rating')
+#     return render_template("rate-user-confirm.html", num_stars=stars,
+#                            comments_text=comments, is_owner=is_owner_true,
+#                            submit_route='/handle-user-rating')
 
 
 @app.route('/handle-user-rating', methods=['POST'])
@@ -716,16 +716,17 @@ def handle_owner_rating():
     owner_rating_id.
     """
 
-    number_stars = int(request.form.get("number_stars"))
-    comments_text = request.form.get("comments_text")
+    number_stars = int(request.form.get("num_stars"))
+    comments_text = request.form.get("comments")
     is_owner = int(request.form.get("is_owner"))
+    history_id = int(request.form.get("hist_id"))
 
     rating = Rating(stars=number_stars, comments=comments_text)
 
     db.session.add(rating)
     db.session.commit()
 
-    history = History.query.get(session['history_id_for_rating'])
+    history = History.query.get(history_id)
 
     if is_owner:
         history.owner_rating_id = rating.rating_id
@@ -734,15 +735,17 @@ def handle_owner_rating():
 
     db.session.commit()
 
-    session.pop('history_id_for_rating')
-    session.pop('username_for_rating')
-    session.pop('user_id_for_rating')
-    session.pop('rating_comments')
+    rating = {'stars': number_stars, 'comments': comments_text}
+
+    # session.pop('history_id_for_rating')
+    # session.pop('username_for_rating')
+    # session.pop('user_id_for_rating')
+    # session.pop('rating_comments')
 
     # flash("Thank you for your rating!")
 
-    # return redirect('/account-info')
-    return
+    return redirect('/account-info')
+
 
 
 @app.route('/rate-product/<int:prod_id>-<int:history_id>-<int:default_star>')
