@@ -7,6 +7,9 @@
 
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css" integrity="sha384-aUGj/X2zp5rLCbBxumKTCw2Z50WgIr1vs/PFN4praOTvYXWlVyh2UtNUU0KAUhAX" crossorigin="anonymous">
 
+<script src="http://code.jquery.com/jquery.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js" integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ==" crossorigin="anonymous"></script>
+
 </head>
 
 <body>
@@ -72,9 +75,9 @@
                                         </a></td>
                                         <td>
                                             {% if not history.renter_rating_id %}
-                                                <a data-toggle="modal" id="{{ history.renter_user_id }}-{{ history.history_id }}-rate-renter-button" button type="button" class="btn btn-primary btn-xsmall"  data-target="#rateUserModal">Rate Renter</a>
+                                                <a data-toggle="modal" id="{{ history.renter_user_id }}-{{ history.history_id }}-rate-renter-button" button type="button" class="btn btn-primary btn-xsmall"  data-target="#rateRenterModal">Rate Renter</a>
 
-                                                <div class="modal fade" id="rateUserModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                                <div class="modal fade" id="rateRenterModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                                                     <div class="modal-dialog">
                                                         <div class="modal-content">
                                                             <div class="modal-header">
@@ -84,14 +87,14 @@
                                                             <div class="modal-body">
                                                                     <h3>Rating for {{ history.renter.email }}</h3>
 
-                                                                    <form action="/handle-user-rating" id="rating_form" method="POST">
+                                                                    <form action="/handle-user-rating" id="renter_rating_form" method="POST">
 
                                                                         <h3>Star rating</h3>
 
                                                                             <p>How many stars would you rate your experience with this user?</p>
 
                                                                             <br>
-                                                                            <select id="number_stars" name="num_stars">
+                                                                            <select id="renter_number_stars" name="num_stars">
                                                                                 {% for star_rating in star_rating_values %}
                                                                                     <option value="{{ star_rating }}">{{ star_ratings[star_rating] }}</option>
                                                                                 {% endfor %}
@@ -101,7 +104,7 @@
                                                                             <p>Please provide your reasoning for your star feedback.</p>
 
 
-                                                                            <textarea rows="4" cols="50" maxlength="128" id="comments_text" name="comments"></textarea><br><br>
+                                                                            <textarea rows="4" cols="50" maxlength="128" id="renter_comments" name="comments"></textarea><br><br>
 
                                                                             <input type="hidden" id="owner_bool" name="is_owner" value="0">
                                                                              <input type="hidden" id="hist_num" name="hist_id" value="{{ history.history_id }}">
@@ -239,31 +242,31 @@
   <p>--------------------------------</p>
  <p><a href="/success">Homepage</a>     |     <a href="/account-info">Your Account</a>     |     <a href="/logout">Log out</a></p>
 
- <script src="http://code.jquery.com/jquery.js"></script>
- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js" integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ==" crossorigin="anonymous"></script>
+ 
 
   <script>
     function showRatingSuccessful(result) {
         alert(result);
-    }
+    };
 
     function submitRating(evt) {
+        console.log("start submitRating");
         evt.preventDefault();
 
         var formInputs = {
-            "num_stars": $("#number_stars").val(),
-            "comments": $("#comments_text").val(),
+            "num_stars": $("#renter_number_stars").val(),
+            "comments": $("#renter_comments").val(),
             "is_owner": $("#owner_bool").val(),
-            "hist_id": $("#hist_num").VAL()
+            "hist_id": $("#hist_num").val()
         };
 
+        // var formInputs = "abc"
+
         $.post("/handle-user-rating", formInputs, showRatingSuccessful);
-        $.("#rateUserModal").modal("hide")
-    }
+        $("#rateRenterModal").modal("hide");
+    };
 
-    $.("#rating_form").on("submit", submitRating);
-
-    var rat
+    $("#renter_rating_form").submit(submitRating);
 
  </script>
 

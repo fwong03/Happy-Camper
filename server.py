@@ -735,8 +735,6 @@ def handle_owner_rating():
 
     db.session.commit()
 
-    rating = {'stars': number_stars, 'comments': comments_text}
-
     # session.pop('history_id_for_rating')
     # session.pop('username_for_rating')
     # session.pop('user_id_for_rating')
@@ -744,7 +742,7 @@ def handle_owner_rating():
 
     # flash("Thank you for your rating!")
 
-    return redirect('/account-info')
+    return "Rating submitted!"
 
 
 
