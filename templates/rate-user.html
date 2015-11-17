@@ -1,17 +1,33 @@
-{% extends 'rate-form-base.html' %}
+</head>
+<!doctype html>
+<html>
+<head>
+  <title>{% block title %}Rating Form{% endblock %}</title>
 
-{% block title %}Rate Owner Form{% endblock %}
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
 
-{% block page_heading %} Rating for {{ session['username_for_rating'] }} {% endblock %}
+ <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css" integrity="sha384-aUGj/X2zp5rLCbBxumKTCw2Z50WgIr1vs/PFN4praOTvYXWlVyh2UtNUU0KAUhAX" crossorigin="anonymous">
 
- {% block star_instructions %}
+<body>
+  <hr>
 
-     How many stars would you rate your experience with this person?
+    <ul>
+      {% for message in get_flashed_messages() %}
+        <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
 
-{% endblock %}
 
-{% block star_dropdown %}
-    <select id="num_stars" name="stars">
+<h3>Rating for {{ session['username_for_rating'] }}</h3>
+
+<form action="{{ submit_route }}" id="rating_form" method="POST">
+
+ <h3>Star rating</h3>
+
+     <p>How many stars would you rate your experience with this user?</p>
+
+<br>
+    <select id="number_stars" name="number_stars">
         {% for star_rating in star_ratings %}
             {% if star_rating == default_star_rating %}
                 <option value="{{ star_rating }}" selected>{{ star_ratings[star_rating] }}</option>
@@ -20,16 +36,50 @@
             {% endif %}
         {% endfor %}
   </select>
-{% endblock %}
 
-{% block comments_instructions %}
-    Please provide your reasoning for your star feedback.
-{% endblock %}
+   <h3>Comments</h3>
+      <p>Please provide your reasoning for your star feedback.</p>
 
-{% block comments_text %}
 
- <textarea rows="4" cols="50" maxlength="128" id="text_comments" name="comments">{{ default_comments_text }}</textarea><br><br>
+ <textarea rows="4" cols="50" maxlength="128" id="comments_text" name="comments_text">{{ default_comments_text }}</textarea><br><br>
 
  <input type="hidden" name="is_owner" value="{{ is_owner }}">
 
- {% endblock %}
+  <br><br><input type="submit" value="Submit Rating"><br><br>
+
+  
+  <p>--------------------------------</p>
+ <p><a href="/success">Homepage</a>     |     <a href="/account-info">Your Account</a>     |     <a href="/logout">Log out</a></p>
+
+ <script src="http://code.jquery.com/jquery.js"></script>
+ <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js" integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ==" crossorigin="anonymous"></script>
+ <script>
+    function showRatingSuccessful(result) {
+        alert(result)
+    }
+
+    function submitRating(evt) {
+        evt.preventDefault();
+
+        var formInputs = {
+            "number_stars": $("#number_stars").val()
+            "comments_text": $("#comments_text").val()
+            "is_owner": $("#is_owner").val()
+        }
+
+        $.post("/handle-user-rating", formInputs, showRatingSuccessful)
+    }
+
+    $.("#rating_form").on("submit", submitRating)
+
+ </script>
+
+
+
+
+</body>
+
+
+
+</html>
+

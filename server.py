@@ -676,7 +676,7 @@ def rate_user(user_id, history_id, owner_is_true, default_star):
         default_comments = ""
 
     return render_template("rate-user.html",
-                           submit_route='/rate-user-confirm/',
+                           submit_route='/handle-user-rating',
                            star_ratings=star_categories[owner_is_true],
                            default_star_rating=default_star,
                            default_comments_text=default_comments,
@@ -717,7 +717,7 @@ def handle_owner_rating():
     history = History.query.get(session['history_id_for_rating'])
 
     if is_owner:
-      history.owner_rating_id = rating.rating_id
+        history.owner_rating_id = rating.rating_id
     else:
         history.renter_rating_id = rating.rating_id
 
