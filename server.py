@@ -145,10 +145,20 @@ def show_account():
 
     rentals = History.query.filter(History.renter_user_id == customer.user_id).all()
 
+    star_categories = {4: "4: Awesome! Would be happy to work with this person again.",
+                       3: "3: It was fine. Wouldn't mind working with this person again.",
+                       2: "2: Meh. MIGHT say hi I saw him or her on the street.",
+                       1: "1: Awful. I hope I never interact with this person again.",
+                      }
+
+    star_values = sorted(star_categories.keys(), reverse=True)
+
     return render_template("account-info.html", user=customer, state=st,
                            products_available=products_avail,
                            products_not_available=products_out,
-                           histories=rentals, today=today_date)
+                           histories=rentals, today=today_date,
+                           star_ratings=star_categories,
+                           star_rating_values=star_values)
 
 
 @app.route('/confirm-deactivate-account')

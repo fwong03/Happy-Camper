@@ -57,7 +57,7 @@
                                         </a></td>
                                         <td>
                                             {% if not history.renter_rating_id %}
-<a data-toggle="modal" id="{{ history.renter_user_id }}-{{ history.history_id }}-button" href="/rate-user/{{ history.renter_user_id }}-{{ history.history_id }}-0-4" button type="button" class="btn btn-primary btn-xsmall"  data-target="#rateUserModal">Rate Renter</a>
+<a data-toggle="modal" id="{{ history.renter_user_id }}-{{ history.history_id }}-button" button type="button" class="btn btn-primary btn-xsmall"  data-target="#rateUserModal">Rate Renter</a>
 
 <div class="modal fade" id="rateUserModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -66,7 +66,33 @@
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                  <h4 class="modal-title">Submit a Rating</h4>
             </div>
-            <div class="modal-body"></div>
+            <div class="modal-body">
+                    <h3>Rating for {{ history.renter.email }}</h3>
+
+                    <form action="/handle-user-rating" id="rating_form" method="POST">
+
+                        <h3>Star rating</h3>
+
+                            <p>How many stars would you rate your experience with this user?</p>
+
+                            <br>
+                            <select id="number_stars" name="number_stars">
+                                {% for star_rating in star_rating_values %}
+                                    <option value="{{ star_rating }}">{{ star_ratings[star_rating] }}</option>
+                                {% endfor %}
+                          </select>
+
+                        <h3>Comments</h3>
+                            <p>Please provide your reasoning for your star feedback.</p>
+
+
+                            <textarea rows="4" cols="50" maxlength="128" id="comments_text" name="comments_text"></textarea><br><br>
+
+                            <input type="hidden" name="is_owner" value="0">
+
+                    <br><br><input type="submit" value="Submit Rating"><br><br>
+
+            </div>
             <div class="modal-footer">
             </div>
         </div> 
