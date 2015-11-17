@@ -11,7 +11,7 @@
 {% endblock %}
 
 {% block star_dropdown %}
-    <select name="stars">
+    <select id="num_stars" name="stars">
         {% for star_rating in star_ratings %}
             {% if star_rating == default_star_rating %}
                 <option value="{{ star_rating }}" selected>{{ star_ratings[star_rating] }}</option>
@@ -28,7 +28,7 @@
 
 {% block comments_text %}
 
- <textarea rows="4" cols="50" maxlength="128" name="comments">{{ default_comments_text }}</textarea><br><br>
+ <textarea rows="4" cols="50" maxlength="128" id="text_comments" name="comments">{{ default_comments_text }}</textarea><br><br>
 
  <input type="hidden" name="is_owner" value="{{ is_owner }}">
 
