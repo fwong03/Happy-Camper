@@ -75,7 +75,7 @@
                                         </a></td>
                                         <td>
                                             {% if not history.renter_rating_id %}
-                                                <a data-toggle="modal" id="{{ history.renter_user_id }}-{{ history.history_id }}-rate-renter-button" button type="button" class="btn btn-primary btn-xsmall"  data-target="#rateRenterModal">Rate Renter</a>
+                                                <div id="{{ history.renter_user_id }}{{ history.history_id }}-rate-renter-button"><a data-toggle="modal" button type="button" class="btn btn-primary btn-xsmall"  data-target="#rateRenterModal">Rate Renter</a></div>
 
                                                 <div class="modal fade" id="rateRenterModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                                                     <div class="modal-dialog">
@@ -107,7 +107,8 @@
                                                                             <textarea rows="4" cols="50" maxlength="128" id="renter_comments" name="comments"></textarea><br><br>
 
                                                                             <input type="hidden" id="owner_bool" name="is_owner" value="0">
-                                                                             <input type="hidden" id="hist_num" name="hist_id" value="{{ history.history_id }}">
+                                                                            <input type="hidden" id="hist_num" name="hist_id" value="{{ history.history_id }}">
+                                                                            <input type="hidden" id="renter_num" name="renter_user_id" value="{{ history.renter_user_id }}">
 
                                                                     <br><br><input type="submit" value="Submit Rating"><br><br>
 
@@ -117,7 +118,6 @@
                                                         </div> 
                                                     </div> 
                                                 </div>
-                                                <a href="/rate-user/{{ history.renter_user_id }}-{{ history.history_id }}-0-4">Rate Renter</a>
                                             {% else %}
                                                 You've already submitted a rating for this renter.
                                             {% endif %}
@@ -245,28 +245,27 @@
  
 
   <script>
-    function showRatingSuccessful(result) {
-        alert(result);
-    };
 
-    function submitRating(evt) {
-        console.log("start submitRating");
+    function submitRenterRating(evt) {
         evt.preventDefault();
+        var history_id = $("#hist_num").val()
+        var renter_id = $("#renter_num").val()
 
-        var formInputs = {
-            "num_stars": $("#renter_number_stars").val(),
-            "comments": $("#renter_comments").val(),
-            "is_owner": $("#owner_bool").val(),
-            "hist_id": $("#hist_num").val()
+
+        $.ajax({
+            url: '/handle-user-rating',
+            data: $('#renter_rating_form').serialize(),
+            type: 'POST',
+            success: function(response) {
+                console.log(response);
+            }
+            })
+            $("#rateRenterModal").modal("hide");
+            $("#" + renter_id + history_id + "-rate-renter-button").empty()
+            $("#" + renter_id + history_id + "-rate-renter-button").html("<p>Rating submitted!</p>");
         };
 
-        // var formInputs = "abc"
-
-        $.post("/handle-user-rating", formInputs, showRatingSuccessful);
-        $("#rateRenterModal").modal("hide");
-    };
-
-    $("#renter_rating_form").submit(submitRating);
+    $("#renter_rating_form").submit(submitRenterRating);
 
  </script>
 
