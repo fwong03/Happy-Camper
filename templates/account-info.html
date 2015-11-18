@@ -124,7 +124,9 @@
                                         <td> <a href="/show-renter-ratings/{{ history.renter_user_id }}">Ratings of {{ history.renter.email }} 
                                         </a></td>
                                         <td>
-                                            {% if not history.renter_rating_id %}
+                                            {% if history.renter_rating_id %}
+                                                <p>Renter rating already submitted.</p>
+                                            {% else %}
                                                 <div id="{{ history.renter_user_id }}{{ history.history_id }}-rate-renter-button"><a data-toggle="modal" button type="button" class="btn btn-primary btn-xsmall"  data-target="#rateRenterModal">Rate Renter</a></div>
 
                                                 <div class="modal fade" id="rateRenterModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -156,7 +158,7 @@
 
                                                                             <textarea rows="4" cols="50" maxlength="128" id="renter_comments" name="comments"></textarea><br><br>
 
-                                                                            <input type="hidden" id="owner_bool" name="is_owner" value="0">
+                                                                            <input type="hidden" id="renter_owner_bool" name="is_owner" value="0">
                                                                             <input type="hidden" id="hist_num" name="hist_id" value="{{ history.history_id }}">
                                                                             <input type="hidden" id="renter_num" name="renter_user_id" value="{{ history.renter_user_id }}">
 
@@ -168,8 +170,6 @@
                                                         </div> 
                                                     </div> 
                                                 </div>
-                                            {% else %}
-                                                You've already submitted a rating for this renter.
                                             {% endif %}
                                         </td>
                                 {% endfor %}
@@ -182,7 +182,9 @@
 
 
 <h3>Items You Have Rented</h3>
-{% if histories %}
+{% if not histories %}
+    <p>You have no history of renting products.
+{% else %}
     <table border="1" cellpadding="5">
             <tr>
                 <th>Dates</th>
@@ -210,25 +212,50 @@
                         <ul>
                             <li><a href="mailto:{{ history.product.owner.email }}">Send owner an email</a></li>
                             <li> 
-                                {% if not history.owner_rating_id %}
-                                    <a href="/rate-user/{{ history.product.owner_user_id }}-{{ history.history_id }}-1-4">Rate owner here</a>
-                                {% else %}
+                                {% if history.owner_rating_id %}
                                     Owner rating already submitted.
-                                {% endif %}
-                            </li>
-                            <li>
-                                {% if not history.prod_rating_id %}
-                                    <a href="/rate-product/{{ history.prod_id }}-{{ history.history_id }}-4">Rate product here</a>
                                 {% else %}
-                                    Product rating already submitted.
+
+                                <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#rateOwnerModal" href="/rate-user-modal/{{ history.product.owner_user_id }}-{{ history.history_id }}-1">Rate Owner</button>
+
+                        <div class="modal fade" id="rateOwnerModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                          <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                               
+                                <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+                              </div>
+                              <div class="modal-body">
+                                
+                              </div>
+                              <div class="modal-footer">
+
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+
+
+
+
+                                  
+
+                                
+                                    <a href="/rate-user/{{ history.product.owner_user_id }}-{{ history.history_id }}-1-4">Rate owner here</a>           
                                 {% endif %}
                             </li>
+                        <li>
+                            {% if not history.prod_rating_id %}
+                                <a href="/rate-product/{{ history.prod_id }}-{{ history.history_id }}-4">Rate product here</a>
+                            {% else %}
+                                Product rating already submitted.
+                            {% endif %}
+                        </li>
                     </td>
                 </tr>
             {% endfor %}
         </table><br><br>
-    {% else %}
-        You have no rental history.<br><br>
 {% endif %}
 <br>
 
@@ -253,12 +280,22 @@
                 console.log(response);
             }
             })
+
             $("#rateRenterModal").modal("hide");
             $("#" + renter_id + history_id + "-rate-renter-button").empty()
             $("#" + renter_id + history_id + "-rate-renter-button").html("<p>Rating submitted!</p>");
-        };
+        }
+
+        // function loadOwnerRatingModal(evt){
+        //     $("#owner-rating-modal").load();
+
+    }
 
     $("#renter_rating_form").submit(submitRenterRating);
+
+    // $("#owner-rate-button").click(loadOwnerRatingModal);
+
+
 
  </script>
 

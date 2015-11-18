@@ -659,6 +659,38 @@ def show_product_ratings(prod_id):
                            average=avg_star_rating, product=item)
 
 
+@app.route('/rate-user-modal/<int:user_id>-<int:history_id>-<int:owner_is_true>')
+def rate_user(user_id, history_id, owner_is_true):
+    """Modal popup to rate owner or renter.
+
+    """
+
+
+    # owner_is_true used to determine if show rate owner or rate renter
+    # forms. 0 is renter, 1 is owner
+    star_categories = [{1: "1: Awful. Would not rent to this person again.",
+                        2: "2: Worse than expected, but not awful. Might rent to this person again.",
+                        3: "3: As expected. Would rent to this person again.",
+                        4: "4: Awesome! Would be happy to rent to this person again."
+                        },
+
+                        {1: "1: Awful. Would not rent from this person again.",
+                         2: "2: Not as good as expected, but might rent from again.",
+                         3: "3: As expected. Would rent from again.",
+                         4: "4: Awesome! Would rent from again.",
+                         }]
+
+    user_to_rate = User.query.get(user_id)
+
+    print "\n\n User: %d \n\n" % user_id
+
+    return render_template("rate-owner-modal.html",
+                           user=user_to_rate,
+                           submit_route='/handle-user-rating',
+                           star_ratings=star_categories[owner_is_true],
+                           is_owner=owner_is_true)
+
+
 # @app.route('/rate-user/<int:user_id>-<int:history_id>-<int:owner_is_true>-<int:default_star>')
 # def rate_user(user_id, history_id, owner_is_true, default_star):
 #     """Page to rate owner or renter.
