@@ -37,7 +37,9 @@
 
 <br>
 <h3>Items You Have Available for Rent</h3>
-    {% if products_available %}
+    {% if not products_available %}
+        <p>None</p>
+    {% else %}
         <table border="1" cellpadding="5">
             <tr>
                 <th>Category</th>
@@ -45,7 +47,6 @@
                 <th>Available Start</th>
                 <th>Available End</th>
                 <th>Price Per Day</th>
-                <th>Rental History</th>
                 <th>Actions Available</th>
             </tr>
             {% for product in products_available %}
@@ -54,10 +55,59 @@
                     <td><a href="/product-detail/{{ product.prod_id }}">{{ product.brand.brand_name }} {{ product.model }}</a></td>
                     <td>{{ product.avail_start_date.date().isoformat() }}</td>
                     <td>{{ product.avail_end_date.date().isoformat() }}</td>
-                    <td>${{ '{:,.2f}'.format(product.price_per_day) }}</td> <td>
-                        {% if not product.histories %}
-                            This product has no rental history
-                        {% else %}
+                    <td>${{ '{:,.2f}'.format(product.price_per_day) }}</td>
+                    <td><ul>
+                            <li><a href="confirm-delist-product/{{ product.prod_id }}">Delist product</a></li>
+                            <li><a href="edit-listing/{{ product.prod_id }}">Edit listing</a>
+                        </ul>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+    <br>
+
+<h3>Items you have listed but are currently unavailable</h3>
+    {% if not products_not_available %}
+        <p>None</p>
+    {% else %}
+        <table border="1" cellpadding="5">
+            <tr>
+                <th>Category</th>
+                <th>Brand and Model</th>
+                <th>Price Per Day</th>
+                <th>Actions Available</th>
+            </tr>
+            {% for product in products_not_available %}
+                <tr>
+                    <td>{{ product.category.cat_name }}</td>
+                    <td><a href="/product-detail/{{ product.prod_id }}">{{ product.brand.brand_name }} {{ product.model }}</a></td>
+                    <td>${{ '{:,.2f}'.format(product.price_per_day) }}</td>
+                    <td><ul>
+                            <li><a href="edit-listing/{{ product.prod_id }}">Relist/Edit listing</a></td>
+                        </ul>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+    <br>
+
+<h3>Your Product Rental Histories</h3>
+    {% if not products_with_histories %}
+        <p>You do not yet have a history of renting out products.</p>
+    {% else %}
+        <table border="1" cellpadding="5">
+            <tr>
+                <th>Category</th>
+                <th>Brand and Model</th>
+                <th>Rental History</th>
+            </tr>
+                {% for product in products_with_histories %}
+                <tr>
+                    <td>{{ product.category.cat_name }}</td>
+                    <td><a href="/product-detail/{{ product.prod_id }}">{{ product.brand.brand_name }} {{ product.model }}</a></td>
+                    <td>
                             <table border="1" cellpadding="2">
                                 <tr>
                                     <th>Rental Dates</th>
@@ -124,70 +174,13 @@
                                         </td>
                                 {% endfor %}
                             </table>
-                            {% endif %}
-                        <td>
-                        <ul>
-                            <li><a href="confirm-delist-product/{{ product.prod_id }}">Delist product</a></li>
-                            <li><a href="edit-listing/{{ product.prod_id }}">Edit listing</a></td>
-                </tr>
-            {% endfor %}
+                {% endfor %}
         </table>
-    {% else %}
-        You have no items available for rent.<br><br>
-{% endif %}
-<br>
+    {% endif %}
+    <br>
 
-<h3>Items you have listed but are currently unavailable</h3>
-    {% if products_not_available %}
-        <table border="1" cellpadding="5">
-            <tr>
-                <th>Category</th>
-                <th>Brand and Model</th>
-                <th>Price Per Day</th>
-                <th>Rental History</th>
-                <th>Actions Available</th>
-            </tr>
-            {% for product in products_not_available %}
-                <tr>
-                    <td>{{ product.category.cat_name }}</td>
-                    <td><a href="/product-detail/{{ product.prod_id }}">{{ product.brand.brand_name }} {{ product.model }}</a></td>
-                    <td>${{ '{:,.2f}'.format(product.price_per_day) }}</td> <td>
-                        {% if not product.histories %}
-                            This product has no rental history
-                        {% else %}
-                            <table border="1" cellpadding="2">
-                                <tr>
-                                    <th>Rental Dates</th>
-                                    <th>Total Cost</th>
-                                    <th>email Renter</th>
-                                    <th>See Ratings of Renter</th>
-                                    <th>Rate Renter</th>
-                                </tr>
-                                {% for history in product.histories %}
-                                    <tr>
-                                        <td>{{ history.start_date.date().isoformat() }} to {{ history.end_date.date().isoformat() }}</td>
-                                        <td>${{ '{:,.2f}'.format(history.total_cost) }}</td>
-                                        <td><a href="mailto:{{ history.renter.email }}">email renter: {{ history.renter.email }}</a></td>
-                                        <td> <a href="/show-renter-ratings/{{ history.renter_user_id }}">Ratings of {{ history.renter.email }} </a></td>
-                                        <td>
-                                            {% if not history.renter_rating_id %}
-                                                <a href="/rate-user/{{ history.renter_user_id }}-{{ history.history_id }}-0-4">Rate Renter</a>
-                                            {% else %}
-                                                You've already submitted a rating for this renter.
-                                            {% endif %}
-                                        </td>
-                                {% endfor %}
-                            </table>
-                            {% endif %}
-                        <td>
-                            <li><a href="edit-listing/{{ product.prod_id }}">Relist/Edit listing</a></td>
-                </tr>
-            {% endfor %}
-        </table>
-    {% else %}
-        You have no history of renting out products.<br><br>
-{% endif %}
-<br>
+
+
 <h3>Items You Have Rented</h3>
 {% if histories %}
     <table border="1" cellpadding="5">

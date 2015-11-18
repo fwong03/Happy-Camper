@@ -136,6 +136,7 @@ def show_account():
     products_all = Product.query.filter(Product.owner_user_id == customer.user_id).all()
     products_avail = []
     products_out = []
+    products_histories = set([])
 
     for product in products_all:
         if product.available:
@@ -144,6 +145,10 @@ def show_account():
             products_out.append(product)
 
     rentals = History.query.filter(History.renter_user_id == customer.user_id).all()
+
+    for product in products_all:
+        if product.histories:
+            products_histories.add(product)
 
     star_categories = {4: "4: Awesome! Would be happy to work with this person again.",
                        3: "3: It was fine. Wouldn't mind working with this person again.",
@@ -154,8 +159,10 @@ def show_account():
     star_values = sorted(star_categories.keys(), reverse=True)
 
     return render_template("account-info.html", user=customer, state=st,
+                           all_products=products_all,
                            products_available=products_avail,
                            products_not_available=products_out,
+                           products_with_histories=products_histories,
                            histories=rentals, today=today_date,
                            star_ratings=star_categories,
                            star_rating_values=star_values)
