@@ -159,7 +159,7 @@
                                                                             <textarea rows="4" cols="50" maxlength="128" id="renter_comments" name="comments"></textarea><br><br>
 
                                                                             <input type="hidden" id="renter_owner_bool" name="is_owner" value="0">
-                                                                            <input type="hidden" id="hist_num" name="hist_id" value="{{ history.history_id }}">
+                                                                            <input type="hidden" id="renter_hist_num" name="hist_id" value="{{ history.history_id }}">
                                                                             <input type="hidden" id="renter_num" name="renter_user_id" value="{{ history.renter_user_id }}">
 
                                                                     <br><br><input type="submit" value="Submit Rating"><br><br>
@@ -215,8 +215,9 @@
                                 {% if history.owner_rating_id %}
                                     Owner rating already submitted.
                                 {% else %}
-
-                                <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#rateOwnerModal" href="/rate-user-modal/{{ history.product.owner_user_id }}-{{ history.history_id }}-1">Rate Owner</button>
+                                <div id="{{ history.product.owner_user_id }}{{ history.history_id }}-rate-owner-button">
+                                    <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#rateOwnerModal" href="/rate-user-modal/{{ history.product.owner_user_id }}-{{ history.history_id }}-1">Rate Owner</button>
+                                </div>
 
                         <div class="modal fade" id="rateOwnerModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
                           <div class="modal-dialog" role="document">
@@ -268,8 +269,8 @@
 
     function submitRenterRating(evt) {
         evt.preventDefault();
-        var history_id = $("#hist_num").val()
-        var renter_id = $("#renter_num").val()
+        var history_id = $("#renter_hist_num").val();
+        var renter_id = $("#renter_num").val();
 
 
         $.ajax({
@@ -282,18 +283,16 @@
             })
 
             $("#rateRenterModal").modal("hide");
-            $("#" + renter_id + history_id + "-rate-renter-button").empty()
+            $("#" + renter_id + history_id + "-rate-renter-button").empty();
             $("#" + renter_id + history_id + "-rate-renter-button").html("<p>Rating submitted!</p>");
         }
 
-        // function loadOwnerRatingModal(evt){
-        //     $("#owner-rating-modal").load();
 
-    }
 
     $("#renter_rating_form").submit(submitRenterRating);
 
-    // $("#owner-rate-button").click(loadOwnerRatingModal);
+
+
 
 
 

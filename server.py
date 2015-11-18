@@ -688,7 +688,8 @@ def rate_user(user_id, history_id, owner_is_true):
                            user=user_to_rate,
                            submit_route='/handle-user-rating',
                            star_ratings=star_categories[owner_is_true],
-                           is_owner=owner_is_true)
+                           is_owner=owner_is_true,
+                           hist_num=history_id)
 
 
 # @app.route('/rate-user/<int:user_id>-<int:history_id>-<int:owner_is_true>-<int:default_star>')
@@ -767,10 +768,16 @@ def handle_owner_rating():
 
     history = History.query.get(history_id)
 
+    print "\n\nhistory id is %d\n\n" % history.history_id
+
     if is_owner:
         history.owner_rating_id = rating.rating_id
+        print "Owner rating: updating history id %d with rating id %d" % (
+                                          history.history_id, rating.rating_id)
     else:
         history.renter_rating_id = rating.rating_id
+        print "Renter rating: updating history id %d with rating id %d" % (
+                                          history.history_id, rating.rating_id)
 
     db.session.commit()
 

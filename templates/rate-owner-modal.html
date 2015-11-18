@@ -3,13 +3,6 @@
 <head>
   <title>Rate User</title>
 
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
-
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css" integrity="sha384-aUGj/X2zp5rLCbBxumKTCw2Z50WgIr1vs/PFN4praOTvYXWlVyh2UtNUU0KAUhAX" crossorigin="anonymous">
-
-    <script src="http://code.jquery.com/jquery.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js" integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ==" crossorigin="anonymous"></script>
-
     </head>
 
     <body>
@@ -20,14 +13,14 @@
         <div class="modal-body">
             <h3>Rating for {{ user.email }}</h3>
 
-            <form action="{{ submit_route }}" id="rating_form" method="POST">
+            <form action="{{ submit_route }}" id="owner_rating_form" method="POST">
 
              <h3>Star rating</h3>
 
                  <p>How many stars would you rate your experience with this user?</p>
 
             <br>
-                <select id="number_stars" name="number_stars">
+                <select id="number_stars" name="num_stars">
                     {% for star_rating in star_ratings %}
                         <option value="{{ star_rating }}">{{ star_ratings[star_rating] }}</option>
                     {% endfor %}
@@ -37,9 +30,11 @@
                   <p>Please provide your reasoning for your star feedback.</p>
 
 
-                 <textarea rows="4" cols="50" maxlength="128" id="comments_text" name="comments_text"></textarea><br><br>
+                 <textarea rows="4" cols="50" maxlength="128" id="comments_text" name="comments"></textarea><br><br>
 
-                 <input type="hidden" name="is_owner" value="{{ is_owner }}">
+                 <input type="hidden" id="owner_owner_bool" name="is_owner" value="1">
+                 <input type="hidden" id="owner_hist_num" name="hist_id" value="{{ hist_num  }}">
+                 <input type="hidden" id="owner_num" name="user_id" value="{{ user.user_id }}">
 
             <br><br><input type="submit" value="Submit Rating"><br><br>
 
@@ -51,44 +46,31 @@
 
   <p>--------------------------------</p>
  <p><a href="/success">Homepage</a>     |     <a href="/account-info">Your Account</a>     |     <a href="/logout">Log out</a></p>
-
- 
-
-  <script>
-
-    function submitRenterRating(evt) {
+<script>
+    function submitOwnerRating(evt){
+        console.log("starting submitOwner Rating");
         evt.preventDefault();
-        var history_id = $("#hist_num").val()
-        var renter_id = $("#renter_num").val()
 
+        var owner_history_id = $("#owner_hist_num").val();
+        var owner_id = $("#owner_num").val();
 
         $.ajax({
             url: '/handle-user-rating',
-            data: $('#renter_rating_form').serialize(),
+            data: $('#owner_rating_form').serialize(),
             type: 'POST',
             success: function(response) {
                 console.log(response);
             }
             })
 
-            $("#rateRenterModal").modal("hide");
-            $("#" + renter_id + history_id + "-rate-renter-button").empty()
-            $("#" + renter_id + history_id + "-rate-renter-button").html("<p>Rating submitted!</p>");
-        }
-
-        function loadOwnerRatingModal(evt){
-            $("#owner-rating-modal").load();
+            $("#rateOwnerModal").modal("hide");
+            $("#" + owner_id + owner_history_id + "-rate-owner-button").empty();
+            $("#" + owner_id + owner_history_id + "-rate-owner-button").html("<p>Rating submitted!</p>");
 
     }
-
-    $("#renter_rating_form").submit(submitRenterRating);
-
-    $("#owner-rate-button").click(loadOwnerRatingModal);
+    $("#owner_rating_form").submit(submitOwnerRating);
+</script>
 
 
-
- </script>
-
-  
 </body>
 </html>
