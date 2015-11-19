@@ -1,6 +1,6 @@
 # Helper functions for my routes in server.py
 from flask import request, session
-from model import User, Brand, Category, Product, Tent, Rating, Region
+from model import User, Brand, Product, Tent, Region
 from model import SleepingBag, SleepingPad
 from model import db
 from datetime import datetime, timedelta
@@ -31,6 +31,7 @@ def make_user(password):
                 phone=phonenumber, email=username, password=password)
 
     return user
+
 
 ######################## Listing stuff ###################################
 def make_brand(brandname):
@@ -154,8 +155,9 @@ def make_sleeping_pad(product_id):
         pad_width = None
 
     sleeping_pad = SleepingPad(prod_id=product_id, type_code=padtype,
-                   use_id=best_use_id, r_value=r_val, weight=pad_weight,
-                   length=pad_length, width=pad_width)
+                               use_id=best_use_id, r_value=r_val,
+                               weight=pad_weight,
+                               length=pad_length, width=pad_width)
 
     return sleeping_pad
 
@@ -226,10 +228,11 @@ def update_tent(prod_id):
 
     db.session.commit()
 
-    print "\n\nTent updated: id=%d capacity=%d seasons=%d weight=%d\n\n" % (tent.prod_id,
-                                                   tent.sleep_capacity,
-                                                   tent.seasons,
-                                                   tent.min_trail_weight)
+    print "\n\nTent updated: id=%d capacity=%d seasons=%d weight=%d\n\n" % (
+                                                    tent.prod_id,
+                                                    tent.sleep_capacity,
+                                                    tent.seasons,
+                                                    tent.min_trail_weight)
     return
 
 
@@ -250,7 +253,7 @@ def update_sleeping_bag(prod_id):
     try:
         sleeping_bag.length = int(request.form.get("length"))
     except ValueError:
-        sleeping_pad.length = None
+        sleeping_bag.length = None
 
     gender = request.form.get("gender")
 

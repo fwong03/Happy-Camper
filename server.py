@@ -2,7 +2,7 @@
 
 from jinja2 import StrictUndefined
 
-from flask import Flask, render_template, redirect, request, flash, session, jsonify
+from flask import Flask, render_template, redirect, request, flash, session
 from flask_debugtoolbar import DebugToolbarExtension
 
 from sqlalchemy.orm.exc import NoResultFound
@@ -139,6 +139,8 @@ def show_account():
     products_histories = set([])
 
     for product in products_all:
+        if product.histories:
+            products_histories.add(product)
         if product.available:
             products_avail.append(product)
         else:
@@ -146,26 +148,11 @@ def show_account():
 
     rentals = History.query.filter(History.renter_user_id == customer.user_id).all()
 
-    for product in products_all:
-        if product.histories:
-            products_histories.add(product)
-
-    star_categories = {4: "4: Awesome! Would be happy to work with this person again.",
-                       3: "3: It was fine. Wouldn't mind working with this person again.",
-                       2: "2: Meh. MIGHT say hi I saw him or her on the street.",
-                       1: "1: Awful. I hope I never interact with this person again.",
-                      }
-
-    star_values = sorted(star_categories.keys(), reverse=True)
-
     return render_template("account-info.html", user=customer, state=st,
-                           all_products=products_all,
                            products_available=products_avail,
                            products_not_available=products_out,
                            products_with_histories=products_histories,
-                           histories=rentals, today=today_date,
-                           star_ratings=star_categories,
-                           star_rating_values=star_values)
+                           histories=rentals, today=today_date)
 
 
 @app.route('/confirm-deactivate-account')

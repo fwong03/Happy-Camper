@@ -18,7 +18,7 @@
     <br>
     --------------------------------
     <br>
-    <h3>Items You Have Available for Rent</h3>
+    <h3>Items Currently Available for Rent</h3>
     {% if not products_available %}
         <p>None</p>
     {% else %}
@@ -49,7 +49,7 @@
     {% endif %}
     <br>
 
-    <h3>Items you have listed but are currently unavailable</h3>
+    <h3>Items Currently Unavailable for Rent</h3>
     {% if not products_not_available %}
         <p>None</p>
     {% else %}
@@ -65,9 +65,8 @@
                     <td>{{ product.category.cat_name }}</td>
                     <td><a href="/product-detail/{{ product.prod_id }}">{{ product.brand.brand_name }} {{ product.model }}</a></td>
                     <td>${{ '{:,.2f}'.format(product.price_per_day) }}</td>
-                    <td><ul>
-                            <li><a href="edit-listing/{{ product.prod_id }}">Relist/Edit listing</a></td>
-                        </ul>
+                    <td>
+                        <a href="edit-listing/{{ product.prod_id }}">Relist/Edit listing</a>                      
                     </td>
                 </tr>
             {% endfor %}
