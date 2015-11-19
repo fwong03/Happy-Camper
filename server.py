@@ -10,14 +10,17 @@ from sqlalchemy.orm.exc import NoResultFound
 from model import connect_to_db, db
 from model import User, Region, Product, Tent, SleepingBag, SleepingPad, BestUse
 from model import Brand, History, Category, Rating, Gender, FillType, PadType
-from helpers import make_user
-from helpers import search_radius, get_users_in_area
+# Make and update helpers
+from helpers import make_user, check_brand, make_parent_product, make_tent
+from helpers import make_sleeping_bag, make_sleeping_pad, update_parent_product
+from helpers import update_tent, update_sleeping_bag, update_sleeping_pad
+# Search helpers
+from helpers import search_radius, get_users_in_area, filter_products
+from helpers import get_products_within_dates, categorize_products
 from helpers import calc_default_dates, convert_string_to_datetime
-from helpers import make_parent_product, make_tent, make_sleeping_bag, make_sleeping_pad
-from helpers import update_parent_product, update_tent, update_sleeping_bag, update_sleeping_pad
-from helpers import check_brand
-from helpers import filter_products, categorize_products, get_products_within_dates
+# Rating helper
 from helpers import calc_avg_star_rating
+
 from datetime import datetime
 
 
@@ -349,25 +352,8 @@ def edit_listing(prod_id):
 @app.route('/handle-edit-listing/<int:prod_id>', methods=['POST'])
 def handle_edit_listing(prod_id):
 
-    # categories = {1: Tent.query.get(prod_id),
-    #               2: SleepingBag.query.get(prod_id),
-    #               3: SleepingPad.query.get(prod_id),
-    #               # 4: Pack.query.get(prod_id),
-    #               # 5: Stove.query.get(prod_id),
-    #               # 6: WaterFilter.query.get(prod_id),
-    #               }
-
-    # templates = {1: 'tent.html',
-    #              2: 'sleeping-bag.html',
-    #              3: 'sleeping-pad.html',
-    #              # 4: 'pack.html',
-    #              # 5: 'stove.html',
-    #              # 6: 'water-filter.html',
-    #              }
-
     parent_product = Product.query.get(prod_id)
     category_id = parent_product.cat_id
-    # child_item = categories[category_id]
 
     brand_num = int(request.form.get("brand_id"))
     brand_num = check_brand(brand_num)

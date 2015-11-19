@@ -34,6 +34,24 @@ def make_user(password):
 
 
 ######################## Listing stuff ###################################
+def check_brand(brand_id):
+    """Takes int brand_id and returns int brand_id.
+
+        Check if need to add a new brand to database. If given brand_id is
+        less than zero, it makes a new brand and returns the brand_id of that
+        newly created brand.
+    """
+
+    if brand_id < 0:
+        new_brand_name = request.form.get("new_brand_name")
+        brand = Brand(brand_name=new_brand_name)
+        db.session.add(brand)
+        db.session.commit()
+        brand_id = brand.brand_id
+
+    return brand_id
+
+
 def make_brand(brandname):
     """Adds a new brand to the database."""
 
@@ -398,22 +416,7 @@ def convert_string_to_datetime(date_string):
 
     return date
 
-def check_brand(brand_id):
-    """Takes int brand_id and returns int brand_id.
 
-        Check if need to add a new brand to database. If given brand_id is
-        less than zero, it makes a new brand and returns the brand_id of that
-        newly created brand.
-    """
-
-    if brand_id < 0:
-        new_brand_name = request.form.get("new_brand_name")
-        brand = Brand(brand_name=new_brand_name)
-        db.session.add(brand)
-        db.session.commit()
-        brand_id = brand.brand_id
-
-    return brand_id
 
 def filter_products(products, category_id, brand_id):
     """Takes in list of products, category_id as int and brand_id as int and
@@ -481,13 +484,6 @@ def categorize_products(categories, products):
 def calc_avg_star_rating(ratings):
     """Takes a list of ratings and returns average star rating as a
         float. If no star ratings, returns -1.
-
-        >>> rating1 = Rating(rating_id=1, stars=4, comments="abc")
-        >>> rating2 = Rating(rating_id=3, stars=2, comments="def")
-        >>> rating3 = Rating(rating_id=3, stars=1, comments="ghi")
-        >>> ratings = [rating1, rating2, rating3]
-        >>> calc_avg_star_rating(ratings)
-        2.3333333333333335
 
     """
     avg_star_rating = -1
