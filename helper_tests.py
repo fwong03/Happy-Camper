@@ -7,6 +7,7 @@ from seed import load_regions, load_users, load_bestuses, load_categories
 from seed import load_brands, load_products
 
 from model import connect_to_db, db
+from model import Rating, User
 
 from make_update_helpers import make_user, check_brand, make_parent_product
 from make_update_helpers import make_tent, make_sleeping_bag, make_sleeping_pad
@@ -22,8 +23,8 @@ class SearchHelpersTestCase(TestCase):
 
     def test_search_radius(self):
         searchcenter = '94612'
-        postalcodes = ['94608', '94102', '94040', '95376', '95451', '92277',
-                       '10013', '02139']
+        postalcodes = [('94608',), ('94102',), ('94040',), ('95376',), ('95451',),
+                        ('92277',), ('10013',), ('02139',)]
 
         within10 = search_radius(searchcenter, postalcodes, 10)
         within20 = search_radius(searchcenter, postalcodes, 20)
@@ -35,21 +36,25 @@ class SearchHelpersTestCase(TestCase):
         shouldbeall = search_radius(searchcenter, postalcodes, 3100)
 
         self.assertEqual(within10, ['94608'])
-        self.assertEqual(within20, ['94608', '94102'])
-        self.assertEqual(within50, ['94608', '94102', '94040'])
-        self.assertEqual(within60, ['94608', '94102', '94040', '95376'])
-        self.assertEqual(within200, ['94608', '94102', '94040', '95376', '95451'])
-        self.assertEqual(within600, ['94608', '94102', '94040', '95376', '95451',
-                                     '92277'])
-        self.assertEqual(within3000, ['94608', '94102', '94040', '95376', '95451',
-                                      '92277', '10013'])
-        self.assertEqual(shouldbeall, ['94608', '94102', '94040', '95376', '95451',
-                                       '92277', '10013', '02139'])
+        self.assertEqual(sorted(within20), sorted(['94608', '94102']))
+        self.assertEqual(sorted(within50), sorted(['94608', '94102', '94040']))
+        self.assertEqual(sorted(within60), sorted(['94608', '94102', '94040',
+                                                   '95376']))
+        self.assertEqual(sorted(within200), sorted(['94608', '94102', '94040',
+                                                    '95376', '95451']))
+        self.assertEqual(sorted(within600), sorted(['94608', '94102', '94040',
+                                                    '95376', '95451', '92277']))
+        self.assertEqual(sorted(within3000), sorted(['94608', '94102', '94040',
+                                                    '95376', '95451', '92277',
+                                                    '10013']))
+        self.assertEqual(sorted(shouldbeall), sorted(['94608', '94102', '94040',
+                                                      '95376', '95451', '92277',
+                                                      '10013', '02139']))
 
 
     # http://www.robotswillkillusall.org/posts/how-to-mock-datetime-in-python/
     # https://pypi.python.org/pypi/mock
-    @patch('helpers.datetime')
+    @patch('search_helpers.datetime')
     def test_calc_default_dates(self, mock_dt):
         expected = {'future': datetime(2015, 12, 18),
                     'today_string': '2015-11-18',
