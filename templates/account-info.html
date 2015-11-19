@@ -1,23 +1,8 @@
-<!doctype html>
-<html>
-<head>
-  <title>Account Info</title>
+{% extends 'base.html' %}
 
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+  {% block title %}Account Info{% endblock %}
 
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css" integrity="sha384-aUGj/X2zp5rLCbBxumKTCw2Z50WgIr1vs/PFN4praOTvYXWlVyh2UtNUU0KAUhAX" crossorigin="anonymous">
-
-<script src="http://code.jquery.com/jquery.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js" integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ==" crossorigin="anonymous"></script>
-
-</head>
-
-<body>
-  <hr>
-    <ul>{% for message in get_flashed_messages() %}
-            <li>{{ message }}</li>
-        {% endfor %}
-    </ul>
+  {% block content %}
 
     <h1>Your Account</h1>
 
@@ -122,9 +107,9 @@
                                     </a></td>
                                     <td>
                                         {% if history.renter_rating_id %}
-                                            <p>Renter rating already submitted.</p>
+                                            <p><i>Renter rating already submitted.</i></p>
                                         {% else %}
-                                            <div id="{{ history.renter_user_id }}{{ history.history_id }}-rate-user-button"><a data-toggle="modal" button type="button" class="btn btn-primary btn-xsmall"  data-target="#rate-user-modal" href="/rate-user-modal/{{ history.renter_user_id }}-{{ history.history_id }}-0">Rate Renter</a>
+                                            <div id="{{ history.renter_user_id }}{{ history.history_id }}-rate-user-button"><a data-toggle="modal" data-target="#rate-user-modal" href="/rate-user-modal/{{ history.renter_user_id }}-{{ history.history_id }}-0">Rate Renter</a>
                                             </div>
                                         {% endif %}
                                     </td>
@@ -134,8 +119,6 @@
         </table>
     {% endif %}
     <br>
-
-
 
     <h3>Items You Have Rented</h3>
     {% if not histories %}
@@ -169,19 +152,18 @@
                             <li><a href="mailto:{{ history.product.owner.email }}">Send owner an email</a></li>
                             <li> 
                                 {% if history.owner_rating_id %}
-                                    Owner rating already submitted.
+                                    <i>Owner rating already submitted.</i>
                                 {% else %}
                                 <div id="{{ history.product.owner_user_id }}{{ history.history_id }}-rate-user-button">
-                                    <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#rate-user-modal" href="/rate-user-modal/{{ history.product.owner_user_id }}-{{ history.history_id }}-1">Rate Owner</button>
-                                </div>
-                                    <a href="/rate-user/{{ history.product.owner_user_id }}-{{ history.history_id }}-1-4">Rate owner here</a>           
+                                    <a href="/rate-user-modal/{{ history.product.owner_user_id }}-{{ history.history_id }}-1" data-toggle="modal" data-target="#rate-user-modal">Rate Owner</a>
+                                </div>        
                                 {% endif %}
                             </li>
                             <li>
                                 {% if not history.prod_rating_id %}
                                     <a href="/rate-product/{{ history.prod_id }}-{{ history.history_id }}-4">Rate product here</a>
                                 {% else %}
-                                    Product rating already submitted.
+                                    <i>Product rating already submitted.</i>
                                 {% endif %}
                             </li>
                         </ul>
@@ -192,9 +174,6 @@
         <br><br>
     {% endif %}
     <br>
-
-    <p>--------------------------------</p>
-    <p><a href="/success">Homepage</a>     |     <a href="/account-info">Your Account</a>     |     <a href="/logout">Log out</a></p>
 
     <div class="modal fade" id="rate-user-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog" role="document">
@@ -209,33 +188,4 @@
     </div>
     </div>
 
-
-  <script>
-
-    // function submitRenterRating(evt) {
-    //     evt.preventDefault();
-    //     var history_id = $("#renter_hist_num").val();
-    //     var renter_id = $("#renter_num").val();
-
-
-    //     $.ajax({
-    //         url: '/handle-user-rating',
-    //         data: $('#renter_rating_form').serialize(),
-    //         type: 'POST',
-    //         success: function(response) {
-    //             console.log(response);
-    //         }
-    //         })
-
-    //         $("#rateRenterModal").modal("hide");
-    //         $("#" + renter_id + history_id + "-rate-renter-button").empty();
-    //         $("#" + renter_id + history_id + "-rate-renter-button").html("<p>Rating submitted!</p>");
-    //     }
-
-    // $("#renter_rating_form").submit(submitRenterRating);
-
- </script>
-
-  
-</body>
-</html>
+{% endblock %}
