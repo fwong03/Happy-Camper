@@ -1,7 +1,8 @@
 import unittest
 from mock import patch
 from datetime import datetime
-from helpers import convert_string_to_datetime, calc_default_dates
+from helpers import convert_string_to_datetime, calc_default_dates, calc_avg_star_rating
+from model import Rating
 
 
 class HelpersTestCase(unittest.TestCase):
@@ -23,9 +24,13 @@ class HelpersTestCase(unittest.TestCase):
         self.assertIsInstance(test_date, datetime)
         self.assertEqual(test_date, datetime(2015, 11, 18))
 
+    def test_calc_avg_star_rating(self):
+        rating1 = Rating(rating_id=1, stars=4, comments="abc")
+        rating2 = Rating(rating_id=3, stars=2, comments="def")
+        rating3 = Rating(rating_id=3, stars=3, comments="ghi")
+        ratings = [rating1, rating2, rating3]
 
-
-
+        self.assertEqual(calc_avg_star_rating(ratings), 3)
 
 
 
