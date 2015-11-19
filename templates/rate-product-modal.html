@@ -2,19 +2,19 @@
 <html>
 
 <head>
-  <title>Rate User</title>
+  <title>Rate Product</title>
 </head>
 
   <body>
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h4 class="modal-title">Submit a User Rating</h4>
+        <h4 class="modal-title">Submit a Product Rating</h4>
       </div>       
     <div class="modal-body">
-        <h3>Rating for {{ user.email }}</h3>
-        <form action="{{ submit_route }}" id="user_rating_form" method="POST">
+        <h3>Rating for {{ product.brand.brand_name }} {{ product.model }}</h3>
+        <form action="{{ submit_route }}" id="product_rating_form" method="POST">
           <h3>Star rating</h3>
-            <p>How many stars would you rate your experience with this user?</p>
+            <p>How many stars would you rate this product?</p>
             <br>
             <select id="number_stars" name="num_stars">
               {% for star_value in star_values %}
@@ -26,9 +26,8 @@
             <p>Please provide your reasoning for your star feedback.</p>
             <textarea rows="4" cols="50" maxlength="128" id="comments_text" name="comments"></textarea>
             <br><br>
-            <input type="hidden" id="owner_bool" name="is_owner" value="{{ is_owner }}">
             <input type="hidden" id="hist_num" name="hist_id" value="{{ hist_num  }}">
-            <input type="hidden" id="user_num" name="user_id" value="{{ user.user_id }}">
+            <input type="hidden" id="prod_num" name="prod_id" value="{{ product.prod_id }}">
             <br><br>
 
             <input type="submit" value="Submit Rating">
@@ -38,16 +37,16 @@
         </div>
 
 <script>
-    function submitUserRating(evt){
-        console.log("starting submitUserRating");
+    function submitProductRating(evt){
+        console.log("starting submitProductRating");
         evt.preventDefault();
 
         var history_id = $("#hist_num").val();
-        var user_id = $("#user_num").val();
+        var prod_id = $("#prod_num").val();
 
         $.ajax({
-            url: '/handle-user-rating',
-            data: $('#user_rating_form').serialize(),
+            url: '/handle-product-rating',
+            data: $('#product_rating_form').serialize(),
             type: 'POST',
             success: function(response) {
                 console.log(response);
@@ -55,12 +54,11 @@
             })
 
             $("#rating-modal").modal("hide");
-            $("#" + user_id + history_id + "-rate-user-link").empty();
-            $("#" + user_id + history_id + "-rate-user-link").html("<b>Rating submitted!</b>");
-
+            $("#" + prod_id + history_id + "-rate-product-link").empty();
+            $("#" + prod_id + history_id + "-rate-product-link").html("<b>Rating submitted!</b>");
     }
-    
-    $("#user_rating_form").submit(submitUserRating);
+
+    $("#product_rating_form").submit(submitProductRating);
     $("#rating-modal").on("hidden.bs.modal", function() { $(this).removeData() });
 </script>
 

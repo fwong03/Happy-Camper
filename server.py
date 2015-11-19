@@ -790,12 +790,11 @@ def handle_owner_rating():
 
     # flash("Thank you for your rating!")
 
-    return "Rating submitted!"
+    return "History id=%d, Rating id=%d" % (history_id, rating.rating_id)
 
 
-
-@app.route('/rate-product/<int:prod_id>-<int:history_id>-<int:default_star>')
-def rate_product(prod_id, history_id, default_star):
+@app.route('/rate-product-modal/<int:prod_id>-<int:history_id>')
+def rate_product(prod_id, history_id):
     """Page to rate product.
 
     """
@@ -807,34 +806,58 @@ def rate_product(prod_id, history_id, default_star):
                               }
 
     item = Product.query.get(prod_id)
+    star_keys_reversed = sorted(star_rating_categories.keys(), reverse=True)
 
-    session['history_id_for_rating'] = history_id
-    session['prod_id_for_rating'] = prod_id
-    session['prod_name_for_rating'] = "%s %s" % (item.brand.brand_name, item.model)
 
-    try:
-        default_comments = session['rating_comments']
-    except KeyError:
-        default_comments = ""
-
-    return render_template("rate-product.html", product=item,
+    return render_template("rate-product-modal.html",
+                           product=item,
                            star_ratings=star_rating_categories,
-                           submit_route='/rate-product-confirm/',
-                           default_star_rating=default_star,
-                           default_comments_text=default_comments)
+                           submit_route='/handle-product-rating',
+                           star_values=star_keys_reversed,
+                           hist_num=history_id)
 
 
-@app.route('/rate-product-confirm/', methods=['POST'])
-def confirm_product_rating():
-    """Confirm product rating before adding to database"""
+# @app.route('/rate-product/<int:prod_id>-<int:history_id>-<int:default_star>')
+# def rate_product(prod_id, history_id, default_star):
+#     """Page to rate product.
 
-    stars = request.form.get("stars")
-    comments = request.form.get("comments")
-    session['rating_comments'] = comments
+#     """
+#     star_rating_categories = {
+#                                 1: '1: Awful. Would not rent again',
+#                                 2: '2: Not as good as expected, but might rent again if in a pinch.',
+#                                 3: '3: As expected. Would not mind renting again if needed.',
+#                                 4: '4: Great! Even better than expected. Would be happy to rent again if needed.',
+#                               }
 
-    return render_template("rate-product-confirm.html", num_stars=stars,
-                           comments_text=comments,
-                           submit_route='/handle-product-rating')
+#     item = Product.query.get(prod_id)
+
+#     session['history_id_for_rating'] = history_id
+#     session['prod_id_for_rating'] = prod_id
+#     session['prod_name_for_rating'] = "%s %s" % (item.brand.brand_name, item.model)
+
+#     try:
+#         default_comments = session['rating_comments']
+#     except KeyError:
+#         default_comments = ""
+
+#     return render_template("rate-product.html", product=item,
+#                            star_ratings=star_rating_categories,
+#                            submit_route='/rate-product-confirm/',
+#                            default_star_rating=default_star,
+#                            default_comments_text=default_comments)
+
+
+# @app.route('/rate-product-confirm/', methods=['POST'])
+# def confirm_product_rating():
+#     """Confirm product rating before adding to database"""
+
+#     stars = request.form.get("stars")
+#     comments = request.form.get("comments")
+#     session['rating_comments'] = comments
+
+#     return render_template("rate-product-confirm.html", num_stars=stars,
+#                            comments_text=comments,
+#                            submit_route='/handle-product-rating')
 
 
 @app.route('/handle-product-rating', methods=['POST'])
@@ -845,25 +868,21 @@ def handle_product_rating():
     prod_rating_id.
     """
 
-    number_stars = int(request.form.get("number_stars"))
-    comments_text = request.form.get("comments_text")
+    history_id = int(request.form.get("hist_id"))
+    number_stars = int(request.form.get("num_stars"))
+    comments_text = request.form.get("comments")
 
     product_rating = Rating(stars=number_stars, comments=comments_text)
     db.session.add(product_rating)
     db.session.commit()
 
-    history = History.query.get(session['history_id_for_rating'])
+    history = History.query.get(history_id)
     history.prod_rating_id = product_rating.rating_id
 
     db.session.commit()
 
-    session.pop('history_id_for_rating')
-    session.pop('prod_name_for_rating')
-    session.pop('rating_comments')
-
-    flash("Thank you for your rating!")
-
-    return redirect('/account-info')
+    return "Product rating id=%d submitted for history_id=%d" % (
+                                          product_rating.rating_id, history_id)
 
 
 ######################## Delisting stuff ###################################
