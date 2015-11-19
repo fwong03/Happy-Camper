@@ -4,25 +4,19 @@ from jinja2 import StrictUndefined
 
 from flask import Flask, render_template, redirect, request, flash, session
 from flask_debugtoolbar import DebugToolbarExtension
-
 from sqlalchemy.orm.exc import NoResultFound
-
-from model import connect_to_db, db
-from model import User, Region, Product, Tent, SleepingBag, SleepingPad, BestUse
-from model import Brand, History, Category, Rating, Gender, FillType, PadType
-# Make and update helpers
-from helpers import make_user, check_brand, make_parent_product, make_tent
-from helpers import make_sleeping_bag, make_sleeping_pad, update_parent_product
-from helpers import update_tent, update_sleeping_bag, update_sleeping_pad
-# Search helpers
-from helpers import search_radius, get_users_in_area, filter_products
-from helpers import get_products_within_dates, categorize_products
-from helpers import calc_default_dates, convert_string_to_datetime
-# Rating helper
-from helpers import calc_avg_star_rating
-
 from datetime import datetime
-
+from model import connect_to_db, db, User, Region, Product, Tent, SleepingBag
+from model import SleepingPad, BestUse, Brand, History, Category, Rating, Gender
+from model import FillType, PadType
+from make_update_helpers import make_user, check_brand, make_parent_product
+from make_update_helpers import make_tent, make_sleeping_bag, make_sleeping_pad
+from make_update_helpers import update_parent_product, update_tent
+from make_update_helpers import update_sleeping_bag, update_sleeping_pad
+from make_update_helpers import calc_avg_star_rating
+from search_helpers import search_radius, get_users_in_area, filter_products
+from search_helpers import get_products_within_dates, categorize_products
+from search_helpers import calc_default_dates, convert_string_to_datetime
 
 app = Flask(__name__)
 
