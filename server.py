@@ -694,62 +694,6 @@ def rate_user(user_id, history_id, owner_is_true):
                            hist_num=history_id)
 
 
-# @app.route('/rate-user/<int:user_id>-<int:history_id>-<int:owner_is_true>-<int:default_star>')
-# def rate_user(user_id, history_id, owner_is_true, default_star):
-#     """Page to rate owner or renter.
-
-#     """
-
-#     # owner_is_true used to determine if show rate owner or rate renter
-#     # forms. 0 is renter, 1 is owner
-#     star_categories = [{1: "1: Awful. Would not rent to this person again.",
-#                         2: "2: Worse than expected, but not awful. Might rent to this person again.",
-#                         3: "3: As expected. Would rent to this person again.",
-#                         4: "4: Awesome! Would be happy to rent to this person again."
-#                         },
-
-#                         {1: "1: Awful. Would not rent from this person again.",
-#                         2: "2: Not as good as expected, but might rent from again.",
-#                         3: "3: As expected. Would rent from again.",
-#                         4: "4: Awesome! Would rent from again.",
-#                         }]
-
-#     user = User.query.get(user_id)
-
-#     print "\n\n User: %d \n\n" % user_id
-
-#     session['history_id_for_rating'] = history_id
-#     session['username_for_rating'] = User.query.get(user_id).email
-#     session['user_id_for_rating'] = user_id
-
-#     try:
-#         default_comments = session['rating_comments']
-#     except KeyError:
-#         default_comments = ""
-#         session['rating_comments'] = default_comments
-
-#     return render_template("rate-user.html",
-#                            submit_route='/handle-user-rating',
-#                            star_ratings=star_categories[owner_is_true],
-#                            default_star_rating=default_star,
-#                            default_comments_text=default_comments,
-#                            is_owner=owner_is_true)
-
-
-# @app.route('/rate-user-confirm/', methods=['POST'])
-# def confirm_owner_rating():
-#     """Confirm user rating before adding to database"""
-
-#     stars = request.form.get("stars")
-#     comments = request.form.get("comments")
-#     is_owner_true = int(request.form.get("is_owner"))
-#     session['rating_comments'] = comments
-
-#     return render_template("rate-user-confirm.html", num_stars=stars,
-#                            comments_text=comments, is_owner=is_owner_true,
-#                            submit_route='/handle-user-rating')
-
-
 @app.route('/handle-user-rating', methods=['POST'])
 def handle_owner_rating():
     """Handle owner rating form submission.
@@ -783,13 +727,6 @@ def handle_owner_rating():
 
     db.session.commit()
 
-    # session.pop('history_id_for_rating')
-    # session.pop('username_for_rating')
-    # session.pop('user_id_for_rating')
-    # session.pop('rating_comments')
-
-    # flash("Thank you for your rating!")
-
     return "History id=%d, Rating id=%d" % (history_id, rating.rating_id)
 
 
@@ -815,49 +752,6 @@ def rate_product(prod_id, history_id):
                            submit_route='/handle-product-rating',
                            star_values=star_keys_reversed,
                            hist_num=history_id)
-
-
-# @app.route('/rate-product/<int:prod_id>-<int:history_id>-<int:default_star>')
-# def rate_product(prod_id, history_id, default_star):
-#     """Page to rate product.
-
-#     """
-#     star_rating_categories = {
-#                                 1: '1: Awful. Would not rent again',
-#                                 2: '2: Not as good as expected, but might rent again if in a pinch.',
-#                                 3: '3: As expected. Would not mind renting again if needed.',
-#                                 4: '4: Great! Even better than expected. Would be happy to rent again if needed.',
-#                               }
-
-#     item = Product.query.get(prod_id)
-
-#     session['history_id_for_rating'] = history_id
-#     session['prod_id_for_rating'] = prod_id
-#     session['prod_name_for_rating'] = "%s %s" % (item.brand.brand_name, item.model)
-
-#     try:
-#         default_comments = session['rating_comments']
-#     except KeyError:
-#         default_comments = ""
-
-#     return render_template("rate-product.html", product=item,
-#                            star_ratings=star_rating_categories,
-#                            submit_route='/rate-product-confirm/',
-#                            default_star_rating=default_star,
-#                            default_comments_text=default_comments)
-
-
-# @app.route('/rate-product-confirm/', methods=['POST'])
-# def confirm_product_rating():
-#     """Confirm product rating before adding to database"""
-
-#     stars = request.form.get("stars")
-#     comments = request.form.get("comments")
-#     session['rating_comments'] = comments
-
-#     return render_template("rate-product-confirm.html", num_stars=stars,
-#                            comments_text=comments,
-#                            submit_route='/handle-product-rating')
 
 
 @app.route('/handle-product-rating', methods=['POST'])

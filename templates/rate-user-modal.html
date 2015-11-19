@@ -11,7 +11,7 @@
         <h4 class="modal-title">Submit a User Rating</h4>
       </div>       
     <div class="modal-body">
-        <h3>Rating for {{ user.email }}</h3>
+        <h3>Rating for User: {{ user.email }}</h3>
         <form action="{{ submit_route }}" id="user_rating_form" method="POST">
           <h3>Star rating</h3>
             <p>How many stars would you rate your experience with this user?</p>
@@ -59,7 +59,7 @@
             $("#" + user_id + history_id + "-rate-user-link").html("<b>Rating submitted!</b>");
 
     }
-    
+
     $("#user_rating_form").submit(submitUserRating);
     $("#rating-modal").on("hidden.bs.modal", function() { $(this).removeData() });
 </script>

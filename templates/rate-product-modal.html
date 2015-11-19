@@ -11,7 +11,7 @@
         <h4 class="modal-title">Submit a Product Rating</h4>
       </div>       
     <div class="modal-body">
-        <h3>Rating for {{ product.brand.brand_name }} {{ product.model }}</h3>
+        <h3>Rating for Item: {{ product.brand.brand_name }} {{ product.model }}</h3>
         <form action="{{ submit_route }}" id="product_rating_form" method="POST">
           <h3>Star rating</h3>
             <p>How many stars would you rate this product?</p>
