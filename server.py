@@ -664,8 +664,6 @@ def rate_user(user_id, history_id, owner_is_true):
     """Modal popup to rate owner or renter.
 
     """
-
-
     # owner_is_true used to determine if show rate owner or rate renter
     # forms. 0 is renter, 1 is owner
     star_categories = [{1: "1: Awful. Would not rent to this person again.",
@@ -680,14 +678,18 @@ def rate_user(user_id, history_id, owner_is_true):
                          4: "4: Awesome! Would rent from again.",
                          }]
 
+    star_keys_reversed = sorted(star_categories[0].keys(), reverse=True)
+
+
     user_to_rate = User.query.get(user_id)
 
     print "\n\n User: %d \n\n" % user_id
 
-    return render_template("rate-owner-modal.html",
+    return render_template("rate-user-modal.html",
                            user=user_to_rate,
                            submit_route='/handle-user-rating',
                            star_ratings=star_categories[owner_is_true],
+                           star_values=star_keys_reversed,
                            is_owner=owner_is_true,
                            hist_num=history_id)
 
@@ -772,11 +774,11 @@ def handle_owner_rating():
 
     if is_owner:
         history.owner_rating_id = rating.rating_id
-        print "Owner rating: updating history id %d with rating id %d" % (
+        print "\n\nOwner rating: updating history id %d with rating id %d\n\n" % (
                                           history.history_id, rating.rating_id)
     else:
         history.renter_rating_id = rating.rating_id
-        print "Renter rating: updating history id %d with rating id %d" % (
+        print "\n\nRenter rating: updating history id %d with rating id %d\n\n" % (
                                           history.history_id, rating.rating_id)
 
     db.session.commit()
