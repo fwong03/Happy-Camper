@@ -1,3 +1,5 @@
+# I PUT THESE ALL IN INTEGRATION TESTS
+
 from unittest import TestCase
 from mock import patch
 from datetime import datetime
@@ -9,14 +11,8 @@ from seed import load_brands, load_products
 from model import connect_to_db, db
 from model import Rating, User
 
-from make_update_helpers import make_user, check_brand, make_parent_product
-from make_update_helpers import make_tent, make_sleeping_bag, make_sleeping_pad
-from make_update_helpers import update_parent_product, update_tent
-from make_update_helpers import update_sleeping_bag, update_sleeping_pad
 from make_update_helpers import calc_avg_star_rating
-from search_helpers import search_radius, get_users_in_area, filter_products
-from search_helpers import get_products_within_dates, categorize_products
-from search_helpers import calc_default_dates, convert_string_to_datetime
+from search_helpers import search_radius, calc_default_dates, convert_string_to_datetime
 
 
 class SearchHelpersTestCase(TestCase):
@@ -51,15 +47,6 @@ class SearchHelpersTestCase(TestCase):
                                                       '95376', '95451', '92277',
                                                       '10013', '02139']))
 
-    def test_get_users_in_area(self):
-        users_in_area = get_users_in_area(['94612'], 1)
-        users_names = []
-
-        for user in users_in_area:
-            users_names.append(user.fname)
-
-        self.assertEqual(sorted(users_names), ['Count', 'Trix'])
-
     # http://www.robotswillkillusall.org/posts/how-to-mock-datetime-in-python/
     # https://pypi.python.org/pypi/mock
     @patch('search_helpers.datetime')
@@ -86,11 +73,8 @@ class SearchHelpersTestCase(TestCase):
         self.assertEqual(calc_avg_star_rating(ratings), 3)
 
 
-
-
-
 class MakeUpdateTestCase(TestCase):
-    def test_make_user(self):
+    def test_create_user_object(self):
         user1 = User(fname='Michelle', lname='Tanner', street='1709 Broderick Street',
                      city='San Francisco', region_id=1, postalcode='94115',
                      phone=4155556666, email='michelle@tanner.com', password='123')
@@ -103,7 +87,6 @@ class MakeUpdateTestCase(TestCase):
         self.assertEqual(user2.email, 'grumpy@grandpa.com')
         self.assertEqual(user1.region_id, 1)
         self.assertEqual(user2.region_id, 2)
-
 
 
 if __name__ == "__main__":

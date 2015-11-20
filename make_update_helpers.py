@@ -86,6 +86,10 @@ def make_parent_product(brand_id, category_id):
     avail_start = datetime.strptime(avail_start, "%Y-%m-%d")
     avail_end = datetime.strptime(avail_end, "%Y-%m-%d")
 
+    # print "\n\nsession user: %s\n\n" % session['user']
+
+    # print "\n\nAll Users: %r \n\n" % User.query.all()
+
     user = User.query.filter(User.email == session['user']).one()
 
     product = Product(cat_id=category_id, brand_id=brand_id,
@@ -93,6 +97,8 @@ def make_parent_product(brand_id, category_id):
                       description=desc, condition=cond,
                       avail_start_date=avail_start, avail_end_date=avail_end,
                       price_per_day=pricing, image_url=image)
+
+    print "\n\nMake Parent Product model: %r" % product.model
 
     return product
 
@@ -128,6 +134,9 @@ def make_tent(product_id):
                 sleep_capacity=sleep, seasons=seasoncat, min_trail_weight=weight,
                 floor_width=width, floor_length=length, num_doors=doors,
                 num_poles=poles)
+
+    print "\n\nMake Tent: %r" % tent
+
     return tent
 
 
