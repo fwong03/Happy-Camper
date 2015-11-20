@@ -204,9 +204,6 @@ def list_product(category_id):
     templates = {1: 'list-tent.html',
                  2: 'list-sleeping-bag.html',
                  3: 'list-sleeping-pad.html',
-                 # 4: 'list-pack.html',
-                 # 5: 'list-stove.html',
-                 # 6: 'list-water-filter.html',
                  }
 
     # Tent
@@ -295,17 +292,11 @@ def edit_listing(prod_id):
     categories = {1: Tent.query.get(prod_id),
                   2: SleepingBag.query.get(prod_id),
                   3: SleepingPad.query.get(prod_id),
-                  # 4: Pack.query.get(prod_id),
-                  # 5: Stove.query.get(prod_id),
-                  # 6: WaterFilter.query.get(prod_id),
                   }
 
     templates = {1: 'edit-tent.html',
                  2: 'edit-sleeping-bag.html',
                  3: 'edit-sleeping-pad.html',
-                 # 4: 'edit-pack.html',
-                 # 5: 'edit-stove.html',
-                 # 6: 'edit-water-filter.html',
                  }
 
     parent_product = Product.query.get(prod_id)
@@ -424,8 +415,10 @@ def show_results():
     # Get zipcodes in the database that are within the search radius.
     postal_codes = search_radius(search_center=search_area,
                                  postalcodes=postalcodes, radius=search_miles)
-    # Get users are in those zipcodes.
-    users_in_area = get_users_in_area(postal_codes)
+    # Get users are in those zipcodes. Get logged in user so can take them out
+    # of results. Don't want to show his or her own products.
+    logged_in_user = User.query.filter(User.email == session['user']).one()
+    users_in_area = get_users_in_area(postal_codes, logged_in_user.user_id)
 
     # Get products those users have listed for rent and are currently available
     # within the search dates.

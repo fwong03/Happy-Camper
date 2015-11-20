@@ -51,6 +51,17 @@ class SearchHelpersTestCase(TestCase):
                                                       '95376', '95451', '92277',
                                                       '10013', '02139']))
 
+    def test_get_users_in_area(self):
+        users_in_area = (['94612'], 1)
+        users_names = []
+
+        for user in users_in_area:
+            users_names.append(user.fname)
+
+        self.assertEqual(sorted(users_names), ['Count', 'Trix'])
+
+
+
 
     # http://www.robotswillkillusall.org/posts/how-to-mock-datetime-in-python/
     # https://pypi.python.org/pypi/mock
@@ -79,6 +90,7 @@ class SearchHelpersTestCase(TestCase):
 
 
 
+
 class MakeUpdateTestCase(TestCase):
     def test_make_user(self):
         user1 = User(fname='Michelle', lname='Tanner', street='1709 Broderick Street',
@@ -93,6 +105,8 @@ class MakeUpdateTestCase(TestCase):
         self.assertEqual(user2.email, 'grumpy@grandpa.com')
         self.assertEqual(user1.region_id, 1)
         self.assertEqual(user2.region_id, 2)
+
+
 
 if __name__ == "__main__":
     import unittest

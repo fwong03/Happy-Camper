@@ -62,11 +62,12 @@ def search_radius(search_center, postalcodes, radius):
     return postalcodes
 
 
-def get_users_in_area(postal_codes):
-    """Give a list of postal with searching user taken out"""
+def get_users_in_area(postal_codes, user_id):
+    """Returns a list of users that live within a given list of postal codes.
+    Takes searching user out"""
 
     users_in_area = User.query.filter(User.postalcode.in_(postal_codes)).all()
-    logged_in_user = User.query.filter(User.email == session['user']).one()
+    logged_in_user = User.query.get(user_id)
 
     if logged_in_user in users_in_area:
         users_in_area.remove(logged_in_user)
