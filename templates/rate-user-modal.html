@@ -51,12 +51,17 @@
             type: 'POST',
             success: function(response) {
                 console.log(response);
+                $("#rating-modal").modal("hide");
+                $("#" + user_id + history_id + "-rate-user-link").empty();
+                $("#" + user_id + history_id + "-rate-user-link").html("<b>Rating submitted!</b>");
+            },
+            error: function(response) {
+                consolde.log(response);
             }
+
             })
 
-            $("#rating-modal").modal("hide");
-            $("#" + user_id + history_id + "-rate-user-link").empty();
-            $("#" + user_id + history_id + "-rate-user-link").html("<b>Rating submitted!</b>");
+            
 
     }
 
