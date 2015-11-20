@@ -52,16 +52,13 @@ class SearchHelpersTestCase(TestCase):
                                                       '10013', '02139']))
 
     def test_get_users_in_area(self):
-        users_in_area = (['94612'], 1)
+        users_in_area = get_users_in_area(['94612'], 1)
         users_names = []
 
         for user in users_in_area:
             users_names.append(user.fname)
 
         self.assertEqual(sorted(users_names), ['Count', 'Trix'])
-
-
-
 
     # http://www.robotswillkillusall.org/posts/how-to-mock-datetime-in-python/
     # https://pypi.python.org/pypi/mock
@@ -87,6 +84,7 @@ class SearchHelpersTestCase(TestCase):
         ratings = [rating1, rating2, rating3]
 
         self.assertEqual(calc_avg_star_rating(ratings), 3)
+
 
 
 
