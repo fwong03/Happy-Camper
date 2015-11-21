@@ -10,7 +10,7 @@ from seed import load_regions, load_users, load_bestuses, load_categories
 from seed import load_brands, load_products, load_tents, load_filltypes
 from seed import load_gendertypes, load_sleepingbags, load_padtypes
 from seed import load_sleepingpads, load_ratings, load_histories
-from model import User, Brand, Product, Tent, Category, Rating
+from model import User, Brand, Product, Tent, SleepingBag, Category, Rating, SleepingPad
 
 from make_update_helpers import check_brand, make_brand, get_brand_id
 from search_helpers import get_users_in_area, filter_products, convert_string_to_datetime
@@ -49,61 +49,119 @@ class IntegrationTestCase(TestCase):
         db.session.remove()
         os.remove("////tmp/temp.db")
 
-
     def test_find_users(self):
+        print "\n\nrunning test_find_users\n\n"
         franken = User.query.filter(User.fname == 'Franken').one()
         self.assertEqual(franken.fname, 'Franken')
         self.assertEqual(franken.email, 'franken@berry.com')
 
     def test_homepage(self):
+        print "\n\nrunning test_homepage\n\n"
         result = self.client.get('/')
         self.assertEqual(result.status_code, 200)
         self.assertIn('<p><b>Login Here</b></p>', result.data)
 
     def test_login(self):
-
+        print "\n\nrunning test_login\n\n"
         result = self.client.post('/handle-login', data={'email': 'franken@berry.com',
                                   'password': 'abc'}, follow_redirects=True)
         self.assertEqual(result.status_code, 200)
         self.assertIn('<h2>Your options are the following:</h2>', result.data)
 
     def test_handle_tent_listing(self):
-
+        print "\n\nrunning test_handle_test_listing\n\n"
         with self.client as c:
             with c.session_transaction() as sess:
                 sess['user'] = 'franken@berry.com'
-                print "\n\nAll Users: %r\n\n" % User.query.all()
 
             c.set_cookie('localhost', 'MYCOOKIE', 'cookie_value')
-            print "\n\nAGAIN All Users: %r\n\n" % User.query.all()
-            # load_users()
 
             result = c.post('/handle-listing/1', data={'category_id': 1,
                     'brand_id': 3, 'modelname': 'Kaiju 6', 
                     'desc': 'Guaranteeing campground fun for the family, blah blah',
-                    'cond': 'Excellente', 'avail_start': '2016-11-20',
-                    'avail_end': '2016-12-31', 'pricing': 4.5, 'image': None,
+                    'cond': 'Excellente', 'avail_start': '2015-11-20',
+                    'avail_end': '2015-12-31', 'pricing': 4.5, 'image': None,
                     'user': User.query.get(1), 'bestuse': 2, 'sleep': 6,
                     'seasoncat': 3, 'weight': 200, 'length': 80, 'width': 25,
-                    'doors': 3, 'poles':3}, follow_redirects=True)
+                    'doors': 3, 'poles': 3}, follow_redirects=True)
 
         self.assertEqual(result.status_code, 200)
         self.assertIn('Listing successfully posted!', result.data)
 
         product = Product.query.filter(Product.model == 'Kaiju 6').one()
-
         self.assertEqual(product.model, 'Kaiju 6')
+        print "\n\nproduct listed: %r\n\n" % product
+
         tent = Tent.query.get(product.prod_id)
         self.assertEqual(tent.sleep_capacity, 6)
+        print "\n\ntent listed: %r\n\n" % tent
 
+    def test_handle_sleepingbag_listing(self):
+        print "\n\nrunning test_handle_sleepingbag_listing\n\n"
+        with self.client as c:
+            with c.session_transaction() as sess:
+                sess['user'] = 'count@chocula.com'
+
+            c.set_cookie('localhost', 'MYCOOKIE', 'cookie_value')
+
+            result = c.post('/handle-listing/2', data={'category_id': 2,
+                    'brand_id': 2, 'modelname': 'Arrow Rock 15',
+                    'desc': 'By the time you clean up dinner and organize, blah blah',
+                    'cond': 'Lost some feathers', 'avail_start': '2016-03-01',
+                    'avail_end': '2016-03-31', 'pricing': 3.0, 'image': None,
+                    'user': User.query.get(2), 'filltype': 'D', 'temp': 15,
+                    'bag_weight': 45, 'length': 43, 'gender': 'U'},
+                    follow_redirects=True)
+
+        self.assertEqual(result.status_code, 200)
+        self.assertIn('Listing successfully posted!', result.data)
+
+        product = Product.query.filter(Product.model == 'Arrow Rock 15').one()
+        self.assertEqual(product.brand_id, 2)
+        print "\n\nproduct listed: %r\n\n" % product
+
+        sleepingbag = SleepingBag.query.get(product.prod_id)
+        self.assertEqual(sleepingbag.fill_code, 'D')
+        print "\n\nsleeping bag listed: %r\n\n" % sleepingbag
+
+    def test_handle_sleepingpad_listing(self):
+        print "\n\nrunning test_handle_sleepingpad_listing\n\n"
+        with self.client as c:
+            with c.session_transaction() as sess:
+                sess['user'] = 'trix@rabbit.com'
+
+            c.set_cookie('localhost', 'MYCOOKIE', 'cookie_value')
+
+            result = c.post('/handle-listing/3', data={'category_id': 3,
+                    'brand_id': -1, 'new_brand_name': 'Exped', 'modelname': 'Mega Mat 10', 
+                    'desc': 'mega big and mega warm',
+                    'cond': 'mega good', 'avail_start': '2017-03-01',
+                    'avail_end': '2017-06-15', 'pricing': 2.50, 'image': None,
+                    'user': User.query.get(3), 'padtype': 'F', 'bestuse': 2,
+                    'r_val': 9.5, 'pad_weight': 38, 'pad_length': '78'},
+                    follow_redirects=True)
+
+        self.assertEqual(result.status_code, 200)
+        self.assertIn('Listing successfully posted!', result.data)
+
+        product = Product.query.filter(Product.model == 'Mega Mat 10').one()
+        self.assertEqual(product.brand.brand_name, 'Exped')
+        print "\n\nproduct listed: %r\n\n" % product
+
+        sleepingpad = SleepingPad.query.get(product.prod_id)
+        self.assertEqual(sleepingpad.type_code, 'F')
+        print "\n\nsleeping pad listed: %r\n\n" % sleepingpad
 
     def test_find_product(self):
-        prod = Product.query.filter(Product.model == 'Sugar Shack 2').one()
-        self.assertEqual(prod.condition, 'Good. Used twice.')
-        print "\n\n test find product %s\n\n" % prod.model
+        print "\n\n test find product\n\n"
 
-        tent = Tent.query.get(prod.prod_id)
+        product = Product.query.filter(Product.model == 'Sugar Shack 2').one()
+        self.assertEqual(product.condition, 'Good. Used twice.')
+        print "Product found (should be Sugar Shack: %r" % product
+
+        tent = Tent.query.get(product.prod_id)
         self.assertEqual(tent.sleep_capacity, 2)
+        print "Tent found: %r" % tent
 
     # def test_get_users_in_area(self):
     #     users_in_area = get_users_in_area(['94612'], 1)
@@ -115,22 +173,29 @@ class IntegrationTestCase(TestCase):
     #     self.assertEqual(sorted(users_names), ['Count', 'Trix'])
 
     def test_filter_products(self):
+        print "\n\n test filter products\n\n"
         filtered_products = filter_products(Product.query.all(), 1, 1)
 
         self.assertEqual(filtered_products[0].model, 'Passage 2')
 
     def test_check_brand(self):
+        print "\n\n test check brand\n\n"
         self.assertEqual(check_brand(3), 3)
 
     def test_make_brand(self):
+        print "\n\n test make brand\n\n"
         make_brand("ABC")
         self.assertEqual(Brand.query.filter(Brand.brand_name == "ABC").one().brand_name, "ABC")
 
+        brand = Brand.query.filter(Brand.brand_name == "ABC").one()
+        print "\n\nBrand made: %r\n\n" % brand
+
     def test_get_brand_id(self):
+        print "\n\n test get brand id\n\n"
         self.assertEqual(get_brand_id("REI"), 1)
 
-
     def test_get_products_within_dates(self):
+        print "\n\n test get products within dates\n\n"
         start_date = convert_string_to_datetime('2015-10-31')
         end_date = convert_string_to_datetime('2015-11-01')
 
@@ -139,6 +204,7 @@ class IntegrationTestCase(TestCase):
         self.assertEqual(products[0].prod_id, 1)
 
     def test_categorize_products(self):
+        print "\n\n test categorize products\n\n"
         categories = [Category.query.get(1), Category.query.get(2)]
         products = [Product.query.get(1), Product.query.get(2), Product.query.get(5)]
 
@@ -146,7 +212,6 @@ class IntegrationTestCase(TestCase):
 
         self.assertEqual(inventory['Tents'][0].prod_id, 1)
         self.assertEqual(inventory['Sleeping Bags'][0].prod_id, 5)
-
 
 
 class SearchHelpersTestCase(TestCase):
@@ -185,6 +250,7 @@ class SearchHelpersTestCase(TestCase):
     # https://pypi.python.org/pypi/mock
     @patch('search_helpers.datetime')
     def test_calc_default_dates(self, mock_dt):
+        print "\n\n test calc default dates\n\n"
         expected = {'future': datetime(2015, 12, 18),
                     'today_string': '2015-11-18',
                     'today': datetime(2015, 11, 18),
@@ -193,11 +259,18 @@ class SearchHelpersTestCase(TestCase):
         mock_dt.today.return_value = datetime(2015, 11, 18)
         self.assertEqual(calc_default_dates(30), expected)
 
+        print "\n\nToday (should be 2015-11-18): %s " % expected['today_string']
+        print "Future (should be 2015-12-18): %s" % expected['future_string']
+
     def test_convert_string_to_datetime(self):
+        print "\n\n test convert string to datetime\n\n"
         test_date = convert_string_to_datetime("2015-11-18")
         self.assertEqual(test_date, datetime(2015, 11, 18))
 
+        print "\n\nDatetime for 2015-11-18: %r" % test_date
+
     def test_calc_avg_star_rating(self):
+        print "\n\n test calc avg star rating\n\n"
         rating1 = Rating(rating_id=1, stars=4, comments="abc")
         rating2 = Rating(rating_id=3, stars=2, comments="def")
         rating3 = Rating(rating_id=3, stars=3, comments="ghi")
@@ -208,6 +281,7 @@ class SearchHelpersTestCase(TestCase):
 
 class MakeUpdateTestCase(TestCase):
     def test_create_user_object(self):
+        print "\n\n test make user\n\n"
         user1 = User(fname='Michelle', lname='Tanner', street='1709 Broderick Street',
                      city='San Francisco', region_id=1, postalcode='94115',
                      phone=4155556666, email='michelle@tanner.com', password='123')

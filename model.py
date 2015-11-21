@@ -153,8 +153,8 @@ class Product(db.Model):
     histories = db.relationship('History', backref='product')
 
     def __repr__(self):
-        return "<Product prod_id=%d, cat_id=%d, owner_id=%d, model=%s, description=%s, condition=%s, avail=%r to %r, price=%r>" % (
-            self.prod_id, self.cat_id, self.owner_user_id, self.model,
+        return "<Product prod_id=%d, cat_id=%d, owner_id=%d, brand_id: %d, model=%s, description=%s, condition=%s, avail=%r to %r, price=%r>" % (
+            self.prod_id, self.cat_id, self.owner_user_id, self.brand_id, self.model,
             self.description, self.condition, self.avail_start_date, self.avail_end_date, self.price_per_day)
 
 
