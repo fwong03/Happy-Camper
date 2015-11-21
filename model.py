@@ -324,7 +324,7 @@ def connect_to_db(app, db_uri='sqlite:///camper.db'):
 
     # Configure to use SQLite database
     app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
-    app.config['SQLALCHEMY_ECHO'] = False
+    app.config['SQLALCHEMY_ECHO'] = True
     db.app = app
     db.init_app(app)
 

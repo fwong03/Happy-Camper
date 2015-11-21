@@ -1,4 +1,6 @@
 from unittest import TestCase
+import os
+import tempfile
 from mock import patch
 from datetime import datetime
 
@@ -20,6 +22,7 @@ from search_helpers import search_radius, calc_default_dates
 
 class IntegrationTestCase(TestCase):
     def setUp(self):
+
         self.client = app.test_client()
         app.config['TESTING'] = True
         connect_to_db(app, "sqlite:////tmp/temp.db")
@@ -43,7 +46,10 @@ class IntegrationTestCase(TestCase):
 
     def tearDown(self):
         # can put in here the python (os) to remove a file r
-            pass
+        db.session.remove()
+        os.close("sqlite:////tmp/temp.db")
+        os.unlink(app.config['SQLALCHEMY_DATABASE_URI'])
+
 
     def test_find_users(self):
         franken = User.query.filter(User.fname == 'Franken').one()
