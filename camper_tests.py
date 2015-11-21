@@ -47,8 +47,7 @@ class IntegrationTestCase(TestCase):
     def tearDown(self):
         # can put in here the python (os) to remove a file r
         db.session.remove()
-        os.close("sqlite:////tmp/temp.db")
-        os.unlink(app.config['SQLALCHEMY_DATABASE_URI'])
+        # os.unlink(app.config['SQLALCHEMY_DATABASE_URI'])
 
 
     def test_find_users(self):
