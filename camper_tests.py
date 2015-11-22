@@ -22,7 +22,6 @@ from search_helpers import search_radius, calc_default_dates
 
 class IntegrationTestCase(TestCase):
     def setUp(self):
-
         self.client = app.test_client()
         app.config['TESTING'] = True
         connect_to_db(app, "sqlite:////tmp/temp.db")
@@ -54,16 +53,34 @@ class IntegrationTestCase(TestCase):
         self.assertEqual(result.status_code, 200)
         self.assertIn('<p><b>Login Here</b></p>', result.data)
 
-    def test_handle_login(self):
-        result1 = self.client.post('/handle-login', data={'email': 'phar@fignewton.com',
+    def test_handle_successful_login(self):
+        result = self.client.post('/handle-login', data={'email': 'phar@fignewton.com',
                                   'password': 'abc'}, follow_redirects=True)
-        self.assertEqual(result1.status_code, 200)
-        self.assertIn('<h2>Your options are the following:</h2>', result1.data)
+        self.assertEqual(result.status_code, 200)
+        self.assertIn('<h2>Your options are the following:</h2>', result.data)
 
-        result2 = self.client.post('/handle-login', data={'email': 'the@godpigeon.com',
+    def test_handle_failed_login(self):
+        result = self.client.post('/handle-login', data={'email': 'the@godpigeon.com',
                                   'password': 'abc'}, follow_redirects=True)
-        self.assertEqual(result2.status_code, 200)
-        self.assertIn('<p><b>Login Here</b></p>', result2.data)
+        self.assertEqual(result.status_code, 200)
+        self.assertIn('<p><b>Login Here</b></p>', result.data)
+
+    def test_handle_successful_create_account(self):
+        result = self.client.post('handle-create-account', data={'pword': '123',
+                    'confirm_pword': '123', 'firstname': 'The', 'lastname': 'Brain',
+                    'staddress': '8 6th St', 'cty': 'San Francisco', 'state': 'CA',
+                    'zipcode': '94103', 'phonenumber': '4155552222',
+                    'username': 'the@brain.com'}, follow_redirects=True)
+
+        self.assertEqual(result.status_code, 200)
+        self.assertIn('<h2>Your options are the following:</h2>', result.data)
+
+    def test_handle_failed_create_account(self):
+        result = self.client.post('handle-create-account', data={'pword': '123',
+                    'confirm_pword': 'abc'}, follow_redirects=True)
+
+        self.assertEqual(result.status_code, 200)
+        self.assertIn('<h3>Contact Info</h3>', result.data)
 
     def test_show_account_info(self):
         with self.client as c:
@@ -258,14 +275,9 @@ class SearchHelpersTestCase(TestCase):
         mock_dt.today.return_value = datetime(2015, 11, 18)
         self.assertEqual(calc_default_dates(30), expected)
 
-        print "\n\nToday (should be 2015-11-18): %s " % expected['today_string']
-        print "Future (should be 2015-12-18): %s" % expected['future_string']
-
     def test_convert_string_to_datetime(self):
         test_date = convert_string_to_datetime("2015-11-18")
         self.assertEqual(test_date, datetime(2015, 11, 18))
-
-        print "\n\nDatetime for 2015-11-18: %r" % test_date
 
     def test_calc_avg_star_rating(self):
         rating1 = Rating(rating_id=1, stars=4, comments="abc")
