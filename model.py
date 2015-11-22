@@ -306,8 +306,8 @@ class History(db.Model):
                                       order_by=rental_submission_date.desc())
 
     def __repr__(self):
-        return "<History history_id=%d, prod_id=%d, renter_user_id=%r, owner_rating_id=%r, renter_rating_id=%r, prod_rating_id=%r>" % (
-            self.history_id, self.prod_id, self.renter_user_id,
+        return "<History history_id=%d, prod_id=%d, rental_submit_date= %r, renter_user_id=%r, owner_rating_id=%r, renter_rating_id=%r, prod_rating_id=%r>" % (
+            self.history_id, self.prod_id, self.rental_submission_date, self.renter_user_id,
             self.owner_rating_id, self.renter_rating_id, self.prod_rating_id)
 
 

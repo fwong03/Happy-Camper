@@ -22,7 +22,7 @@
     {% if not products_available %}
         <p>None</p>
     {% else %}
-        <table border="1" cellpadding="5">
+        <table class="table" border="1" cellpadding="5">
             <tr>
                 <th>Category</th>
                 <th>Brand and Model</th>
@@ -75,48 +75,41 @@
     <br>
 
     <h3> Your Product Rental Histories</h3>
-    {% if not products_with_histories %}
+    {% if not desc_order_hist %}
         <p>You do not yet have a history of renting out products.</p>
     {% else %}
         <table border="1" cellpadding="5">
             <tr>
                 <th>Category</th>
                 <th>Brand and Model</th>
-                <th>Rental History</th>
+                 <th>Rental Submission Data</th>
+                <th>Rental Start Date</th>
+                <th>Rental End Date</th>
+                <th>Total Cost</th>
+                <th>email Renter</th>
+                <th>See Ratings of Renter</th>
+                <th>Rate Renter</th>
             </tr>
-                {% for product in products_with_histories %}
+                {% for history in desc_order_hist %}
                 <tr>
-                    <td>{{ product.category.cat_name }}</td>
-                    <td><a href="/product-detail/{{ product.prod_id }}">{{ product.brand.brand_name }} {{ product.model }}</a></td>
-                    <td>
-                        <table border="1" cellpadding="2">
-                            <tr>
-                                <th>Rental Submission Data</th>
-                                <th>Rental Dates</th>
-                                <th>Total Cost</th>
-                                <th>email Renter</th>
-                                <th>See Ratings of Renter</th>
-                                <th>Rate Renter</th>
-                            </tr>
-                            {% for history in product.histories %}
-                                <tr>
-                                    <td>{% if history.rental_submission_date > monthago %} <b>{{ history.rental_submission_date.date().isoformat() }}</b>
-                                        {% else %}{{ history.rental_submission_date.date().isoformat() }} {% endif %}
-                                    <td>{{ history.start_date.date().isoformat() }} to {{ history.end_date.date().isoformat() }}</td>
-                                    <td>${{ '{:,.2f}'.format(history.total_cost) }}</td>
-                                    <td><a href="mailto:{{ history.renter.email }}">{{ history.renter.email }}</a></td>
-                                    <td> <a href="/show-renter-ratings/{{ history.renter_user_id }}">Ratings of {{ history.renter.email }} 
-                                    </a></td>
-                                    <td>
-                                        {% if history.renter_rating_id %}
-                                            <p><i>Renter rating already submitted.</i></p>
-                                        {% else %}
-                                            <div id="{{ history.renter_user_id }}{{ history.history_id }}-rate-user-link"><a data-toggle="modal" data-target="#rating-modal" href="/rate-user-modal/{{ history.renter_user_id }}-{{ history.history_id }}-0">Rate Renter</a>
-                                            </div>
-                                        {% endif %}
-                                    </td>
-                            {% endfor %}
-                        </table>
+                    <td>{{ history.product.category.cat_name }}</td>
+                    <td><a href="/product-detail/{{ history.product.prod_id }}">{{ history.product.brand.brand_name }} {{ history.product.model }}</a></td>
+                    <td>{% if history.rental_submission_date > monthago %} <b>{{ history.rental_submission_date.date().isoformat() }}</b>
+                        {% else %} {{ history.rental_submission_date.date().isoformat() }} {% endif %}
+                    <td>{% if (history.start_date < monthfromnow) and (history.start_date > today) %} <b>{{ history.start_date.date().isoformat() }}</b>
+                        {% else %} {{ history.start_date.date().isoformat() }} {% endif %} </td>
+                    <td>{{ history.end_date.date().isoformat() }}</td>
+                    <td>${{ '{:,.2f}'.format(history.total_cost) }}</td>
+                    <td><a href="mailto:{{ history.renter.email }}">{{ history.renter.email }}</a></td>
+                    <td> <a href="/show-renter-ratings/{{ history.renter_user_id }}">Ratings of {{ history.renter.email }} </a></td>
+                    <td> {% if history.renter_rating_id %}
+                            <p><i>Renter rating already submitted.</i></p>
+                        {% else %}
+                            <div id="{{ history.renter_user_id }}{{ history.history_id }}-rate-user-link">
+                                <button type="button" class="btn btn-primary btn-small" data-toggle="modal" data-target="#rating-modal"href="/rate-user-modal/{{ history.renter_user_id }}-{{ history.history_id }}-0">Rate Renter</button>
+                            </div>
+                        {% endif %}
+                    </td>
                 {% endfor %}
         </table>
     {% endif %}
@@ -157,7 +150,7 @@
                                     <i>Owner rating already submitted.</i>
                                 {% else %}
                                 <div id="{{ history.product.owner_user_id }}{{ history.history_id }}-rate-user-link">
-                                    <a href="/rate-user-modal/{{ history.product.owner_user_id }}-{{ history.history_id }}-1" data-toggle="modal" data-target="#rating-modal">Rate Owner</a>
+                                    <button type="button" class="btn btn-primary btn-small" data-toggle="modal" data-target="#rating-modal" href="/rate-user-modal/{{ history.product.owner_user_id }}-{{ history.history_id }}-1">Rate Owner</button>
                                 </div>        
                                 {% endif %}
                             </li>
@@ -166,7 +159,8 @@
                                     <i>Product rating already submitted.</i>
                                 {% else %}
                                     <div id="{{ history.prod_id }}{{ history.history_id }}-rate-product-link">
-                                    <a href="/rate-product-modal/{{ history.prod_id }}-{{ history.history_id }}" data-toggle="modal" data-target="#rating-modal">Rate Product</a>
+                                        <button type="button" class="btn btn-primary btn-small" data-toggle="modal" data-target="#rating-modal" href="/rate-product-modal/{{ history.prod_id }}-{{ history.history_id }}">Rate Product</button>
+                                    </div>
                                 {% endif %}
                             </li>
                         </ul>

@@ -13,7 +13,7 @@ from make_update_helpers import make_user, check_brand, make_parent_product
 from make_update_helpers import make_tent, make_sleeping_bag, make_sleeping_pad
 from make_update_helpers import update_parent_product, update_tent
 from make_update_helpers import update_sleeping_bag, update_sleeping_pad
-from make_update_helpers import calc_avg_star_rating
+from make_update_helpers import calc_avg_star_rating, reverse_merge_sort_histories
 from search_helpers import search_radius, get_users_in_area, filter_products
 from search_helpers import get_products_within_dates, categorize_products
 from search_helpers import calc_default_dates, convert_string_to_datetime
@@ -133,24 +133,34 @@ def show_account():
     products_all = Product.query.filter(Product.owner_user_id == customer.user_id).all()
     products_avail = []
     products_out = []
-    products_histories = set([])
+
+    product_history_lists = []
+    product_histories = []
 
     for product in products_all:
         if product.histories:
-            products_histories.add(product)
+            product_history_lists.append(product.histories)
         if product.available:
             products_avail.append(product)
         else:
             products_out.append(product)
 
+    for history_list in product_history_lists:
+        for history in history_list:
+            product_histories.append(history)
+
+    desc_date_histories = reverse_merge_sort_histories(product_histories)
+
     rentals = History.query.filter(History.renter_user_id == customer.user_id).all()
-    last30 = datetime.today() - timedelta(days=30)
+    last30 = today_date - timedelta(days=30)
+    next30 = today_date + timedelta(days=30)
 
     return render_template("account-info.html", user=customer, state=st,
                            products_available=products_avail,
                            products_not_available=products_out,
-                           products_with_histories=products_histories,
-                           histories=rentals, today=today_date, monthago=last30)
+                           desc_order_hist=desc_date_histories,
+                           histories=rentals, today=today_date, monthago=last30,
+                           monthfromnow=next30)
 
 
 @app.route('/confirm-deactivate-account')
