@@ -124,6 +124,7 @@ def load_products():
         date2 = row[7]
         dollarz = float(row[8])
         image = row[9]
+        avail = int(row[10])
 
         date1 = datetime.strptime(date1, "%Y-%m-%d")
         date2 = datetime.strptime(date2, "%Y-%m-%d")
@@ -131,7 +132,7 @@ def load_products():
         a = Product(cat_id=category, brand_id=brand, owner_user_id=owner,
                     model=mname, condition=con, description=desc,
                     avail_start_date=date1, avail_end_date=date2,
-                    price_per_day=dollarz, image_url=image)
+                    price_per_day=dollarz, image_url=image, available=avail)
 
         db.session.add(a)
 
@@ -281,28 +282,33 @@ def load_histories():
 
         product = int(row[0])
         renter = int(row[1])
-        date1 = row[2]
-        date2 = row[3]
-        cost = float(row[4])
+        rental_submit_date = row[2]
+        rental_start_date = row[3]
+        rental_end_date = row[4]
+        cost = float(row[5])
 
         try:
-            owner_rate = int(row[5])
+            owner_rate = int(row[6])
         except ValueError:
             owner_rate = None
         try:
-            renter_rate = int(row[6])
+            renter_rate = int(row[7])
         except ValueError:
             renter_rate = None
         try:
-            prod_rate = int(row[7])
+            prod_rate = int(row[8])
         except ValueError:
             prod_rate = None
 
-        date1 = datetime.strptime(date1, "%Y-%m-%d")
-        date2 = datetime.strptime(date2, "%Y-%m-%d")
+        rental_submit_date = datetime.strptime(rental_submit_date, "%Y-%m-%d")
+        rental_start_date = datetime.strptime(rental_start_date, "%Y-%m-%d")
+        rental_end_date = datetime.strptime(rental_end_date, "%Y-%m-%d")
 
-        a = History(prod_id=product, renter_user_id=renter, start_date=date1,
-                    end_date=date2, total_cost=cost, owner_rating_id=owner_rate,
+        a = History(prod_id=product, renter_user_id=renter,
+                    rental_submission_date=rental_submit_date,
+                    start_date=rental_start_date,
+                    end_date=rental_end_date, total_cost=cost,
+                    owner_rating_id=owner_rate,
                     renter_rating_id=renter_rate, prod_rating_id=prod_rate)
 
         db.session.add(a)

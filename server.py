@@ -5,7 +5,7 @@ from jinja2 import StrictUndefined
 from flask import Flask, render_template, redirect, request, flash, session
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.orm.exc import NoResultFound
-from datetime import datetime
+from datetime import datetime, timedelta
 from model import connect_to_db, db, User, Region, Product, Tent, SleepingBag
 from model import SleepingPad, BestUse, Brand, History, Category, Rating, Gender
 from model import FillType, PadType
@@ -144,12 +144,13 @@ def show_account():
             products_out.append(product)
 
     rentals = History.query.filter(History.renter_user_id == customer.user_id).all()
+    last30 = datetime.today() - timedelta(days=30)
 
     return render_template("account-info.html", user=customer, state=st,
                            products_available=products_avail,
                            products_not_available=products_out,
                            products_with_histories=products_histories,
-                           histories=rentals, today=today_date)
+                           histories=rentals, today=today_date, monthago=last30)
 
 
 @app.route('/confirm-deactivate-account')

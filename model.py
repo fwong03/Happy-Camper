@@ -3,6 +3,7 @@
 # October 27, 2015
 
 from flask_sqlalchemy import SQLAlchemy
+import datetime
 
 db = SQLAlchemy()
 
@@ -283,6 +284,7 @@ class History(db.Model):
                         nullable=False)
     renter_user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'),
                                nullable=False)
+    rental_submission_date = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now())
     start_date = db.Column(db.DateTime, nullable=False)
     end_date = db.Column(db.DateTime, nullable=False)
     total_cost = db.Column(db.Float, nullable=False)
@@ -293,9 +295,15 @@ class History(db.Model):
     prod_rating_id = db.Column(db.Integer, db.ForeignKey('ratings.rating_id'))
 
     # http://docs.sqlalchemy.org/en/latest/orm/join_conditions.html
-    owner_rating = db.relationship('Rating', foreign_keys='History.owner_rating_id', backref='ohistory')
-    renter_rating = db.relationship('Rating', foreign_keys='History.renter_rating_id', backref='rhistory')
-    product_rating = db.relationship('Rating', foreign_keys='History.prod_rating_id', backref='phistory')
+    owner_rating = db.relationship('Rating', foreign_keys='History.owner_rating_id',
+                                    backref='ohistory',
+                                    order_by=rental_submission_date.desc())
+    renter_rating = db.relationship('Rating', foreign_keys='History.renter_rating_id',
+                                     backref='rhistory',
+                                     order_by=rental_submission_date.desc())
+    product_rating = db.relationship('Rating', foreign_keys='History.prod_rating_id',
+                                      backref='phistory',
+                                      order_by=rental_submission_date.desc())
 
     def __repr__(self):
         return "<History history_id=%d, prod_id=%d, renter_user_id=%r, owner_rating_id=%r, renter_rating_id=%r, prod_rating_id=%r>" % (

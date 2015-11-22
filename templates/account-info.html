@@ -74,7 +74,7 @@
     {% endif %}
     <br>
 
-    <h3>Your Product Rental Histories</h3>
+    <h3> Your Product Rental Histories</h3>
     {% if not products_with_histories %}
         <p>You do not yet have a history of renting out products.</p>
     {% else %}
@@ -91,6 +91,7 @@
                     <td>
                         <table border="1" cellpadding="2">
                             <tr>
+                                <th>Rental Submission Data</th>
                                 <th>Rental Dates</th>
                                 <th>Total Cost</th>
                                 <th>email Renter</th>
@@ -99,9 +100,11 @@
                             </tr>
                             {% for history in product.histories %}
                                 <tr>
+                                    <td>{% if history.rental_submission_date > monthago %} <b>{{ history.rental_submission_date.date().isoformat() }}</b>
+                                        {% else %}{{ history.rental_submission_date.date().isoformat() }} {% endif %}
                                     <td>{{ history.start_date.date().isoformat() }} to {{ history.end_date.date().isoformat() }}</td>
                                     <td>${{ '{:,.2f}'.format(history.total_cost) }}</td>
-                                    <td><a href="mailto:{{ history.renter.email }}">email renter: {{ history.renter.email }}</a></td>
+                                    <td><a href="mailto:{{ history.renter.email }}">{{ history.renter.email }}</a></td>
                                     <td> <a href="/show-renter-ratings/{{ history.renter_user_id }}">Ratings of {{ history.renter.email }} 
                                     </a></td>
                                     <td>
@@ -148,7 +151,7 @@
                     </td>
                     <td> 
                         <ul>
-                            <li><a href="mailto:{{ history.product.owner.email }}">Send owner an email</a></li>
+                            <li><a href="mailto:{{ history.product.owner.email }}"></a></li>
                             <li> 
                                 {% if history.owner_rating_id %}
                                     <i>Owner rating already submitted.</i>
