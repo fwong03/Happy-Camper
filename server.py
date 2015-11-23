@@ -199,16 +199,16 @@ def deactivate_account():
 
 
 ######################## Listing stuff ###################################
-@app.route('/list-item-choices')
-def list_item():
-    """List an item page.
+# @app.route('/list-item-choices')
+# def list_item():
+#     """List an item page.
 
-    Routes from signed in homepage, which has a button to List an Item.
-    Routes to item detail page.
-    """
-    all_categories = Category.query.all()
+#     Routes from signed in homepage, which has a button to List an Item.
+#     Routes to item detail page.
+#     """
+#     all_categories = Category.query.all()
 
-    return render_template("list-item-choices.html", categories=all_categories)
+#     return render_template("list-item-choices.html", categories=all_categories)
 
 
 @app.route('/list-product/<int:category_id>')

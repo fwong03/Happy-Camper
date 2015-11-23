@@ -4,20 +4,46 @@
 
 {% block content %}
 
-    <h4><b>Your options are the following:</b></h4>
-    <ul>
-        <li><a href="/list-item-choices"><b>List an item</b></a></li><br>
+<div class="container">
+    
+    <div class="row row-centered">
+      <div class="col-xs-2 col-centered"></div>
 
-        <form action="/search-results">
-            <li><b>Search for gear:</b></li>
-                <p><b>(1)</b> Enter search center and search radius:</P>
-                    City and state and/or zipcode: <input type="text" size="32" value={{ user.postalcode }} name="search_area"><br>
-                 <br>
-                    Search radius (miles): <input type="text" size="4" value="20" name="search_miles"><br>
-                <p><b>(2)</b> Dates of interest (format YYYY-mm-dd):</p>
-                        Start Date: <input type="text" size="10" value ={{ today }} name="search_start_date">
-                        End Date: <input type="text" size="10" value ={{ future }} name="search_end_date"><br>
-                <p><b>(3)</b> Category and/or brand (optional):</p>
+      <div class="col-xs-8 col-centered">
+        <div class="dropdown">
+          <button class="btn btn-default btn-lg dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">List Stuff<span class="caret"></span></button>
+          <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+            {% for category in product_categories %}
+              <li><a href="/list-product/{{ category.cat_id }}">{{ category.cat_name }}</a></li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+        <div class="col-xs-2 col-centered"></div>
+    </div>
+
+     <div class="row row-centered">
+      <div class="col-xs-2 col-centered"></div>
+        <div class="col-xs-8 col-centered"><div class="landing-page-choice"><br>-- or --</div></div>
+        <div class="col-xs-2 col-centered"></div>
+    </div>
+    <br>
+
+    
+    <div class="row row-centered">
+      <div class="col-xs-2 col-centered"></div>
+        <div class="col-xs-8 col-centered"><form action="/search-results" id="search-form">
+            <div class="landing-page-choice">Find Stuff:</div>
+            <br>
+              Search center (city and state or zipcode):<br>
+                <input type="text" size="15" value={{ user.postalcode }} name="search_area"><br>
+              <br>
+              Distance (miles):<br>
+                <input type="text" size="4" value="20" name="search_miles"><br><br>
+               Dates of interest (format YYYY-mm-dd):<br><br>
+                  Start Date: <input type="text" size="10" value ={{ today }} name="search_start_date">
+                  End Date: <input type="text" size="10" value ={{ future }} name="search_end_date"><br><br>
+                Optional: Filter by category and/or brand<br>
                     Category    <select name="category_id">     
                         <option value="-1">Any</option>
                           {% for category in product_categories %}
@@ -32,7 +58,11 @@
                           {% endfor %}
                         </select>
                         <br><br>
-                <input type="submit" value="Search for Gear">
-    </ul>
+                <input type="submit" value="Search for Gear"></a></div>
+        <div class="col-xs-2 col-centered"></div>
+    </div>
+</div>
+
+    
 
 {% endblock %}

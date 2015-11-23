@@ -11,12 +11,10 @@
         <p><b>Address: </b> {{ user.street }}, {{ user.city }}, {{ state }} {{ user.postalcode }}</p>
         <p><b>Phone: </b> {{ phonenum }}</p>
         <p><b>email: </b> {{ user.email }}</p>
-        <p><b>Actions available: </b>
-        <ul>
-            <li><a href="/confirm-deactivate-account">Deactivate your account</a></li>
+        <p><b>Actions available: <a href="/confirm-deactivate-account">Deactivate your account</a></li>
     <br>
-    --------------------------------
     <br>
+
     <h3>Your Inventory Part 1: Stuff you have available for rent</h3>
     {% if not products_available %}
         <p>None</p>
@@ -104,7 +102,7 @@
                     <td> {% if history.renter_rating_id %}
                             <p><i>Renter rating already submitted.</i></p>
                         {% else %}
-                            <div id="{{ history.renter_user_id }}{{ history.history_id }}-rate-user-link">
+                            <div class="rate-button" id="{{ history.renter_user_id }}{{ history.history_id }}-rate-user-link">
                                 <button type="button" class="btn btn-primary btn-small" data-toggle="modal" data-target="#rating-modal"href="/rate-user-modal/{{ history.renter_user_id }}-{{ history.history_id }}-0">Rate Renter</button>
                             </div>
                         {% endif %}

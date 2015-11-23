@@ -1,0 +1,58 @@
+body {
+  background-image: url("/static/img/light_grey.png");
+  background-repeat: repeat;
+  color: #262626;
+}
+
+input {
+  text-align: center;
+  color: #262626;
+  font-size: 80%;
+}
+
+select {
+  color: #262626;
+  font-size: 80%;
+}
+
+
+input {
+  text-align: center;
+  color: #262626;
+}
+
+
+.navbar-default .navbar-brand {
+    font-size: 100%;
+}
+
+.row .row-centered {
+    text-align:center;
+}
+.col-centered {
+    display:inline-block;
+    float:none;
+    /* reset the text-align */
+    text-align:center;
+    /* inline-block space fix */
+    margin-right:-4px;
+}
+.landing-page-choice {
+    font-size: 130%;
+}
+
+.dropdown-menu {
+  left: 50%;
+  right: auto;
+  text-align: center;
+  transform: translate(-50%, 0);
+}
+
+.btn{
+  background-color: #909899;
+}
+
+
+#search-form{
+  font-size: 125%
+  }
