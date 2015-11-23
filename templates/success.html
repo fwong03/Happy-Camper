@@ -4,14 +4,14 @@
 
 {% block content %}
 
-<div class="container">
+<div class="container-fluid">
     
     <div class="row row-centered">
       <div class="col-xs-2 col-centered"></div>
 
       <div class="col-xs-8 col-centered">
         <div class="dropdown">
-          <button class="btn btn-default btn-lg dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">List Stuff<span class="caret"></span></button>
+          <button class="btn btn-default btn-xlarge dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><b>List Stuff</b><span class="caret"></span></button>
           <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
             {% for category in product_categories %}
               <li><a href="/list-product/{{ category.cat_id }}">{{ category.cat_name }}</a></li>
@@ -21,10 +21,11 @@
       </div>
         <div class="col-xs-2 col-centered"></div>
     </div>
+    <br>
 
      <div class="row row-centered">
       <div class="col-xs-2 col-centered"></div>
-        <div class="col-xs-8 col-centered"><div class="landing-page-choice"><br>-- or --</div></div>
+        <div class="col-xs-8 col-centered"><div class="landing-page-choice"><i>-- or --</i></div></div>
         <div class="col-xs-2 col-centered"></div>
     </div>
     <br>
@@ -32,32 +33,53 @@
     
     <div class="row row-centered">
       <div class="col-xs-2 col-centered"></div>
-        <div class="col-xs-8 col-centered"><form action="/search-results" id="search-form">
-            <div class="landing-page-choice">Find Stuff:</div>
-            <br>
-              Search center (city and state or zipcode):<br>
-                <input type="text" size="15" value={{ user.postalcode }} name="search_area"><br>
-              <br>
-              Distance (miles):<br>
-                <input type="text" size="4" value="20" name="search_miles"><br><br>
-               Dates of interest (format YYYY-mm-dd):<br><br>
-                  Start Date: <input type="text" size="10" value ={{ today }} name="search_start_date">
-                  End Date: <input type="text" size="10" value ={{ future }} name="search_end_date"><br><br>
-                Optional: Filter by category and/or brand<br>
-                    Category    <select name="category_id">     
-                        <option value="-1">Any</option>
-                          {% for category in product_categories %}
-                            <option value="{{ category.cat_id }}">{{ category.cat_name }}</option>
-                          {% endfor %}
-                    </select>
-                     Brand 
-                        <select name="brand_id">
-                            <option value="-1">Any</option>
-                          {% for brand in product_brands %}
-                            <option value="{{ brand.brand_id }}">{{ brand.brand_name }}</option>
-                          {% endfor %}
-                        </select>
-                        <br><br>
+      <div class="col-xs-8 col-centered"><div class="landing-page-choice"><b>Find Stuff</b></div></div>
+      <div class="col-xs-2 col-centered"></div>
+    </div>
+    <br>
+    <br>
+    <div class="row row-centered">
+      <div class="col-xs-2 col-centered"></div>
+      <div class="col-xs-8 col-centered">
+        <form action="/search-results" id="search-form">
+          <table class="table search-form-table">
+            <tr>
+            <td>Search center (city and state or zipcode):</td>
+            <td><input type="text" size="15" value="{{ user.postalcode }}" name="search_area"></td>
+            </tr>
+            <tr>
+            <td>Distance (miles):</td>
+            <td><input type="text" size="4" value="20" name="search_miles"></td>
+            </tr>
+            <tr>
+            <td>Start Date (yyyy-mm-dd):</td>
+            <td><input type="text" size="10" value ={{ today }} name="search_start_date"></td>
+            </tr>
+            <tr>
+            <td>End Date (yyyy-mm-dd):</td>
+            <td><input type="text" size="10" value ={{ future }} name="search_end_date"></td>
+           </tr>
+            <tr>
+            <td>Optional: Filter by category:</td>
+            <td><select name="category_id">     
+                <option value="-1">Any</option>
+                {% for category in product_categories %}
+                <option value="{{ category.cat_id }}">{{ category.cat_name }}</option>
+                {% endfor %}
+                </select>
+            </td>
+            </tr>
+            <tr>
+            <td>Optional: Filter by brand:</td>
+            <td><select name="brand_id">
+                <option value="-1">Any</option>
+                {% for brand in product_brands %}
+                <option value="{{ brand.brand_id }}">{{ brand.brand_name }}</option>
+                {% endfor %}
+                </select>
+            </td>
+            </tr>
+          </table>
                 <input type="submit" value="Search for Gear"></a></div>
         <div class="col-xs-2 col-centered"></div>
     </div>

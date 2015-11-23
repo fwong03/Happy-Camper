@@ -3,36 +3,51 @@
 {% block title %}Search Results{% endblock %}
 
 {% block content %}
-    <h4><b>Search Results</b></h4>
-    Current Search: Location: {{ location }} || Search radius: {{ miles }} miles || Dates: {{ session['search_start_date'].date().isoformat() }} to {{ session['search_end_date'].date().isoformat() }}
-    <br>----------------------------------------
+    <div class="container">
+        <div class="row row-centered">
+            <div class="col-xs-2 col-centered"></div>
+            <div class="col-xs-8 col-centered"><div class="landing-page-choice">Search Results</div></div>
+            <div class="col-xs-2 col-centered"></div>
+        </div>
 
-    <form action="/search-results">
-
-    <br>Modify Search:
-    <ul>
-        <li>Search center: <input type="text" size="20" value={{ session['search_area'] }} name="search_area"> Search radius (miles): <input type="text" size="4" value="{{ session['search_radius'] }}" name="search_miles"></li>
-        <li>Search dates (YYYY-mm-dd): Start Date: <input type="text" size="10" value ={{ session['search_start_date'].date().isoformat() }} name="search_start_date">
-            End Date: <input type="text" size="10" value ={{ session['search_end_date'].date().isoformat()  }} name="search_end_date">
-        </li>
-        <li>Category: 
-            <select name="category_id">     
-                <option value="-1">Any</option>
-              {% for category in product_categories %}
-                <option value="{{ category.cat_id }}">{{ category.cat_name }}</option>
-              {% endfor %}
-            </select>
-            
-            Brand: 
-            <select name="brand_id">
-                <option value="-1">Any</option>
-              {% for brand in product_brands %}
-                <option value="{{ brand.brand_id }}">{{ brand.brand_name }}</option>
-              {% endfor %}
-            </select></li>
-    </ul>
-
-    <input type="submit" value="Search Again">
+        <div class="row">
+            <div class="col-xs-12 col-centered">
+              Current Search: Location: {{ location }} || Search radius: {{ miles }} miles || Dates: {{ session['search_start_date'].date().isoformat() }} to {{ session['search_end_date'].date().isoformat() }}
+            </div>
+        </div>
+        <div class="row search-form-table">
+            <div class="col-xs-12">
+            <form action="/search-results">
+                <br>Modify Search:
+                <ul>
+                <li>Search center: <input type="text" size="20" value={{ session['search_area'] }} name="search_area"> Search radius (miles): <input type="text" size="4" value="{{ session['search_radius'] }}" name="search_miles"></li>
+                <li>Start Date: <input type="text" size="10" value ={{ session['search_start_date'].date().isoformat() }} name="search_start_date">
+                    End Date: <input type="text" size="10" value ={{ session['search_end_date'].date().isoformat()  }} name="search_end_date">
+                </li>
+                <li>Category: 
+                    <select name="category_id">     
+                        <option value="-1">Any</option>
+                        {% for category in product_categories %}
+                        <option value="{{ category.cat_id }}">{{ category.cat_name }}</option>
+                        {% endfor %}
+                    </select>
+                Brand: 
+                <select name="brand_id">
+                    <option value="-1">Any</option>
+                    {% for brand in product_brands %}
+                    <option value="{{ brand.brand_id }}">{{ brand.brand_name }}</option>
+                    {% endfor %}
+                </select></li>
+                </ul>
+            </div>
+        </div>
+     <div class="row row-centered search-form-table">
+        <div class="col-xs-2"></div>
+        <div class="col-xs-4">
+            <input type="submit" value="Search Again">
+        </div>
+        <div class="col-xs-6"></div>
+    </div>
 
     {% for category in search_categories %}
     <h3>{{ category }}</h3>

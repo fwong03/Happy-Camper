@@ -5,22 +5,26 @@ body {
 }
 
 input {
-  text-align: center;
+/*  text-align: center;*/
   color: #262626;
-  font-size: 80%;
+/*  font-size: 80%;*/
 }
 
 select {
   color: #262626;
-  font-size: 80%;
+/*  font-size: 80%;*/
 }
 
-
-input {
-  text-align: center;
+.search-form-table {
+  background-image: url("/static/img/gray_jean.png");
+  background-repeat: repeat;
   color: #262626;
+
 }
 
+.modify-search {
+  line-height: 30px
+}
 
 .navbar-default .navbar-brand {
     font-size: 100%;
@@ -38,7 +42,7 @@ input {
     margin-right:-4px;
 }
 .landing-page-choice {
-    font-size: 130%;
+    font-size: 25px;
 }
 
 .dropdown-menu {
@@ -50,9 +54,20 @@ input {
 
 .btn{
   background-color: #909899;
+  color: white;
 }
 
+.btn-xlarge {
+    padding: 18px 28px;
+    font-size: 22px; 
+    line-height: normal;
+    -webkit-border-radius: 8px;
+       -moz-border-radius: 8px;
+            border-radius: 8px;
+}
 
-#search-form{
-  font-size: 125%
+#search-form {
+  font-size: 115%
   }
+
+ 
