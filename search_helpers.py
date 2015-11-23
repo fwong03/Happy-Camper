@@ -9,8 +9,17 @@ import os
  # Seven function total
 
 def search_radius(search_center, postalcodes, radius):
-    """Takes in search center as a string, postalcodes as a list of tuples,
-        and search radius in miles as an int. The function returns the list of
+    """ Finds zipcodes in the database that are within a search radius of a
+        location.
+        These zipcodes are then returned so we can find users with those zipcodes
+        and display their products in search results.
+
+        This uses the python library geolocation-python, which uses the
+        GoogleMaps API.
+
+        Takes in search center as a string, postalcodes as a list of tuples
+        (because that is the format returned from the database), and search
+        radius in miles as an int. The function returns the list of
         postal codes in the given list that are within the given radius.
 
     """
@@ -63,8 +72,12 @@ def search_radius(search_center, postalcodes, radius):
 
 
 def get_users_in_area(postal_codes, user_id):
-    """Returns a list of users that live within a given list of postal codes.
-    Takes searching user out"""
+    """Finds users in the database that live in one of the given zipcodes.
+
+        (Here I also passed in the use_id to make it easier to test. This was before
+        Jackie showed me how to set cookies in tests.)
+
+    t"""
 
     users_in_area = User.query.filter(User.postalcode.in_(postal_codes)).all()
     logged_in_user = User.query.get(user_id)
@@ -76,8 +89,10 @@ def get_users_in_area(postal_codes, user_id):
 
 
 def filter_products(products, category_id, brand_id):
-    """Takes in list of products, category_id as int and brand_id as int and
-        returns products with those category and brand IDs.
+    """ Filters a given list of products for a given category and brand.
+
+        Takes in list of products, category_id as int and brand_id as integers
+        and returns a list of products.
     """
 
     if category_id < 0 and brand_id < 0:
@@ -102,7 +117,9 @@ def filter_products(products, category_id, brand_id):
 
 
 def get_products_within_dates(start_date, end_date, users):
-    """Takes in list of User objects and returns a list of Product objects
+    """Finds products that are available within a given date range.
+
+        Takes in list of users and returns a list of products
         those users have available for rent within the specified start and
         end dates (inclusive).
 
@@ -120,8 +137,10 @@ def get_products_within_dates(start_date, end_date, users):
 
 
 def categorize_products(categories, products):
-    """Takes in lists of Category and Product objects and returns dictionary of
-        Products objects organized by category name.
+    """Organizes products by categories.
+
+        Takes in lists of Category and Product objects and returns dictionary of
+        Products objects with category names as keys.
 
     """
     inventory = {}
@@ -136,12 +155,15 @@ def categorize_products(categories, products):
 
 
 def calc_default_dates(deltadays):
-    """Takes an integer and returns two datetimes and two strings:
+    """Calculates default dates to pre-populate the search area.
+
+        Takes an integer and returns two datetimes and two strings:
             today: datetime of today
             future: datetime of today plus the number of days
             today_string': string version of 'today' in isoformat and of date
                        only ('yyyy-mm-dd')
             future_string: datetime object of future, isoformat and date only
+
     """
     dates = {}
     today = datetime.today()
@@ -156,8 +178,11 @@ def calc_default_dates(deltadays):
 
 
 def convert_string_to_datetime(date_string):
-    """Takes in date as string in format "yyyy-mm-dd" (e.g. "2015-11-04"
+    """Converts the date supplied as a string on an HTML form into a datetime.
+
+        Takes in date as string in format "yyyy-mm-dd" (e.g. "2015-11-04"
         for November 4, 2015) and returns datetime object.
+
     """
 
     date = datetime.strptime(date_string, "%Y-%m-%d")

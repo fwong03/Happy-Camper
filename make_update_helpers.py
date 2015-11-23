@@ -11,7 +11,12 @@ from datetime import datetime
 
 ######################## User stuff ###################################
 def make_user(password):
-    """Create User object. Called by route /handle-createaccount"""
+    """Creates User object. Called by route /handle-create-account.
+
+        Takes in a password as a string then grabs info from the create account
+        form to create and return a User.
+
+    """
 
     firstname = request.form.get('firstname')
     lastname = request.form.get('lastname')
@@ -35,11 +40,12 @@ def make_user(password):
 
 ######################## Listing stuff ###################################
 def check_brand(brand_id):
-    """Takes int brand_id and returns int brand_id.
+    """Checks if a brand exists in the database, if not it creates it.
 
-        Check if need to add a new brand to database. If given brand_id is
-        less than zero, it makes a new brand and returns the brand_id of that
-        newly created brand.
+        Takes integer brand_id (which will be -1 if it is a new brand),
+        and returns integer brand_id (which, for a new brand, will be the
+        brand_id for the newly created Brand object).
+
     """
 
     if brand_id < 0:
@@ -53,7 +59,9 @@ def check_brand(brand_id):
 
 
 def make_brand(brandname):
-    """Adds a new brand to the database."""
+    """Adds a new brand to the database. This is called by the check_brand
+        function above if a new brand needs to be added to the database.
+    """
 
     brand = Brand(brand_name=brandname)
 
@@ -62,17 +70,19 @@ def make_brand(brandname):
 
 
 def get_brand_id(brandname):
-    """Takes brand name as a string and returns brand id as an integer"""
+    """Takes brand name as a string and returns brand_id as an integer"""
 
     brand = Brand.query.filter(Brand.brand_name == brandname).one()
     return brand.brand_id
 
 
 def make_parent_product(brand_id, category_id):
-    """Takes ints brand_id and category_id and returns Product object.
+    """Makes a parent Product object. Need to do this first before creating
+        child Tent, SleepingBag, or SleepingPad objects.
 
-    Will take a listing form submission to make a parent Product object.
-    Make this before a child (e.g. Tent, Sleeping Bag) object.
+        Takes two integers, brand_id and category_id, grabs info from the
+        listing form, and returns Product object.
+
     """
 
     modelname = request.form.get("modelname")
@@ -104,7 +114,9 @@ def make_parent_product(brand_id, category_id):
 
 
 def make_tent(product_id):
-    """Make child tent object given the corresponding product ID.
+    """Makes a child Tent object given the corresponding parent Product ID.
+
+        Grabs info from the list-tent form.
 
     """
     best_use_id = int(request.form.get("bestuse"))
@@ -141,7 +153,9 @@ def make_tent(product_id):
 
 
 def make_sleeping_bag(product_id):
-    """Make child sleeping bag object given the corresponding product ID.
+    """Make child sleeping bag object given the corresponding parent Product ID.
+
+        Grabs info from the list-sleeping-bag form.
 
     """
     filltype = request.form.get("filltype")
@@ -166,7 +180,9 @@ def make_sleeping_bag(product_id):
 
 
 def make_sleeping_pad(product_id):
-    """Make child sleeping pad object given the corresponding product ID.
+    """Make child sleeping pad object given the corresponding parent Product ID.
+
+        Grabs info from the list-sleeping-pad form.
 
     """
     padtype = request.form.get("padtype")
@@ -191,7 +207,10 @@ def make_sleeping_pad(product_id):
 
 ###################### Editing stuff ################################
 def update_parent_product(prod_id, brand_id):
-    """Takes ints brand_id and category_id and updates Product object.
+    """Updates parent Product attributes.
+
+    Takes integers brand_id and category_id, and uses info from the edit form
+    to update the parent Product.
 
     """
 
@@ -223,7 +242,10 @@ def update_parent_product(prod_id, brand_id):
 
 
 def update_tent(prod_id):
-    """Update tent object given product id"""
+    """Update tent object given parent Product id.
+
+        Grabs info from the category-specific area of the edit item form.
+    """
 
     tent = Tent.query.get(prod_id)
 
@@ -264,7 +286,11 @@ def update_tent(prod_id):
 
 
 def update_sleeping_bag(prod_id):
-    """Update sleeping bag object given product id"""
+    """Update sleeping bag object given parent Product id.
+
+        Grabs info from the category-specific area of the edit item form.
+
+    """
 
     sleeping_bag = SleepingBag.query.get(prod_id)
 
@@ -325,10 +351,13 @@ def update_sleeping_pad(prod_id):
                                                    sleeping_pad.r_value)
     return
 
-# This is not related to making or updating objects. Threw it in here because
-# it is the only rating-related helper function.
+
+# These are not related to making or updating objects. Just threw them in here.
 def calc_avg_star_rating(ratings):
-    """Takes a list of ratings and returns average star rating as a
+    """Calculates average star rating to one decimal point to display one
+        show-user and show-product-ratings templates.
+
+        Takes a list of ratings and returns average star rating as a
         float. If no star ratings, returns -1.
 
     """
@@ -394,63 +423,59 @@ def calc_avg_star_rating(ratings):
 #             lst2_index += 1
 
 #         return lst
-#     else:
-#         return lst
+
 
 def reverse_merge_sort_histories(lst):
-    """Reverses histories by rental_sumbission date.
+    """Reverses histories by rental_sumbission date for display on a user's
+        acount-info page.
 
-        Takes in list of product histories and returns a list of histories.
+        Takes in list of more than one product histories (filtered in server.py)
+        and returns a list of ordered histories.
 
     """
-
-    print "calling reverse merge sort on ", lst
 
     if len(lst) > 1:
         midpt = int(len(lst) / 2)
         lst1 = lst[:midpt]
         lst2 = lst[midpt:]
 
-        print "lst1", lst1
-        print "lst2", lst2
-
+        # Recursively split the lists in half. Degenerate case is list of
+        # single items.
         reverse_merge_sort_histories(lst1)
         reverse_merge_sort_histories(lst2)
 
+        # Function will continue here when the recrusive splits complete
         lst1_index = 0
         lst2_index = 0
+        # Use below to write over the list passed in as a parameter
         ordered_lst_index = 0
 
+        # Loop through histories in each of the lists and compare which has a later
+        # rental sumbission date. The history with the later rental submission
+        # date is added first.
         while lst1_index < len(lst1) and lst2_index < len(lst2):
-            print "ordered_lst_index: %d" % ordered_lst_index
-            print "lst1_index %d" % lst1_index
-            print "lst2_index %d" % lst2_index
 
             if lst1[lst1_index].rental_submission_date > lst2[lst2_index].rental_submission_date:
                 lst[ordered_lst_index] = lst1[lst1_index]
-                print "adding %r to ordered_lst" % lst1[lst1_index]
                 lst1_index += 1
             else:
                 lst[ordered_lst_index] = lst2[lst2_index]
-                print "adding %r to ordered_lst" % lst2[lst2_index]
                 lst2_index += 1
 
             ordered_lst_index += 1
 
+        # If one list is longer than the other, we add all its histories to
+        # the end of the list.
         while lst1_index < len(lst1):
             lst[ordered_lst_index] = lst1[lst1_index]
-            print "adding %r to ordered_lst" % lst1[lst1_index]
             ordered_lst_index += 1
             lst1_index += 1
 
         while lst2_index < len(lst2):
             lst[ordered_lst_index] = lst2[lst2_index]
-            print "adding %r to ordered_lst" % lst2[lst2_index]
             ordered_lst_index += 1
             lst2_index += 1
 
-        return lst
-    else:
         return lst
 
 

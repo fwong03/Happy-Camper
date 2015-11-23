@@ -150,7 +150,10 @@ def show_account():
         for history in history_list:
             product_histories.append(history)
 
-    desc_date_histories = reverse_merge_sort_histories(product_histories)
+    if len(product_histories) > 1:
+        desc_date_histories = reverse_merge_sort_histories(product_histories)
+    else:
+        desc_date_histories = product_histories
 
     rentals = History.query.filter(History.renter_user_id == customer.user_id).all()
     last30 = today_date - timedelta(days=30)
