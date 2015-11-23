@@ -452,3 +452,28 @@ def reverse_merge_sort_histories(lst):
         return lst
     else:
         return lst
+
+
+def format_phone_number(phonenumber):
+    """Formats phone number in (xxx) yyy-zzzz format
+        Takes in int and returns string.
+    """
+    phonenumber = str(phonenumber)
+    pretty_phone_num = "("
+
+    for idx in range(0, 3):
+        pretty_phone_num += phonenumber[idx]
+
+    pretty_phone_num += ") "
+
+    for idx in range(3, 6):
+        pretty_phone_num += phonenumber[idx]
+
+    pretty_phone_num += "-"
+
+    for idx in range(6, 10):
+        pretty_phone_num += phonenumber[idx]
+
+    return pretty_phone_num
+
+

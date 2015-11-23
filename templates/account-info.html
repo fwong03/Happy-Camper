@@ -9,16 +9,15 @@
     <h3>Contact Info</h3>
         <p><b>Name: </b>{{ user.fname }} {{ user.lname }}</p>
         <p><b>Address: </b> {{ user.street }}, {{ user.city }}, {{ state }} {{ user.postalcode }}</p>
-        <p><b>Phone: </b> {{ user.phone }}</p>
+        <p><b>Phone: </b> {{ phonenum }}</p>
         <p><b>email: </b> {{ user.email }}</p>
         <p><b>Actions available: </b>
         <ul>
-            <li>Edit account (not yet implemented)</li>
             <li><a href="/confirm-deactivate-account">Deactivate your account</a></li>
     <br>
     --------------------------------
     <br>
-    <h3>Items Currently Available for Rent</h3>
+    <h3>Your Inventory Part 1: Stuff you have available for rent</h3>
     {% if not products_available %}
         <p>None</p>
     {% else %}
@@ -49,7 +48,7 @@
     {% endif %}
     <br>
 
-    <h3>Items Currently Unavailable for Rent</h3>
+    <h3>Your Inventory Part 2: Stuff you have listed in the past but are no longer available for rent (delisted or maybe recently rented)</h3>
     {% if not products_not_available %}
         <p>None</p>
     {% else %}
@@ -74,15 +73,15 @@
     {% endif %}
     <br>
 
-    <h3> Your Product Rental Histories</h3>
+    <h3> Stuff You've Rented Out (rate renters and get their contact info here)</h3>
     {% if not desc_order_hist %}
         <p>You do not yet have a history of renting out products.</p>
     {% else %}
         <table class="table table-bordered table-condensed">
             <tr>
-                <th>Category</th>
+                <th>Rental Submission Data</th>
                 <th>Brand and Model</th>
-                 <th>Rental Submission Data</th>
+                <th>Category</th>
                 <th>Rental Start Date</th>
                 <th>Rental End Date</th>
                 <th>Total Cost</th>
@@ -92,16 +91,16 @@
             </tr>
                 {% for history in desc_order_hist %}
                 <tr>
-                    <td>{{ history.product.category.cat_name }}</td>
-                    <td><a href="/product-detail/{{ history.product.prod_id }}">{{ history.product.brand.brand_name }} {{ history.product.model }}</a></td>
                     <td>{% if history.rental_submission_date > monthago %} <b>{{ history.rental_submission_date.date().isoformat() }}</b>
                         {% else %} {{ history.rental_submission_date.date().isoformat() }} {% endif %}
+                    <td><a href="/product-detail/{{ history.product.prod_id }}">{{ history.product.brand.brand_name }} {{ history.product.model }}</a></td>
+                    <td>{{ history.product.category.cat_name }}</td>
                     <td>{% if (history.start_date < monthfromnow) and (history.start_date > today) %} <b>{{ history.start_date.date().isoformat() }}</b>
                         {% else %} {{ history.start_date.date().isoformat() }} {% endif %} </td>
                     <td>{{ history.end_date.date().isoformat() }}</td>
                     <td>${{ '{:,.2f}'.format(history.total_cost) }}</td>
                     <td><a href="mailto:{{ history.renter.email }}">{{ history.renter.email }}</a></td>
-                    <td> <a href="/show-renter-ratings/{{ history.renter_user_id }}">Ratings of {{ history.renter.email }} </a></td>
+                    <td> <a href="/show-renter-ratings/{{ history.renter_user_id }}">Ratings of {{ history.renter.fname }} </a></td>
                     <td> {% if history.renter_rating_id %}
                             <p><i>Renter rating already submitted.</i></p>
                         {% else %}
@@ -115,29 +114,36 @@
     {% endif %}
     <br>
 
-    <h3>Items You Have Rented</h3>
+    <h3>Stuff You've Rented</h3>
     {% if not histories %}
         <p>You have no history of renting products.
     {% else %}
         <table class="table table-bordered table-condensed">
             <tr>
-                <th>Start Date</th>
-                <th>End Date</th>
+                <th>Rental Submission Date</th>
+                <th>Rental Start Date</th>
+                <th>Rental End Date</th>
                 <th>Product</th>
                 <th>Category</th>
                 <th>Total Cost</th>
+                <th>Owner and Product Ratings</th>
                 <th>Status</th>
                 <th>email Owner</th>
                 <th>Actions Available</th>
             </tr>
             {% for history in histories %}
                 <tr>
+                    <td>{{ history.rental_submission_date.date().isoformat() }}</td>
                     <td>{% if (history.start_date < monthfromnow) and (history.start_date > today) %} <b>{{ history.start_date.date().isoformat() }}</b>
                         {% else %} {{ history.start_date.date().isoformat() }} {% endif %} </td>
                     <td>{{ history.end_date.date().isoformat() }}</td>
                     <td><a href="/product-detail/{{ history.product.prod_id }}">{{ history.product.brand.brand_name }} {{ history.product.model }}</a></td>
                     <td>{{ history.product.category.cat_name }}
                     <td>${{ '{:,.2f}'.format(history.total_cost) }}</td>
+                    <td><ul>
+                            <li><a href="/show-owner-ratings/{{ history.product.owner.user_id }}">Owner Ratings</a>
+                             <li><a href="/show-product-ratings/{{ history.product.prod_id }}">Product Ratings</a>
+                        </ul>
                     <td>{% if (today > history.end_date) %}
                             Rental done
                         {% elif (today < history.start_date) %}

@@ -14,6 +14,7 @@ from make_update_helpers import make_tent, make_sleeping_bag, make_sleeping_pad
 from make_update_helpers import update_parent_product, update_tent
 from make_update_helpers import update_sleeping_bag, update_sleeping_pad
 from make_update_helpers import calc_avg_star_rating, reverse_merge_sort_histories
+from make_update_helpers import format_phone_number
 from search_helpers import search_radius, get_users_in_area, filter_products
 from search_helpers import get_products_within_dates, categorize_products
 from search_helpers import calc_default_dates, convert_string_to_datetime
@@ -155,12 +156,14 @@ def show_account():
     last30 = today_date - timedelta(days=30)
     next30 = today_date + timedelta(days=30)
 
+    prettify_phone = format_phone_number(customer.phone)
+
     return render_template("account-info.html", user=customer, state=st,
                            products_available=products_avail,
                            products_not_available=products_out,
                            desc_order_hist=desc_date_histories,
                            histories=rentals, today=today_date, monthago=last30,
-                           monthfromnow=next30)
+                           monthfromnow=next30, phonenum=prettify_phone)
 
 
 @app.route('/confirm-deactivate-account')
