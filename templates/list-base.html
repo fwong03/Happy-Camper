@@ -8,6 +8,20 @@
 </head>
 
 <body>
+    <nav class="navbar navbar-default">
+      <div class="container-fluid">
+          <div class="navbar-header">
+              <h1><a class="navbar-brand" href="/success"><b>happy camper</b></a></h1>
+          </div>
+          <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+              <ul class="nav navbar-nav navbar-right">
+                  <li><a href="/account-info"><b>Your Account</b></a></li>
+                  <li><a href="/logout"><b>Log Out</b></a></li>
+              </ul>
+          </div>
+      </div>
+  </nav>
+
   <hr>
     <ul>
       {% for message in get_flashed_messages() %}
@@ -53,9 +67,6 @@
     <input type="submit">
 
 </form>
-
-  <p>--------------------------------</p>
- <p><a href="/success">Homepage</a>     |     <a href="/account-info">Your Account</a>     |     <a href="/logout">Log out</a></p>
 
  <script src="http://code.jquery.com/jquery.js"></script>
 

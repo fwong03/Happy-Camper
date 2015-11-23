@@ -1,6 +1,5 @@
 from unittest import TestCase
 import os
-import tempfile
 from mock import patch
 from datetime import datetime
 
@@ -57,7 +56,7 @@ class IntegrationTestCase(TestCase):
         result = self.client.post('/handle-login', data={'email': 'phar@fignewton.com',
                                   'password': 'abc'}, follow_redirects=True)
         self.assertEqual(result.status_code, 200)
-        self.assertIn('<h2>Your options are the following:</h2>', result.data)
+        self.assertIn('<h4><b>Your options are the following:</b></h4>', result.data)
 
     def test_handle_failed_login(self):
         result = self.client.post('/handle-login', data={'email': 'the@godpigeon.com',
@@ -65,19 +64,26 @@ class IntegrationTestCase(TestCase):
         self.assertEqual(result.status_code, 200)
         self.assertIn('<p><b>Login Here</b></p>', result.data)
 
+    # def test_logout(self):
+    #     result = self.client.post('/logout', follow_redirects=True)
+
+    #     self.assertEqual(result.status_code, 200)
+    #     self.assertIn('<p><b>Login Here</b></p>', result.data)
+
     def test_handle_successful_create_account(self):
         result = self.client.post('handle-create-account', data={'pword': '123',
-                    'confirm_pword': '123', 'firstname': 'The', 'lastname': 'Brain',
-                    'staddress': '8 6th St', 'cty': 'San Francisco', 'state': 'CA',
-                    'zipcode': '94103', 'phonenumber': '4155552222',
-                    'username': 'the@brain.com'}, follow_redirects=True)
+                                  'confirm_pword': '123', 'firstname': 'The',
+                                  'lastname': 'Brain', 'staddress': '8 6th St',
+                                  'cty': 'San Francisco', 'state': 'CA',
+                                  'zipcode': '94103', 'phonenumber': '4155552222',
+                                  'username': 'the@brain.com'}, follow_redirects=True)
 
         self.assertEqual(result.status_code, 200)
-        self.assertIn('<h2>Your options are the following:</h2>', result.data)
+        self.assertIn('<h4><b>Your options are the following:</b></h4>', result.data)
 
     def test_handle_failed_create_account(self):
         result = self.client.post('handle-create-account', data={'pword': '123',
-                    'confirm_pword': 'abc'}, follow_redirects=True)
+                                  'confirm_pword': 'abc'}, follow_redirects=True)
 
         self.assertEqual(result.status_code, 200)
         self.assertIn('<h3>Contact Info</h3>', result.data)
@@ -100,13 +106,13 @@ class IntegrationTestCase(TestCase):
             c.set_cookie('localhost', 'MYCOOKIE', 'cookie_value')
 
             result = c.post('/handle-listing/1', data={'category_id': 1,
-                    'brand_id': 3, 'modelname': 'Kaiju 6',
-                    'desc': 'Guaranteeing campground fun for the family, blah blah',
-                    'cond': 'Excellente', 'avail_start': '2015-11-20',
-                    'avail_end': '2015-12-31', 'pricing': 4.5, 'image': None,
-                    'user': User.query.get(1), 'bestuse': 2, 'sleep': 6,
-                    'seasoncat': 3, 'weight': 200, 'length': 80, 'width': 25,
-                    'doors': 3, 'poles': 3}, follow_redirects=True)
+                            'brand_id': 3, 'modelname': 'Kaiju 6',
+                            'desc': 'Guaranteeing campground fun for the family, blah blah',
+                            'cond': 'Excellente', 'avail_start': '2015-11-20',
+                            'avail_end': '2015-12-31', 'pricing': 4.5, 'image': None,
+                            'user': User.query.get(1), 'bestuse': 2, 'sleep': 6,
+                            'seasoncat': 3, 'weight': 200, 'length': 80, 'width': 25,
+                            'doors': 3, 'poles': 3}, follow_redirects=True)
 
         self.assertEqual(result.status_code, 200)
         self.assertIn('Listing successfully posted!', result.data)
@@ -127,13 +133,13 @@ class IntegrationTestCase(TestCase):
             c.set_cookie('localhost', 'MYCOOKIE', 'cookie_value')
 
             result = c.post('/handle-listing/2', data={'category_id': 2,
-                    'brand_id': 2, 'modelname': 'Arrow Rock 15',
-                    'desc': 'By the time you clean up dinner and organize, blah blah',
-                    'cond': 'Lost some feathers', 'avail_start': '2016-03-01',
-                    'avail_end': '2016-03-31', 'pricing': 3.0, 'image': None,
-                    'user': User.query.get(2), 'filltype': 'D', 'temp': 15,
-                    'bag_weight': 45, 'length': 43, 'gender': 'U'},
-                    follow_redirects=True)
+                            'brand_id': 2, 'modelname': 'Arrow Rock 15',
+                            'desc': 'By the time you clean up dinner and organize, blah blah',
+                            'cond': 'Lost some feathers', 'avail_start': '2016-03-01',
+                            'avail_end': '2016-03-31', 'pricing': 3.0, 'image': None,
+                            'user': User.query.get(2), 'filltype': 'D', 'temp': 15,
+                            'bag_weight': 45, 'length': 43, 'gender': 'U'},
+                            follow_redirects=True)
 
         self.assertEqual(result.status_code, 200)
         self.assertIn('Listing successfully posted!', result.data)
@@ -154,13 +160,13 @@ class IntegrationTestCase(TestCase):
             c.set_cookie('localhost', 'MYCOOKIE', 'cookie_value')
 
             result = c.post('/handle-listing/3', data={'category_id': 3,
-                    'brand_id': -1, 'new_brand_name': 'Exped', 'modelname': 'Mega Mat 10',
-                    'desc': 'mega big and mega warm',
-                    'cond': 'mega good', 'avail_start': '2017-03-01',
-                    'avail_end': '2017-06-15', 'pricing': 2.50, 'image': None,
-                    'user': User.query.get(3), 'padtype': 'F', 'bestuse': 2,
-                    'r_val': 9.5, 'pad_weight': 38, 'pad_length': '78'},
-                    follow_redirects=True)
+                            'brand_id': -1, 'new_brand_name': 'Exped', 'modelname': 'Mega Mat 10',
+                            'desc': 'mega big and mega warm',
+                            'cond': 'mega good', 'avail_start': '2017-03-01',
+                            'avail_end': '2017-06-15', 'pricing': 2.50, 'image': None,
+                            'user': User.query.get(3), 'padtype': 'F', 'bestuse': 2,
+                            'r_val': 9.5, 'pad_weight': 38, 'pad_length': '78'},
+                            follow_redirects=True)
 
         self.assertEqual(result.status_code, 200)
         self.assertIn('Listing successfully posted!', result.data)
@@ -172,6 +178,58 @@ class IntegrationTestCase(TestCase):
         sleepingpad = SleepingPad.query.get(product.prod_id)
         self.assertEqual(sleepingpad.type_code, 'F')
         print "\n\nsleeping pad listed: %r\n\n" % sleepingpad
+
+    def test_submit_renter_rating(self):
+        result = self.client.post('handle-user-rating', data={'hist_id': 7,
+                                  'num_stars': 3, 'is_owner': 0, 'comments': 'abcdefg'},
+                                  follow_redirects=True)
+
+        self.assertEqual(result.status_code, 200)
+        self.assertIn('History id=7', result.data)
+
+    def test_submit_owner_rating(self):
+        result = self.client.post('handle-user-rating', data={'hist_id': 7,
+                                  'num_stars': 3, 'is_owner': 1, 'comments': 'abcdefg'},
+                                  follow_redirects=True)
+
+        self.assertEqual(result.status_code, 200)
+        self.assertIn('History id=7', result.data)
+
+    def test_submit_product_rating(self):
+        result = self.client.post('handle-product-rating', data={'hist_id': 7,
+                                  'num_stars': 3, 'comments': 'abcdefg'},
+                                  follow_redirects=True)
+
+        self.assertEqual(result.status_code, 200)
+        self.assertIn('history_id=7', result.data)
+
+    def test_delist_product(self):
+        with self.client as c:
+            with c.session_transaction() as sess:
+                sess['user'] = 'franken@berry.com'
+
+            c.set_cookie('localhost', 'MYCOOKIE', 'cookie_value')
+            result = self.client.post('handle-delist-product', data={'prod_id': 1},
+                                      follow_redirects=True)
+
+        self.assertEqual(result.status_code, 200)
+        self.assertIn('<li>This product has been delisted.</li>', result.data)
+        self.assertEqual(Product.query.get(1).available, 0)
+
+    def test_deactivate_account(self):
+        with self.client as c:
+            with c.session_transaction() as sess:
+                sess['user'] = 'spuds@mackenzie.com'
+
+            c.set_cookie('localhost', 'MYCOOKIE', 'cookie_value')
+
+            result = self.client.post('handle-deactivate-account',
+                                      follow_redirects=True)
+
+        self.assertEqual(result.status_code, 200)
+        self.assertIn('Your account has been deactivated. Thank you for using Happy Camper!',
+                      result.data)
+        self.assertEqual(User.query.get(5).active, 0)
 
     def test_find_users(self):
         franken = User.query.filter(User.fname == 'Franken').one()
@@ -187,14 +245,14 @@ class IntegrationTestCase(TestCase):
         self.assertEqual(tent.sleep_capacity, 2)
         print "Tent found: %r" % tent
 
-    # def test_get_users_in_area(self):
-    #     users_in_area = get_users_in_area(['94612'], 1)
-    #     users_names = []
+    def test_get_users_in_area(self):
+        users_in_area = get_users_in_area(['94612'], 1)
+        users_names = []
 
-    #     for user in users_in_area:
-    #         users_names.append(user.fname)
+        for user in users_in_area:
+            users_names.append(user.fname)
 
-    #     self.assertEqual(sorted(users_names), ['Count', 'Trix'])
+        self.assertEqual(sorted(users_names), ['Count', 'Trix'])
 
     def test_filter_products(self):
         filtered_products = filter_products(Product.query.all(), 1, 1)
@@ -233,35 +291,35 @@ class IntegrationTestCase(TestCase):
 
 class SearchHelpersTestCase(TestCase):
 
-    # def test_search_radius(self):
-    #     searchcenter = '94612'
-    #     postalcodes = [('94608',), ('94102',), ('94040',), ('95376',), ('95451',),
-    #                     ('92277',), ('10013',), ('02139',)]
+    def test_search_radius(self):
+        searchcenter = '94612'
+        postalcodes = [('94608',), ('94102',), ('94040',), ('95376',), ('95451',),
+                       ('92277',), ('10013',), ('02139',)]
 
-    #     within10 = search_radius(searchcenter, postalcodes, 10)
-    #     within20 = search_radius(searchcenter, postalcodes, 20)
-    #     within50 = search_radius(searchcenter, postalcodes, 50)
-    #     within60 = search_radius(searchcenter, postalcodes, 60)
-    #     within200 = search_radius(searchcenter, postalcodes, 200)
-    #     within600 = search_radius(searchcenter, postalcodes, 600)
-    #     within3000 = search_radius(searchcenter, postalcodes, 3000)
-    #     shouldbeall = search_radius(searchcenter, postalcodes, 3100)
+        # within10 = search_radius(searchcenter, postalcodes, 10)
+        within20 = search_radius(searchcenter, postalcodes, 20)
+        # within50 = search_radius(searchcenter, postalcodes, 50)
+        within60 = search_radius(searchcenter, postalcodes, 60)
+        within200 = search_radius(searchcenter, postalcodes, 200)
+        # within600 = search_radius(searchcenter, postalcodes, 600)
+        # within3000 = search_radius(searchcenter, postalcodes, 3000)
+        shouldbeall = search_radius(searchcenter, postalcodes, 3100)
 
-    #     self.assertEqual(within10, ['94608'])
-    #     self.assertEqual(sorted(within20), sorted(['94608', '94102']))
-    #     self.assertEqual(sorted(within50), sorted(['94608', '94102', '94040']))
-    #     self.assertEqual(sorted(within60), sorted(['94608', '94102', '94040',
-    #                                                '95376']))
-    #     self.assertEqual(sorted(within200), sorted(['94608', '94102', '94040',
-    #                                                 '95376', '95451']))
-    #     self.assertEqual(sorted(within600), sorted(['94608', '94102', '94040',
-    #                                                 '95376', '95451', '92277']))
-    #     self.assertEqual(sorted(within3000), sorted(['94608', '94102', '94040',
-    #                                                 '95376', '95451', '92277',
-    #                                                 '10013']))
-    #     self.assertEqual(sorted(shouldbeall), sorted(['94608', '94102', '94040',
-    #                                                   '95376', '95451', '92277',
-    #                                                   '10013', '02139']))
+        # self.assertEqual(within10, ['94608'])
+        self.assertEqual(sorted(within20), sorted(['94608', '94102']))
+        # self.assertEqual(sorted(within50), sorted(['94608', '94102', '94040']))
+        self.assertEqual(sorted(within60), sorted(['94608', '94102', '94040',
+                                                   '95376']))
+        self.assertEqual(sorted(within200), sorted(['94608', '94102', '94040',
+                                                    '95376', '95451']))
+        # self.assertEqual(sorted(within600), sorted(['94608', '94102', '94040',
+        #                                             '95376', '95451', '92277']))
+        # self.assertEqual(sorted(within3000), sorted(['94608', '94102', '94040',
+        #                                             '95376', '95451', '92277',
+        #                                             '10013']))
+        self.assertEqual(sorted(shouldbeall), sorted(['94608', '94102', '94040',
+                                                      '95376', '95451', '92277',
+                                                      '10013', '02139']))
 
     # http://www.robotswillkillusall.org/posts/how-to-mock-datetime-in-python/
     # https://pypi.python.org/pypi/mock
@@ -302,8 +360,6 @@ class MakeUpdateTestCase(TestCase):
         self.assertEqual(user2.email, 'grumpy@grandpa.com')
         self.assertEqual(user1.region_id, 1)
         self.assertEqual(user2.region_id, 2)
-
-
 
 
 if __name__ == "__main__":

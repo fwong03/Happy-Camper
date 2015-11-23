@@ -681,6 +681,7 @@ def handle_owner_rating():
 
     number_stars = int(request.form.get("num_stars"))
     comments_text = request.form.get("comments")
+    # 0 means rating is for renter, 1 means rating is for owner.
     is_owner = int(request.form.get("is_owner"))
     history_id = int(request.form.get("hist_id"))
 

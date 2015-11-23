@@ -3,7 +3,7 @@
 {% block title %}Search Results{% endblock %}
 
 {% block content %}
-    <h1>Search Results</h1>
+    <h4><b>Search Results</b></h4>
     Current Search: Location: {{ location }} || Search radius: {{ miles }} miles || Dates: {{ session['search_start_date'].date().isoformat() }} to {{ session['search_end_date'].date().isoformat() }}
     <br>----------------------------------------
 
@@ -32,7 +32,7 @@
             </select></li>
     </ul>
 
-    <input type="submit" value="you know you want to">
+    <input type="submit" value="Search Again">
 
     {% for category in search_categories %}
     <h3>{{ category }}</h3>
