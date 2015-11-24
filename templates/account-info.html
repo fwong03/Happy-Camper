@@ -4,22 +4,36 @@
 
   {% block content %}
 
-    <h1>Your Account</h1>
+  <div class="container">
+   <div class="row row-centered">
+        <div class="col-xs-12 col-centered">
+            <h3>Your Contact Info</h3>
+        </div>
+        <div class="col-xs-12">
+            <h4>The Info We Have On File</h4>
+            <ul>
+                <li><b>Name: </b>{{ user.fname }} {{ user.lname }}</li>
+                <li><b>Address: </b> {{ user.street }}, {{ user.city }}, {{ state }} {{ user.postalcode }}</li>
+                <li><b>Phone: </b> {{ phonenum }}</li>
+                <li><b>email: </b> {{ user.email }}</li>
+                <li><b>Actions available: <a href="/confirm-deactivate-account">Deactivate your account</a></li>
+        </div>
+    </div>
 
-    <h3>Contact Info</h3>
-        <p><b>Name: </b>{{ user.fname }} {{ user.lname }}</p>
-        <p><b>Address: </b> {{ user.street }}, {{ user.city }}, {{ state }} {{ user.postalcode }}</p>
-        <p><b>Phone: </b> {{ phonenum }}</p>
-        <p><b>email: </b> {{ user.email }}</p>
-        <p><b>Actions available: <a href="/confirm-deactivate-account">Deactivate your account</a></li>
     <br>
     <br>
 
-    <h3>Your Inventory Part 1: Stuff you have available for rent</h3>
-    {% if not products_available %}
-        <p>None</p>
-    {% else %}
-        <table class="table table-bordered table-condensed">
+    <div class="row row-centered">
+        <div class="col-xs-12 col-centered">
+            <h3>Manage Your Inventory</h3>
+        </div>
+        <div class="col-xs-1"></div>
+        <div class="col-xs-10"></div>
+            <h4>Stuff you have available for rent (these will show up in search results)</h4>
+                {% if not products_available %}
+                    <i>None</i>
+                {% else %}
+        <table class="table table-condensed account-info-table">
             <tr>
                 <th>Category</th>
                 <th>Brand and Model</th>
@@ -45,12 +59,13 @@
         </table>
     {% endif %}
     <br>
+     <div class="col-xs-1"></div>
 
     <h3>Your Inventory Part 2: Stuff you have listed in the past but are no longer available for rent (delisted or maybe recently rented)</h3>
     {% if not products_not_available %}
-        <p>None</p>
+        <i>None</i>
     {% else %}
-        <table class="table table-bordered table-condensed">
+        <table class="table table-condensed table-hover">
             <tr>
                 <th>Category</th>
                 <th>Brand and Model</th>
@@ -73,7 +88,7 @@
 
     <h3> Stuff You've Rented Out (rate renters and get their contact info here)</h3>
     {% if not desc_order_hist %}
-        <p>You do not yet have a history of renting out products.</p>
+        <i>You do not yet have a history of renting out products.</i>
     {% else %}
         <table class="table table-bordered table-condensed">
             <tr>
@@ -114,7 +129,7 @@
 
     <h3>Stuff You've Rented</h3>
     {% if not histories %}
-        <p>You have no history of renting products.
+        <i>You have no history of renting products.</i>
     {% else %}
         <table class="table table-bordered table-condensed">
             <tr>
@@ -192,5 +207,7 @@
     </div>
     </div>
     </div>
+
+</div>
 
 {% endblock %}

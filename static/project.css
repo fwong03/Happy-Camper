@@ -15,21 +15,10 @@ select {
 /*  font-size: 80%;*/
 }
 
-.search-form-table {
-  background-image: url("/static/img/gray_jean.png");
-  background-repeat: repeat;
-  color: #262626;
-
-}
-
-
-.navbar-default .navbar-brand {
-    font-size: 100%;
-}
-
 .row .row-centered {
     text-align:center;
 }
+
 .col-centered {
     display:inline-block;
     float:none;
@@ -38,6 +27,23 @@ select {
     /* inline-block space fix */
     margin-right:-4px;
 }
+
+.account-info-table {
+  background-image: url("/static/img/halftone.png");
+  background-repeat: repeat;
+
+}
+
+.search-form-table {
+  background-image: url("/static/img/gray_jean.png");
+  background-repeat: repeat;
+
+}
+
+.navbar-default .navbar-brand {
+    font-size: 100%;
+}
+
 .landing-page-choice {
     font-size: 25px;
 }
@@ -66,5 +72,6 @@ select {
 #search-form {
   font-size: 115%
   }
+
 
  

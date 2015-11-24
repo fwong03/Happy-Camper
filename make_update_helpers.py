@@ -93,6 +93,9 @@ def make_parent_product(brand_id, category_id):
     pricing = float(request.form.get("pricing"))
     image = request.form.get("image")
 
+    if not image:
+        image = "static/img/defaultimg.jpg"
+
     avail_start = datetime.strptime(avail_start, "%Y-%m-%d")
     avail_end = datetime.strptime(avail_end, "%Y-%m-%d")
 
