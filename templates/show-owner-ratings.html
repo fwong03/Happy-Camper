@@ -6,19 +6,19 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-xs-12">
-    <h3>Ratings for Owner: {{ prod.owner.email }}</h3>
-    <br>
-    <h4>Average Star Rating: 
-        {% if average > 0 %}
-            {{ '{:,.1f}'.format(average) }} Stars
-        {% else %}
-            This user has no owner star ratings yet.
-        {% endif %}
-    </h4>
-    <br>
-    <h4>Comments</h4>
-</div>
-</div>
+            <h3>Ratings for Owner: {{ prod.owner.email }}</h3>
+            <br>
+            <h4>Average Star Rating: 
+                {% if average > 0 %}
+                    {{ '{:,.1f}'.format(average) }} Stars
+                {% else %}
+                    This user has no owner star ratings yet.
+                {% endif %}
+            </h4>
+            <br>
+            <h4>Comments</h4>
+        </div>
+    </div>
 <div class="row">
         <div class="col-xs-12 col-md-6 col-lg-6">
         {% if ratings %}

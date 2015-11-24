@@ -60,10 +60,9 @@ select {
 
 .navbar-default {
     background-image: url("/static/img/crossword.png");
-  background-repeat: repeat;
-
-
+    background-repeat: repeat;
 }
+
 .navbar-default .navbar-brand {
     font-size: 100%;
 }
