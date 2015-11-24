@@ -47,7 +47,8 @@ def search_radius(search_center, postalcodes, radius):
                 postalcodes_within_radius.append(postalcode)
                 print "Added %s with distance %r" % (postalcode, dist_from_94612[postalcode])
                 print "postalcodes to return is now: ", postalcodes_within_radius
-
+            else:
+                print "not wihtin search radius."
             postalcodes_to_remove.append(postalcode)
             print "postalcodes to remove is now: ", postalcodes_to_remove
 
@@ -105,8 +106,7 @@ def search_radius(search_center, postalcodes, radius):
 
             # We return this list of postal codes.
 
-        
-    print "Returning postalcode: %r\n\n\n" % postalcodes_within_radius
+    print "Returning postalcodes: %r\n\n\n" % postalcodes_within_radius
     return postalcodes_within_radius
 
 
