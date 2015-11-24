@@ -50,19 +50,19 @@ class IntegrationTestCase(TestCase):
     def test_homepage(self):
         result = self.client.get('/')
         self.assertEqual(result.status_code, 200)
-        self.assertIn('<p><b>Login Here</b></p>', result.data)
+        self.assertIn('Create one here', result.data)
 
     def test_handle_successful_login(self):
         result = self.client.post('/handle-login', data={'email': 'phar@fignewton.com',
                                   'password': 'abc'}, follow_redirects=True)
         self.assertEqual(result.status_code, 200)
-        self.assertIn('<h4><b>Your options are the following:</b></h4>', result.data)
+        self.assertIn('Find Stuff', result.data)
 
     def test_handle_failed_login(self):
         result = self.client.post('/handle-login', data={'email': 'the@godpigeon.com',
                                   'password': 'abc'}, follow_redirects=True)
         self.assertEqual(result.status_code, 200)
-        self.assertIn('<p><b>Login Here</b></p>', result.data)
+        self.assertIn('Create one here', result.data)
 
     # def test_logout(self):
     #     result = self.client.post('/logout', follow_redirects=True)
@@ -79,7 +79,7 @@ class IntegrationTestCase(TestCase):
                                   'username': 'the@brain.com'}, follow_redirects=True)
 
         self.assertEqual(result.status_code, 200)
-        self.assertIn('<h4><b>Your options are the following:</b></h4>', result.data)
+        self.assertIn('Find Stuff', result.data)
 
     def test_handle_failed_create_account(self):
         result = self.client.post('handle-create-account', data={'pword': '123',
