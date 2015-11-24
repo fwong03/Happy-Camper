@@ -30,61 +30,78 @@
       {% endfor %}
     </ul>
 
-    <h2> Product Detail: {{ product.brand.brand_name }} {{ product.model }} </h2>
-    Category: {{ product.category.cat_name }}
-    <br> Status: {% if product.available %} Available {% else %} Unavailable {% endif %}
-    <br>
-    <br>General Product Info:
-    {% if product.image_url %}
-        <p><img src="{{ "../" + product.image_url }}" alt="{{ product.brand.brand_name }} {{ product.model }}"></p>
-    {% endif %}
-
-        <ul>
-            <li>Product location: {{ product.owner.city }}, {{ product.owner.region.full }}</li>
-            <li>Available start date: {{ product.avail_start_date.date().isoformat() }}</li>
-            <li>Available end date: {{ product.avail_end_date.date().isoformat() }}</li>
-            <li>Price per day: ${{ '{:,.2f}'.format(product.price_per_day) }}</li>
-            <li>Description: {{ product.description }}</li>
-            <li>Condition: {{ product.condition }}</li>
-            <li><a href="/show-owner-ratings/{{ product.owner.user_id }}">See Product Owner Ratings</a>
-            <li><a href="/show-product-ratings/{{ product.prod_id }}">See Product Ratings</a>
-        </ul>
-    <br> {{ product.category.cat_name }}-Specific Info:
-
-        {% block content %}
-
-        CATEOGRY SPECIFIC STUFF HERE
-
-        {% endblock %}
-
-
-        {% if product.owner.email == session['user'] %}
-            Hello, product owner! This item is currently {% if product.available %} available {% else %}not available{% endif %} for rent. 
-        {% elif have_searched %}
-
-            {% if not product.available %}
-                <p>This item is not currently available for rent.</p>
-  
-            {% else %}
-                <p>Your rental period info:</p>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xs-12">
+                <h2>Product Detail: {{ product.brand.brand_name }} {{ product.model }}</h2>
                 <ul>
-                    <li>Rental start date: {{ session['search_start_date'].date().isoformat() }}</li>
-                    <li>Rental end date: {{ session['search_end_date'].date().isoformat() }}</li>
-                    <li>Number of days: {{ session['num_days'] }}
-                    <li>Total cost: ${{ '{:,.2f}'.format(session['num_days'] * product.price_per_day) }}</li>
-                </ul>
+                    <li>Category: {{ product.category.cat_name }}</li>
+                    <li> Status: {% if product.available %} Available {% else %} Unavailable {% endif %}</li>
+            </div>
+        </div>
+    <br> 
+    <br>
 
-                <form action="/rent-confirm/{{ product.prod_id }}" method="POST">
-                <input type="submit" value="Rent This">
-                </form>
+    <div class="row row-centered">
+        <div class="col-xs-12 col-centered">
+            <img src="{{ "../" + product.image_url }}" alt="{{ product.brand.brand_name }} {{ product.model }}">
+        </div>
+    </div>
 
-                <p>Go back to your <a href="/search-results?search_area={{ session['search_area'] }}&search_miles={{ session['search_radius'] }}&search_start_date={{ session['search_start_date'].date().isoformat() }}&search_end_date={{ session['search_end_date'].date().isoformat() }}&category_id={{ session['search_category_id'] }}&brand_id={{ session['search_brand_id'] }}">search results</a></p>
+    <div class="row">
+        <div class="col-xs-12 col-md-4 col-lg-4">
+            <h4>General Product Info:</h4>
+            <ul>
+                <li>Product location: {{ product.owner.city }}, {{ product.owner.region.full }}</li>
+                <li>Available start date: {{ product.avail_start_date.date().isoformat() }}</li>
+                <li>Available end date: {{ product.avail_end_date.date().isoformat() }}</li>
+                <li>Price per day: ${{ '{:,.2f}'.format(product.price_per_day) }}</li>
+                <li>Description: {{ product.description }}</li>
+                <li>Condition: {{ product.condition }}</li>
+                <li><a href="/show-owner-ratings/{{ product.owner.user_id }}">See Product Owner Ratings</a></li>
+                <li><a href="/show-product-ratings/{{ product.prod_id }}">See Product Ratings</a></li>
+            </ul>
+        </div>
+        <div class="col-xs-12 col-md-4 col-lg-4">
+            <h4>Specs:</h4>
+                {% block content %}
+                    CATEOGRY SPECIFIC STUFF HERE
+                {% endblock %}
+        </div>
+        <div class="col-xs-12 col-md-4 col-lg-4">  
+            {% if product.owner.email == session['user'] %}
+                <p>Hello, product owner! This item is currently {% if product.available %} available {% else %}not available{% endif %} for rent.</p>
+            {% elif have_searched %}
+                {% if not product.available %}
+                    <p>This item is not currently available for rent.</p>
+                {% else %}
+                    <h4>Your rental period info:</h4>
+                    <ul>
+                        <li>Rental start date: {{ session['search_start_date'].date().isoformat() }}</li>
+                        <li>Rental end date: {{ session['search_end_date'].date().isoformat() }}</li>
+                        <li>Number of days: {{ session['num_days'] }}</li>
+                        <li>Total cost: ${{ '{:,.2f}'.format(session['num_days'] * product.price_per_day) }}</li>
+                    </ul>
+
+                    <form action="/rent-confirm/{{ product.prod_id }}" method="POST">
+                    <input type="submit" value="Rent This">
+                    </form>
+                {% endif %}
+            {% else %}
+                <p>This item is currently {% if product.available %} available {% else %}not available{% endif %} for rent.</p>
             {% endif %}
-        {% else %}
-                This item is currently {% if product.available %} available {% else %}not available{% endif %} for rent.</p>
+        </div>
+    </div>
+    <div class="row row-centered">
+        <div class="col-xs-12 col-centered">
+            <p>Go back to your <a href="/search-results?search_area={{ session['search_area'] }}&search_miles={{ session['search_radius'] }}&search_start_date={{ session['search_start_date'].date().isoformat() }}&search_end_date={{ session['search_end_date'].date().isoformat() }}&category_id={{ session['search_category_id'] }}&brand_id={{ session['search_brand_id'] }}">search results</a></p>
+        </div>
+    </div>
+</div>
 
-        {% endif %}
 
+    <br>
+    <br>
 
   <div class="container-fluid">
     <footer>2015 | Frances Wong | <a href="mailto:fswong@gmail.com">Say hello</a></footer>
