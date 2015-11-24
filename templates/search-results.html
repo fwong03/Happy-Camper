@@ -15,8 +15,9 @@
               Current Search: Location: {{ location }} || Search radius: {{ miles }} miles || Dates: {{ session['search_start_date'].date().isoformat() }} to {{ session['search_end_date'].date().isoformat() }}
             </div>
         </div>
-        <div class="row search-form-table">
-            <div class="col-xs-12">
+        <div class="row">
+            <div class="col-xs-3"></div>
+            <div class="col-xs-6">
             <form action="/search-results">
                 <br>Modify Search:
                 <ul>
@@ -40,42 +41,44 @@
                 </select></li>
                 </ul>
             </div>
+            <div class="col-xs-3"></div>
         </div>
-     <div class="row row-centered search-form-table">
+     <div class="row row-centered">
         <div class="col-xs-2"></div>
         <div class="col-xs-4">
             <input type="submit" value="Search Again">
         </div>
-        <div class="col-xs-6"></div>
+        <div class="col-xs-"></div>
     </div>
 
-    {% for category in search_categories %}
-    <h3>{{ category }}</h3>
-        {% if products[category] %}
-            <table border="1" cellpadding="5">
-                <tr>
-                    <th>Brand and Model</th>
-                    <th>Image</th>
-                    <th>Price Per Day</th>
-                    <th>Cost for {{ session['num_days'] }} days</th>
-                    <th>product location</th>
-                </tr>
+    
+        {% for category in search_categories %}
+            <div class="row">
+            <div class="column-fluid"><br><h3>{{ category }}</h3></div>
+            {% if not products[category] %}
+                <div class="col-xs-12"><p>Sorry, there are currently no available {{ category }} fitting your search criteria.</p></div>
+            {% else %}
                 {% for product in products[category] %}
-                    <tr>
-                        <td><a href="/product-detail/{{ product.prod_id }}">
-                             {{ product.brand.brand_name }} {{ product.model }} </td>
-                        <td>{% if product.image_url %}<a href="/product-detail/{{ product.prod_id }}"><img src="{{ product.image_url }}" alt="{{ product.brand.brand_name }} {{ product.model }}" style="height:128px;"></a>{% else %}No image provided{% endif %}</td>
-                        <td>${{ '{:,.2f}'.format(product.price_per_day) }}</td>
-                        <td>${{ '{:,.2f}'.format(session['num_days'] * product.price_per_day) }}</td>
-                        <td>{{ product.owner.city }}</td>
-                        </tr>
+                    <div class="col-lg-3 col-md-4 col-xs-6 thumb">
+                    <a class="thumbnail" href="/product-detail/{{ product.prod_id }}">
+                    <img class="img-responsive" src="{{ product.image_url }}" alt="{{ product.brand.brand_name }} {{ product.model }}" style="height:128px">
+                    </a>
+                    <ul>
+                        <li>Brand: {{ product.brand.brand_name }}</li>
+                        <li>Model: {{ product.model }}</li>
+                        <li>Price Per Day: ${{ '{:,.2f}'.format(product.price_per_day) }}</li>
+                        <li>Cost for {{ session['num_days'] }} days: ${{ '{:,.2f}'.format(session['num_days'] * product.price_per_day) }}</li>
+                        <li>Product location: {{ product.owner.city }}</li>
+                    </ul>
+                    </div>
                 {% endfor %}
-            </table><br>
-        {% else %}
-            <p>Sorry, there are currently no available {{ category }} fitting your search criteria.</p>
-            <br><br><br>
-        {% endif  %}
-    {% endfor %}
+            {% endif %}
+            </div>
+        {% endfor %}
+        
+
+
+    
 
 
 {% endblock %}

@@ -140,7 +140,7 @@ class Product(db.Model):
     price_per_day = db.Column(db.Float, nullable=False)
 
     # Do image url now since image upload sounds like it will be complicated.
-    image_url = db.Column(db.String(128))
+    image_url = db.Column(db.String(128), default='/static/img/defaultimg.jpg')
 
     # Put subset table backrefs here
     tent = db.relationship('Tent', uselist=False, backref='product')
