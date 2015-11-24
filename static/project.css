@@ -1,5 +1,5 @@
 body {
-  background-image: url("/static/img/light_grey.png");
+  background-image: url("/static/img/seamless_paper_texture.png");
   background-repeat: repeat;
   color: #262626;
 }
@@ -28,18 +28,42 @@ select {
     margin-right:-4px;
 }
 
-.account-info-table {
-  background-image: url("/static/img/halftone.png");
+.modal-body{
+    background-image: url("/static/img/crossword.png");
   background-repeat: repeat;
+}
+
+.modal-header{
+    background-image: url("/static/img/seamless_paper_texture.png");
+  background-repeat: repeat;
+}
+
+.modal-footer{
+    background-image: url("/static/img/seamless_paper_texture.png");
+  background-repeat: repeat;
+}
+
+
+
+.account-info-table {
+  background-image: url("/static/img/crossword.png");
+  background-repeat: repeat;
+  font-size: 90%;
 
 }
 
 .search-form-table {
-  background-image: url("/static/img/gray_jean.png");
+  background-image: url("/static/img/crossword.png");
   background-repeat: repeat;
 
 }
 
+.navbar-default {
+    background-image: url("/static/img/crossword.png");
+  background-repeat: repeat;
+
+
+}
 .navbar-default .navbar-brand {
     font-size: 100%;
 }

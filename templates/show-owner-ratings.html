@@ -3,37 +3,46 @@
 {% block title %}Product Owner Rating{% endblock %}
 
 {% block content %}
-<h3>Ratings for Owner: {{ prod.owner.email }}</h3>
-<p>Note: Ratings are from renters across all of this owner's products</p>
-
-<h3>Average Star Rating</h3>
-   <ul>
-    {% if average > 0 %}
-        <li> {{ '{:,.1f}'.format(average) }} Stars </li>
-    {% else %}
-        <li>This user has no owner star ratings yet.</li>
-    {% endif %}
-</ul>
-<h3>Comments</h3>
-    {% if ratings %}
-       <table border="1" cellpadding="5">
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-xs-12">
+    <h3>Ratings for Owner: {{ prod.owner.email }}</h3>
+    <br>
+    <h4>Average Star Rating: 
+        {% if average > 0 %}
+            {{ '{:,.1f}'.format(average) }} Stars
+        {% else %}
+            This user has no owner star ratings yet.
+        {% endif %}
+    </h4>
+    <br>
+    <h4>Comments</h4>
+</div>
+</div>
+<div class="row">
+        <div class="col-xs-12 col-md-6 col-lg-6">
+        {% if ratings %}
+           <table class="table account-info-table">
+                <tr>
+                    <th>Stars (out of 4)</th>
+                    <th>Comments</th>
+                    <th>Product</th>
+                </tr>
+            {% for rating in ratings %}
             <tr>
-                <th>Stars (out of 4)</th>
-                <th>Comments</th>
-                <th>Product</th>
-            </tr>
-        {% for rating in ratings %}
-        <tr>
-            <td>{{ rating.stars }}</td>
-            <td>{{ rating.comments }}</td>
-            <td><a href="/product-detail/{{ rating.ohistory[0].product.prod_id }}">{{ rating.ohistory[0].product.brand.brand_name }}: {{ rating.ohistory[0].product.model }}</td>
-        {% endfor %}
-    </table>
-    {% else %}
-        <ul>
-            <li>This user has no owner comments yet.</li>
-        </ul>
-    {% endif %}
+                <td>{{ rating.stars }}</td>
+                <td>{{ rating.comments }}</td>
+                <td><a href="/product-detail/{{ rating.ohistory[0].product.prod_id }}">{{ rating.ohistory[0].product.brand.brand_name }}: {{ rating.ohistory[0].product.model }}</td>
+            {% endfor %}
+        </table>
+        {% else %}
+            <ul>
+                <li>This user has no owner comments yet.</li>
+            </ul>
+        {% endif %}
+        </div>
+    </div>
+</div>
 
 
 {% endblock %}
