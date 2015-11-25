@@ -59,6 +59,7 @@ class User(db.Model):
     # Also check online for JS email check.
     email = db.Column(db.String(64), nullable=False, unique=True)
     password = db.Column(db.String(32), nullable=False)
+    profile_pic_url = db.Column(db.String(128))
 
     renter = db.relationship('History', backref='renter')
 

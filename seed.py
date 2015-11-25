@@ -44,10 +44,11 @@ def load_users():
         phn = int(row[6])
         login = row[7]
         pword = row[8]
+        pic = row[9]
 
         a = User(fname=firstn, lname=lastn, street=staddress,
                  city=cty, region_id=region, postalcode=zcode, phone=phn,
-                 email=login, password=pword)
+                 email=login, password=pword, profile_pic_url=pic)
 
         db.session.add(a)
 

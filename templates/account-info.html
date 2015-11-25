@@ -9,7 +9,7 @@
         <div class="col-xs-12 col-centered">
             <h3>Your Contact Info</h3>
         </div>
-        <div class="col-xs-12">
+        <div class="col-xs-6">
             <h4>The Info We Have On File</h4>
             <ul>
                 <li><b>Name: </b>{{ user.fname }} {{ user.lname }}</li>
@@ -17,6 +17,10 @@
                 <li><b>Phone: </b> {{ phonenum }}</li>
                 <li><b>email: </b> {{ user.email }}</li>
                 <li><b>Actions available:</b> <a href="/confirm-deactivate-account">Deactivate your account</a></li>
+        </div>
+        <div class="col-xs-6 col-centered">
+             <img src={{ user.profile_pic_url }} alt="profile pic" style="height:128px">
+
         </div>
     </div>
 

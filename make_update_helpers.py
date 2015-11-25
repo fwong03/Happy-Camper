@@ -26,14 +26,19 @@ def make_user(password):
     zipcode = request.form.get('zipcode')
     phonenumber = int(request.form.get('phonenumber'))
     username = request.form.get('username')
+    profile_url = request.form.get('profile_url')
 
     # Get region id from the Regions table
     region = Region.query.filter(Region.abbr == state).one()
     state_id = region.region_id
 
+    if not profile_url:
+        profile_url = "static/img/defaultimg.jpg"
+
     user = User(fname=firstname, lname=lastname, street=staddress,
                 city=cty, region_id=state_id, postalcode=zipcode,
-                phone=phonenumber, email=username, password=password)
+                phone=phonenumber, email=username, password=password,
+                profile_pic_url=profile_url)
 
     return user
 
