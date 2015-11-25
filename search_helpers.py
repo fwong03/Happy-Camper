@@ -27,6 +27,7 @@ def search_radius(search_center, postalcodes, radius):
     dist_from_94612 = {'94109': 11.2468, '94612': 0.0006, '94040': 45.4221,
                        '94115': 13.2973, '95376': 53.1893, '94043': 39.0842}
 
+
     # Convert the list of tuples to a list of strings.
     postalcodes_in_db = []
 
