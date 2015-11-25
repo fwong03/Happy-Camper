@@ -92,6 +92,19 @@ select {
             border-radius: 8px;
 }
 
+.thumb {
+  border-radius: 25px;
+  background: url("/static/img/gray_jean.png");
+  background-repeat: repeat;
+  margin: 5px;
+  padding: 5px;
+}
+
+.thumbnail {
+    border-radius:15px;
+    overflow:hidden;
+}
+
 #search-form {
   font-size: 115%
   }
