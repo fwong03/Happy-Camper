@@ -35,6 +35,8 @@
             <h4>Stuff you have available for rent (these will show up in search results)</h4>
                 {% if not products_available %}
                     <i>None</i>
+                    <br>
+                    <br>
                 {% else %}
         <table class="table table-condensed account-info-table">
             <tr>
@@ -66,6 +68,8 @@
     <h4>Stuff no longer available for rent (delisted or recently rented)</h4>
     {% if not products_not_available %}
         <i>None</i>
+        <br>
+        <br>
     {% else %}
         <table class="table table-condensed account-info-table">
             <tr>
@@ -87,10 +91,11 @@
         </table>
     {% endif %}
     <br>
-
-    <h3> Stuff You've Rented Out (rate renters and get their contact info here)</h3>
+    <h4> Stuff You've Rented Out (rate renters and get their contact info here)</h4>
     {% if not desc_order_hist %}
         <i>You do not yet have a history of renting out products.</i>
+        <br>
+        <br>
     {% else %}
         <table class="table table-condensed account-info-table">
             <tr>

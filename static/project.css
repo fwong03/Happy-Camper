@@ -1,5 +1,5 @@
 body {
-  background-image: url("/static/img/seamless_paper_texture.png");
+  background-image: url("/static/img/gray_jean.png");
   background-repeat: repeat;
   color: #262626;
 }
@@ -16,30 +16,30 @@ select {
 }
 
 .row .row-centered {
-    text-align:center;
+  text-align:center;
 }
 
 .col-centered {
-    display:inline-block;
-    float:none;
-    /* reset the text-align */
-    text-align:center;
-    /* inline-block space fix */
-    margin-right:-4px;
+  display:inline-block;
+  float:none;
+  /* reset the text-align */
+  text-align:center;
+  /* inline-block space fix */
+  margin-right:-4px;
 }
 
 .modal-body{
-    background-image: url("/static/img/crossword.png");
+  background-image: url("/static/img/gray_jean.png");
   background-repeat: repeat;
 }
 
 .modal-header{
-    background-image: url("/static/img/seamless_paper_texture.png");
+  background-image: url("/static/img/cream_pixels.png");
   background-repeat: repeat;
 }
 
 .modal-footer{
-    background-image: url("/static/img/seamless_paper_texture.png");
+  background-image: url("/static/img/gray_jean.png");
   background-repeat: repeat;
 }
 
@@ -59,7 +59,7 @@ select {
 }
 
 .navbar-default {
-    background-image: url("/static/img/crossword.png");
+    background-image: url("/static/img/cream_pixels.png");
     background-repeat: repeat;
 }
 
@@ -94,10 +94,12 @@ select {
 
 .thumb {
   border-radius: 25px;
-  background: url("/static/img/gray_jean.png");
-  background-repeat: repeat;
   margin: 5px;
   padding: 5px;
+  border: 2px solid #909899;
+  background-image: url("/static/img/gray_jean.png");
+  background-repeat: repeat;
+
 }
 
 .thumbnail {
