@@ -95,7 +95,7 @@
     {% if product.owner.email != session['user'] and  have_searched %}
         <div class="row row-centered">
             <div class="col-xs-12 col-centered">
-                <p>Go back to your <a href="/search-results?search_area={{ session['search_area'] }}&search_miles={{ session['search_radius'] }}&search_start_date={{ session['search_start_date'].date().isoformat() }}&search_end_date={{ session['search_end_date'].date().isoformat() }}&category_id={{ session['search_category_id'] }}&brand_id={{ session['search_brand_id'] }}">search results</a></p>
+                <h4>Go back to your <a href="/search-results?search_area={{ session['search_area'] }}&search_miles={{ session['search_radius'] }}&search_start_date={{ session['search_start_date'].date().isoformat() }}&search_end_date={{ session['search_end_date'].date().isoformat() }}&category_id={{ session['search_category_id'] }}&brand_id={{ session['search_brand_id'] }}">search results</a></h4>
             </div>
         </div>
     {% endif %}

@@ -6,8 +6,9 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-xs-12">
-            <h3>Ratings for Renter: {{ username }}</h3>
+            <h3>Ratings for Renter: {{ user.email }}</h3>
             <br>
+            <img class="thumbnail" src="{{ "../" + user.profile_pic_url }}" alt="profile pic" style="height:128px">
             <h4>Average Star Rating:
                 {% if average > 0 %}
                     {{ '{:,.1f}'.format(average) }} Stars

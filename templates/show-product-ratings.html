@@ -9,6 +9,7 @@
             <h3>Ratings for Product: {{ product.brand.brand_name }} {{ product.model }}</h3>
             <p><a href="/product-detail/{{ product.prod_id }}">Go back to product listing</a></p>
              <br>
+             <img class="thumbnail" src="{{ "../" + product.image_url }}" alt="profile pic" style="height:128px">
             <h4>Average Star Rating: 
                 {% if average > 0 %}
                     {{ '{:,.1f}'.format(average) }} Stars

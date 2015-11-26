@@ -502,11 +502,9 @@ def show_product(prod_id):
 
     parent_product = Product.query.get(prod_id)
 
-    print "\n\nurl: %s\n\n" % parent_product.image_url
     category_id = parent_product.cat_id
 
     child_product = categories[category_id]
-    print "Template: ", templates[category_id]
 
     try:
         search_start_date = session['search_start_date']
@@ -600,7 +598,6 @@ def show_renter_ratings(renter_id):
 
     histories = History.query.filter(History.renter_user_id == renter_id).all()
     renter = User.query.get(renter_id)
-    renter_email = renter.email
 
     renter_ratings = []
 
@@ -611,7 +608,7 @@ def show_renter_ratings(renter_id):
     avg_star_rating = calc_avg_star_rating(renter_ratings)
 
     return render_template("show-renter-ratings.html", ratings=renter_ratings,
-                           average=avg_star_rating, username=renter_email)
+                           average=avg_star_rating, user=renter)
 
 
 @app.route('/show-product-ratings/<int:prod_id>')

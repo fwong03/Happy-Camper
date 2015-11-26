@@ -8,6 +8,7 @@
         <div class="col-xs-12">
             <h3>Ratings for Owner: {{ prod.owner.email }}</h3>
             <br>
+            <img class="thumbnail" src="{{ "../" + prod.owner.profile_pic_url }}" alt="profile pic" style="height:128px">
             <h4>Average Star Rating: 
                 {% if average > 0 %}
                     {{ '{:,.1f}'.format(average) }} Stars
@@ -16,6 +17,8 @@
                 {% endif %}
             </h4>
             <br>
+        </div>
+    <div class="col-xs-12">
             <h4>Comments</h4>
         </div>
     </div>
