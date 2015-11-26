@@ -7,8 +7,9 @@
   <div class="container">
    <div class="row row-centered">
         <div class="col-xs-12 col-centered">
-            <h3>Your Contact Info</h3>
+            <h3>Your Contact Info</h3><br>
         </div>
+        <div class="col-xs-1"></div>
         <div class="col-xs-6">
             <h4>The Info We Have On File</h4>
             <ul>
@@ -18,8 +19,9 @@
                 <li><b>email: </b> {{ user.email }}</li>
                 <li><b>Actions available:</b> <a href="/confirm-deactivate-account">Deactivate your account</a></li>
         </div>
-        <div class="col-xs-6 col-centered">
-             <img src={{ user.profile_pic_url }} alt="profile pic" style="height:128px">
+        <div class="col-xs-1"></div>
+        <div class="col-xs-4 col-centered">
+             <img class="thumbnail" src={{ user.profile_pic_url }} alt="profile pic" style="height:128px">
 
         </div>
     </div>
