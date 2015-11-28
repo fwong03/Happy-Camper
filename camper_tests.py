@@ -119,11 +119,9 @@ class IntegrationTestCase(TestCase):
 
         product = Product.query.filter(Product.model == 'Kaiju 6').one()
         self.assertEqual(product.model, 'Kaiju 6')
-        print "\n\nproduct listed: %r\n\n" % product
 
         tent = Tent.query.get(product.prod_id)
         self.assertEqual(tent.sleep_capacity, 6)
-        print "\n\ntent listed: %r\n\n" % tent
 
     def test_handle_sleepingbag_listing(self):
         with self.client as c:
@@ -146,11 +144,9 @@ class IntegrationTestCase(TestCase):
 
         product = Product.query.filter(Product.model == 'Arrow Rock 15').one()
         self.assertEqual(product.brand_id, 2)
-        print "\n\nproduct listed: %r\n\n" % product
 
         sleepingbag = SleepingBag.query.get(product.prod_id)
         self.assertEqual(sleepingbag.fill_code, 'D')
-        print "\n\nsleeping bag listed: %r\n\n" % sleepingbag
 
     def test_handle_sleepingpad_listing(self):
         with self.client as c:
@@ -173,11 +169,9 @@ class IntegrationTestCase(TestCase):
 
         product = Product.query.filter(Product.model == 'Mega Mat 10').one()
         self.assertEqual(product.brand.brand_name, 'Exped')
-        print "\n\nproduct listed: %r\n\n" % product
 
         sleepingpad = SleepingPad.query.get(product.prod_id)
         self.assertEqual(sleepingpad.type_code, 'F')
-        print "\n\nsleeping pad listed: %r\n\n" % sleepingpad
 
     def test_submit_renter_rating(self):
         result = self.client.post('handle-user-rating', data={'hist_id': 7,
@@ -239,11 +233,9 @@ class IntegrationTestCase(TestCase):
     def test_find_product(self):
         product = Product.query.filter(Product.model == 'Sugar Shack 2').one()
         self.assertEqual(product.condition, 'Good. Used twice.')
-        print "Product found (should be Sugar Shack: %r" % product
 
         tent = Tent.query.get(product.prod_id)
         self.assertEqual(tent.sleep_capacity, 2)
-        print "Tent found: %r" % tent
 
     def test_get_users_in_area(self):
         users_in_area = get_users_in_area(['94612'], 1)
@@ -266,7 +258,6 @@ class IntegrationTestCase(TestCase):
         self.assertEqual(Brand.query.filter(Brand.brand_name == "ABC").one().brand_name, "ABC")
 
         brand = Brand.query.filter(Brand.brand_name == "ABC").one()
-        print "\n\nBrand made: %r\n\n" % brand
 
     def test_get_brand_id(self):
         self.assertEqual(get_brand_id("REI"), 1)
@@ -291,35 +282,34 @@ class IntegrationTestCase(TestCase):
 
 class SearchHelpersTestCase(TestCase):
 
-    def test_search_radius(self):
+    def test_googlemaps_api(self):
         searchcenter = '94612'
         postalcodes = [('94608',), ('94102',), ('94040',), ('95376',), ('95451',),
                        ('92277',), ('10013',), ('02139',)]
 
-        # within10 = search_radius(searchcenter, postalcodes, 10)
         within20 = search_radius(searchcenter, postalcodes, 20)
-        # within50 = search_radius(searchcenter, postalcodes, 50)
         within60 = search_radius(searchcenter, postalcodes, 60)
         within200 = search_radius(searchcenter, postalcodes, 200)
-        # within600 = search_radius(searchcenter, postalcodes, 600)
-        # within3000 = search_radius(searchcenter, postalcodes, 3000)
-        shouldbeall = search_radius(searchcenter, postalcodes, 3100)
 
-        # self.assertEqual(within10, ['94608'])
         self.assertEqual(sorted(within20), sorted(['94608', '94102']))
-        # self.assertEqual(sorted(within50), sorted(['94608', '94102', '94040']))
         self.assertEqual(sorted(within60), sorted(['94608', '94102', '94040',
                                                    '95376']))
         self.assertEqual(sorted(within200), sorted(['94608', '94102', '94040',
                                                     '95376', '95451']))
-        # self.assertEqual(sorted(within600), sorted(['94608', '94102', '94040',
-        #                                             '95376', '95451', '92277']))
-        # self.assertEqual(sorted(within3000), sorted(['94608', '94102', '94040',
-        #                                             '95376', '95451', '92277',
-        #                                             '10013']))
-        self.assertEqual(sorted(shouldbeall), sorted(['94608', '94102', '94040',
-                                                      '95376', '95451', '92277',
-                                                      '10013', '02139']))
+
+    def test_search_radius(self):
+        searchcenter1 = '94612'
+        searchcenter2 = '94109'
+        searchcenter3 = '94040'
+        searchcenter4 = '10013'
+        postalcodes = [('94612',), ('94109',), ('94040',), ('95376',), ('10013',)]
+
+        self.assertEqual(sorted(search_radius(searchcenter1, postalcodes, 20)), sorted(['94109', '94612']))
+        self.assertEqual(sorted(search_radius(searchcenter1, postalcodes, 60)), sorted(['94109', '94612', '94040', '95376']))
+        self.assertEqual(sorted(search_radius(searchcenter2, postalcodes, 20)), sorted(['94109', '94612']))
+        self.assertEqual(sorted(search_radius(searchcenter2, postalcodes, 60)), sorted(['94109', '94612', '94040']))
+        self.assertEqual(sorted(search_radius(searchcenter3, postalcodes, 20)), ['94040'])
+        self.assertEqual(sorted(search_radius(searchcenter4, postalcodes, 20)), ['10013'])
 
     # http://www.robotswillkillusall.org/posts/how-to-mock-datetime-in-python/
     # https://pypi.python.org/pypi/mock
