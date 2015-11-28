@@ -23,54 +23,53 @@ def search_radius(search_center, postalcodes, radius):
 
     """
     # Put this in for now to prevent eof error from hitting Google Maps API too
-    # frequently.
-    dist_from_94612 = {'94109': 11.2468, '94612': 0.0006, '94040': 45.4221,
-                       '94115': 13.2973, '95376': 53.1893, '94043': 39.0842}
+    # frequently and getting eof error. Later create table that stores
+    # distances searched.
+    distances = {'94612': {'94109': 11.2468,
+                           '94612': 0.0,
+                           '94040': 45.4221,
+                           '94115': 13.2973,
+                           '95376': 53.1893,
+                           '94043': 39.0842,
+                           '10013': 2899.3124,
+                           },
+                 '94109': {'94109': 0.0,
+                           '94612': 10.9361,
+                           '94040': 38.9599,
+                           '94115': 1.2427,
+                           '95376': 62.137,
+                           '10013': 2904.9047,
+                           '94043': 37.2201,
+                           },
+                 }
 
-
-    # Convert the list of tuples to a list of strings.
+    # SQLite returns the distinct postal codes as a list of tuples. Convert this
+    # to a list of the postal codes themselves.
     postalcodes_in_db = []
 
     for postalcode in postalcodes:
         postalcodes_in_db.append(postalcode[0])
 
-    print "\n\n\n\n\nSearch radius is: ", radius
-    print "Search center is", search_center
-    print "Distinct Postalcodes is: ", postalcodes_in_db
-
-    postalcodes_within_radius = []
     distinct_postalcodes = postalcodes_in_db
+    postalcodes_within_radius = []
 
-    if search_center == '94612':
+    if search_center in distances:
         distinct_postalcodes = []
         postalcodes_to_remove = []
 
         for postalcode in postalcodes_in_db:
-            print "checking postalcode: %s" % postalcode
-            if postalcode in dist_from_94612:
-                if dist_from_94612[postalcode] <= radius:
+            if postalcode in distances[search_center]:
+                if distances[search_center][postalcode] <= radius:
                     postalcodes_within_radius.append(postalcode)
-                    print "Added %s with distance %r" % (postalcode, dist_from_94612[postalcode])
-                    print "postalcodes to return is now: ", postalcodes_within_radius
-                else:
-                    print "not wihtin search radius."
+                # Always add postalcode to list of postal codes to remove.
                 postalcodes_to_remove.append(postalcode)
-                print "postalcodes to remove is now: ", postalcodes_to_remove
 
-        print "zipcodes to remove: ", postalcodes_to_remove
-
+        # Check if there are still postal codes to check.
         if len(postalcodes_in_db) > len(postalcodes_to_remove):
-
             distinct_postalcodes = [postalcode for postalcode in postalcodes_in_db if postalcode not in postalcodes_to_remove]
 
-            print "Distinct postalcodes sent to Google Maps API: ", distinct_postalcodes
-            print "Postalcodes to return is now: %r\n\n\n" % postalcodes_within_radius
-
-        print "distinct potalcodes before running GoogleMaps api: ", distinct_postalcodes
-        # Run if there are still things left in distinct_postalcodes
+    # Use GoogleMaps API there are still things left in distinct_postalcodes
     if distinct_postalcodes:
-        print "Now running Google Maps API"
-
         google_maps = GoogleMaps(api_key=os.environ['GOOGLE_API_KEY'])
 
         # Put search center in a list because that is how the the geolocation
@@ -84,12 +83,9 @@ def search_radius(search_center, postalcodes, radius):
         # the search area), destination (here, the user zipcode), and distance
         # between them. First we'll take out the matrix thingies within the search
         # radius of the given search center.
-
         matrixthingies = []
         for item in items:
-            # print "Processing", item.destination, item.distance.miles
             if (item.distance.miles <= radius):
-                # print "adding %r" % item.destination
                 matrixthingies.append(item)
 
         # Now we pull out the user location info from the matrixthingies. This info
@@ -98,20 +94,13 @@ def search_radius(search_center, postalcodes, radius):
         for thingy in matrixthingies:
             destinations.append(thingy.destination)
 
-        # print "destinations: ", destinations
-
         # Now we pull out the zipcode from the list of destinations.
 
         for destination in destinations:
             line = destination.split()
             postalcode = line[-2].replace(",", "")
             postalcodes_within_radius.append(postalcode)
-        #     print line
-        # print "postal codes: ", postalcodes
 
-        # We return this list of postal codes.
-
-    print "Returning postalcodes: %r\n\n\n" % postalcodes_within_radius
     return postalcodes_within_radius
 
 
