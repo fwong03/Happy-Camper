@@ -39,73 +39,77 @@ def search_radius(search_center, postalcodes, radius):
     print "Distinct Postalcodes is: ", postalcodes_in_db
 
     postalcodes_within_radius = []
-    postalcodes_to_remove = []
+    distinct_postalcodes = postalcodes_in_db
 
-    for postalcode in postalcodes_in_db:
-        print "checking postalcode: %s" % postalcode
-        if postalcode in dist_from_94612:
-            if dist_from_94612[postalcode] <= radius:
-                postalcodes_within_radius.append(postalcode)
-                print "Added %s with distance %r" % (postalcode, dist_from_94612[postalcode])
-                print "postalcodes to return is now: ", postalcodes_within_radius
-            else:
-                print "not wihtin search radius."
-            postalcodes_to_remove.append(postalcode)
-            print "postalcodes to remove is now: ", postalcodes_to_remove
+    if search_center == '94612':
+        distinct_postalcodes = []
+        postalcodes_to_remove = []
 
+        for postalcode in postalcodes_in_db:
+            print "checking postalcode: %s" % postalcode
+            if postalcode in dist_from_94612:
+                if dist_from_94612[postalcode] <= radius:
+                    postalcodes_within_radius.append(postalcode)
+                    print "Added %s with distance %r" % (postalcode, dist_from_94612[postalcode])
+                    print "postalcodes to return is now: ", postalcodes_within_radius
+                else:
+                    print "not wihtin search radius."
+                postalcodes_to_remove.append(postalcode)
+                print "postalcodes to remove is now: ", postalcodes_to_remove
 
-    print "zipcodes to remove: ", postalcodes_to_remove
+        print "zipcodes to remove: ", postalcodes_to_remove
 
-    if len(postalcodes_in_db) > len(postalcodes_to_remove):
+        if len(postalcodes_in_db) > len(postalcodes_to_remove):
 
-        distinct_postalcodes = [postalcode for postalcode in postalcodes_in_db if postalcode not in postalcodes_to_remove]
+            distinct_postalcodes = [postalcode for postalcode in postalcodes_in_db if postalcode not in postalcodes_to_remove]
 
-        print "Distinct postalcodes sent to Google Maps API: ", distinct_postalcodes
-        print "Postalcodes to return is now: %r\n\n\n" % postalcodes_within_radius
+            print "Distinct postalcodes sent to Google Maps API: ", distinct_postalcodes
+            print "Postalcodes to return is now: %r\n\n\n" % postalcodes_within_radius
 
+        print "distinct potalcodes before running GoogleMaps api: ", distinct_postalcodes
         # Run if there are still things left in distinct_postalcodes
-        if distinct_postalcodes:
-            print "Now running Google Maps API"
+    if distinct_postalcodes:
+        print "Now running Google Maps API"
 
-            google_maps = GoogleMaps(api_key=os.environ['GOOGLE_API_KEY'])
+        google_maps = GoogleMaps(api_key=os.environ['GOOGLE_API_KEY'])
 
-            # Put search center in a list because that is how the the geolocation
-            # distance module takes it as a parameter
-            search_center = [search_center]
+        # Put search center in a list because that is how the the geolocation
+        # distance module takes it as a parameter
+        search_center = [search_center]
 
-            # Now we can calculate distances.
-            items = google_maps.distance(search_center, distinct_postalcodes).all()
+        # Now we can calculate distances.
+        items = google_maps.distance(search_center, distinct_postalcodes).all()
 
-            # Items is list of distance matrix object thingies. Each has an origin (here,
-            # the search area), destination (here, the user zipcode), and distance
-            # between them. First we'll take out the matrix thingies within the search
-            # radius of the given search center.
+        # Items is list of distance matrix object thingies. Each has an origin (here,
+        # the search area), destination (here, the user zipcode), and distance
+        # between them. First we'll take out the matrix thingies within the search
+        # radius of the given search center.
 
-            matrixthingies = []
-            for item in items:
-                # print "Processing", item.destination, item.distance.miles
-                if (item.distance.miles <= radius):
-                    # print "adding %r" % item.destination
-                    matrixthingies.append(item)
+        matrixthingies = []
+        for item in items:
+            # print "Processing", item.destination, item.distance.miles
+            if (item.distance.miles <= radius):
+                # print "adding %r" % item.destination
+                matrixthingies.append(item)
 
-            # Now we pull out the user location info from the matrixthingies. This info
-            # has the city, state, zipcode and country.
-            destinations = []
-            for thingy in matrixthingies:
-                destinations.append(thingy.destination)
+        # Now we pull out the user location info from the matrixthingies. This info
+        # has the city, state, zipcode and country.
+        destinations = []
+        for thingy in matrixthingies:
+            destinations.append(thingy.destination)
 
-            # print "destinations: ", destinations
+        # print "destinations: ", destinations
 
-            # Now we pull out the zipcode from the list of destinations.
+        # Now we pull out the zipcode from the list of destinations.
 
-            for destination in destinations:
-                line = destination.split()
-                postalcode = line[-2].replace(",", "")
-                postalcodes_within_radius.append(postalcode)
-            #     print line
-            # print "postal codes: ", postalcodes
+        for destination in destinations:
+            line = destination.split()
+            postalcode = line[-2].replace(",", "")
+            postalcodes_within_radius.append(postalcode)
+        #     print line
+        # print "postal codes: ", postalcodes
 
-            # We return this list of postal codes.
+        # We return this list of postal codes.
 
     print "Returning postalcodes: %r\n\n\n" % postalcodes_within_radius
     return postalcodes_within_radius

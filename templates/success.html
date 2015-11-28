@@ -5,42 +5,55 @@
 {% block content %}
 
 <div class="container-fluid">
+  <div class="row row-centered">
+      <div class="col-xs-2 col-centered"></div>
+      <div class="col-xs-7 col-centered"><div class="landing-page-choice"><b>List Stuff</b></div></div>
+      <div class="col-xs-3 col-centered"></div>
+    </div>
+    <br>
     
     <div class="row row-centered">
-      <div class="col-xs-2 col-centered"></div>
-
-      <div class="col-xs-8 col-centered">
-        <div class="dropdown">
-          <button class="btn btn-default btn-xlarge dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><b>List Stuff</b><span class="caret"></span></button>
-          <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-            {% for category in product_categories %}
-              <li><a href="/list-product/{{ category.cat_id }}">{{ category.cat_name }}</a></li>
-            {% endfor %}
-          </ul>
+      <div class="col-xs-1"></div>
+        <div class="col-xs-3 col-centered">
+          <a class="thumbnail" href="/list-product/1">
+          <img class="img-responsive" src="/static/img/cat1.jpg" alt="List a tent" style="height:156px">
+          </a>
+          <p>List a Tent</p>
         </div>
-      </div>
-        <div class="col-xs-2 col-centered"></div>
+           <div class="col-xs-3 col-centered">
+            <a class="thumbnail" href="/list-product/2">
+          <img class="img-responsive" src="/static/img/cat2.jpg" alt="List a sleeping bag" style="height:156px">
+          </a>
+          <p>List a Sleeping Bag</p>
+        </div>
+          <div class="col-xs-3 col-centered">
+            <a class="thumbnail" href="/list-product/3">
+          <img class="img-responsive" src="/static/img/cat3.jpg" alt="List a sleeping pad" style="height:156px">
+          </a>
+          <p>List a Sleeping Pad</p>
+        </div>
+
     </div>
     <br>
 
      <div class="row row-centered">
       <div class="col-xs-2 col-centered"></div>
-        <div class="col-xs-8 col-centered"><div class="landing-page-choice"><i>-- or --</i></div></div>
-        <div class="col-xs-2 col-centered"></div>
+        <div class="col-xs-7 col-centered"><div class="landing-page-choice"><i>-- or --</i></div></div>
+        <div class="col-xs-3 col-centered"></div>
     </div>
     <br>
 
     
     <div class="row row-centered">
       <div class="col-xs-2 col-centered"></div>
-      <div class="col-xs-8 col-centered"><div class="landing-page-choice"><b>Find Stuff</b></div></div>
-      <div class="col-xs-2 col-centered"></div>
+      <div class="col-xs-7 col-centered"><div class="landing-page-choice"><b>Find Stuff</b></div></div>
+      <div class="col-xs-3 col-centered"></div>
     </div>
     <br>
     <br>
     <div class="row row-centered">
       <div class="col-xs-2 col-centered"></div>
-      <div class="col-xs-8 col-centered">
+      <div class="col-xs-7 col-centered">
         <form action="/search-results" id="search-form">
           <table class="table search-form-table">
             <tr>
@@ -81,7 +94,7 @@
             </tr>
           </table>
                 <input type="submit" value="Search for Gear"></a></div>
-        <div class="col-xs-2 col-centered"></div>
+        <div class="col-xs-3 col-centered"></div>
     </div>
 </div>
 
