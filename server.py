@@ -156,6 +156,12 @@ def show_account():
         desc_date_histories = product_histories
 
     rentals = History.query.filter(History.renter_user_id == customer.user_id).all()
+
+    if len(rentals) > 1:
+        desc_date_rentals = reverse_merge_sort_histories(rentals)
+    else:
+        desc_date_rentals = rentals
+
     last30 = today_date - timedelta(days=30)
     next30 = today_date + timedelta(days=30)
 
@@ -165,7 +171,7 @@ def show_account():
                            products_available=products_avail,
                            products_not_available=products_out,
                            desc_order_hist=desc_date_histories,
-                           histories=rentals, today=today_date, monthago=last30,
+                           histories=desc_date_rentals, today=today_date, monthago=last30,
                            monthfromnow=next30, phonenum=prettify_phone)
 
 
@@ -199,18 +205,6 @@ def deactivate_account():
 
 
 ######################## Listing stuff ###################################
-# @app.route('/list-item-choices')
-# def list_item():
-#     """List an item page.
-
-#     Routes from signed in homepage, which has a button to List an Item.
-#     Routes to item detail page.
-#     """
-#     all_categories = Category.query.all()
-
-#     return render_template("list-item-choices.html", categories=all_categories)
-
-
 @app.route('/list-product/<int:category_id>')
 def list_product(category_id):
     # Also changed value of "add new brand" to -1. Per Drew rec.

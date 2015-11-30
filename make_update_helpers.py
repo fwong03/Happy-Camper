@@ -384,54 +384,6 @@ def calc_avg_star_rating(ratings):
 
     return avg_star_rating
 
-# def reverse_merge_sort(lst):
-#     print "calling reverse merge sort on ", lst
-
-#     if len(lst) > 1:
-#         midpt = int(len(lst) / 2)
-#         lst1 = lst[:midpt]
-#         lst2 = lst[midpt:]
-
-#         print "lst1", lst1
-#         print "lst2", lst2
-
-#         reverse_merge_sort(lst1)
-#         reverse_merge_sort(lst2)
-
-#         lst1_index = 0
-#         lst2_index = 0
-#         ordered_lst_index = 0
-
-#         while lst1_index < len(lst1) and lst2_index < len(lst2):
-#             print "ordered_lst_index: %d" % ordered_lst_index
-#             print "lst1_index %d" % lst1_index
-#             print "lst2_index %d" % lst2_index
-
-#             if lst1[lst1_index] > lst2[lst2_index]:
-#                 lst[ordered_lst_index] = lst1[lst1_index]
-#                 print "adding %r to ordered_lst" % lst1[lst1_index]
-#                 lst1_index += 1
-#             else:
-#                 lst[ordered_lst_index] = lst2[lst2_index]
-#                 print "adding %r to ordered_lst" % lst2[lst2_index]
-#                 lst2_index += 1
-
-#             ordered_lst_index += 1
-
-#         while lst1_index < len(lst1):
-#             lst[ordered_lst_index] = lst1[lst1_index]
-#             print "adding %r to ordered_lst" % lst1[lst1_index]
-#             ordered_lst_index += 1
-#             lst1_index += 1
-
-#         while lst2_index < len(lst2):
-#             lst[ordered_lst_index] = lst2[lst2_index]
-#             print "adding %r to ordered_lst" % lst2[lst2_index]
-#             ordered_lst_index += 1
-#             lst2_index += 1
-
-#         return lst
-
 
 def reverse_merge_sort_histories(lst):
     """Reverses histories by rental_sumbission date for display on a user's
