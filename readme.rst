@@ -12,9 +12,9 @@ Academy. Our session ends mid-December 2015.
 
 Technology Stack
 ================
-Application: Python, Flask, Jinja, SQLAlchemy, SQLite
+Application: Python, SQLite, Flask, Flask-SQLAlchemy, Jinja
 
-APIs: Google Maps (for geolocation-python 0.2.0 library)
+APIs: GoogleMaps (geolocation-python 0.2.0)
 
 
 Main Features
@@ -27,7 +27,7 @@ To list an item, click one of the three images at the top of the signed-in home 
 
 To search for gear, enter search criteria in the form below. You can search for gear within a given search radius of a location and optionally filter by category and brand.
 
-The search form is pre-populated with the postal code you entered when you created your account and a search radius of 20 miles.
+The search form is pre-populated with a search radius of 20 miles and the search center as the postal code you entered when you created your account.
 
 
 .. image:: /static/img/readme_search_results.jpg
@@ -52,26 +52,26 @@ You can click on links in the bottom left of the product detail page to see owne
 
 Your Account Info page is where you'll manage your inventory and check out your rental history. To access your account info, click on the "Account Info" link in the top right of the navigation bar.
 
-The top table under "Manage Your Inventory" shows stuff you have listed and are available. These will show up in search results.
+The top table under "Manage Your Inventory" shows inventory you have listed and are available. These items will show up in search results.
 
 
 .. image:: /static/img/readme_second_and_third_tables.jpg
 
-The second table shows products that you have listed and are no longer available, either because you delisted the item or it was recently rented out. These will not show up in search results. 
+The second table called "Stuff no longer available to rent" shows products you have listed in the past and are no longer available, either because you delisted them or they were recently rented out. These will not show up in search results. 
 
 To make the product show up in search results again, click on the "Relist/Edit listing" link under Actions Available.
 
 
 .. image:: /static/img/readme_renterrating.jpg
 
-The third table shows all the histories of every product you have ever rented out, sorted in descending order by the rental request submission date. 
+The third table, called "Stuff You've Rented Out", shows all the histories of every product you have ever rented out, sorted in descending order by the rental request submission date. 
 
 Here you can check out ratings of renters.
 
 
 .. image:: /static/img/readme_raterenter.jpg
 
-You can also rate your experience with the renter by clicking on the "Rate Renter".
+You can also rate your experience with a renter by clicking on the "Rate Renter" button.
 
 
 .. image:: /static/img/readme_fourthtable.jpg
@@ -81,18 +81,12 @@ The fourth and last table on your Account Info page shows your history as a rent
 
 .. image:: /static/img/readme_liststuff.jpg
 
-Going back to listing stuff, if the brand of the item you want to list is not in the drop down, select "Add a new brand" and type in the new brand in the input box immediately below.
+Going back to listing stuff, if the brand of the item you want to list is not in the drop-down menu, select "Add a new brand" and type in the new brand name in the input box immediately below.
 
 
 Database Structure
 =================
 .. image:: /static/img/HappyCamper_database_structure.jpg
 
-Happy Camper usees the above database structure to store user, product, and rating info.
-
-
-
-
-
-   
+Happy Camper uses the above database structure to store user, product, and rating info.
 
