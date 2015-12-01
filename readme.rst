@@ -3,16 +3,17 @@ Happy Camper
 =============
 
 The goal of Happy Camper is to be the Airbnb of gear. We want to
-connect folks who want to rent gear with the those who have the gear and
-want to make some extra cash by renting it out. Cause gear is spensive.
+connect folks who want to rent gear with those who have the gear and want to rent it out
+to make some extra cash. Cause gear is spensive.
 
 This is a project for the fall 2015 cohort of coding camp Hackbright
-Academy (session ends December 2015). 
+Academy. Our session ends mid-December 2015. 
 
 
 Technology Stack
 ================
 Application: Python, Flask, Jinja, SQLAlchemy, SQLite
+
 APIs: Google Maps (for geolocation-python 0.2.0 library)
 
 
@@ -61,9 +62,16 @@ The second table shows products that you have listed and are no longer available
 To make the product show up in search results again, click on the "Relist/Edit listing" link under Actions Available.
 
 
+.. image:: /static/img/readme_renterrating.jpg
+
+The third table shows all the histories of every product you have ever rented out, sorted in descending order by the rental request submission date. 
+
+Here you can check out ratings of renters.
+
+
 .. image:: /static/img/readme_raterenter.jpg
 
-The third table shows all the histories of every product you have ever rented out, sorted in descending order by the rental request date. Here you can check out ratings of the renter. You can also rate your experience with the renter by clicking on the "Rate Renter".
+You can also rate your experience with the renter by clicking on the "Rate Renter".
 
 
 .. image:: /static/img/readme_fourthtable.jpg
