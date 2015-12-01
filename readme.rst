@@ -27,7 +27,7 @@ To list an item, click one of the three images at the top of the signed-in home 
 
 To search for gear, enter search criteria in the form below. You can search for gear within a given search radius of a location and optionally filter by category and brand.
 
-The search form is pre-populated with a search radius of 20 miles and the search center as the postal code you entered when you created your account.
+The search form is pre-populated with a search radius of 20 miles and the search center set to the postal code you entered when you created your account.
 
 
 .. image:: /static/img/readme_search_results.jpg
@@ -50,14 +50,14 @@ You can click on links in the bottom left of the product detail page to see owne
 
 .. image:: /static/img/readme_accountinfo.jpg
 
-Your Account Info page is where you'll manage your inventory and check out your rental history. To access your account info, click on the "Account Info" link in the top right of the navigation bar.
+Your Account Info page is where you'll manage your inventory and check out your rental history. To access your account info, click on the "Your Account" link in the top right of the navigation bar.
 
 The top table under "Manage Your Inventory" shows inventory you have listed and are available. These items will show up in search results.
 
 
 .. image:: /static/img/readme_second_and_third_tables.jpg
 
-The second table called "Stuff no longer available to rent" shows products you have listed in the past and are no longer available, either because you delisted them or they were recently rented out. These will not show up in search results. 
+The second table called "Stuff no longer available for rent" shows products you have listed in the past and are no longer available, either because you delisted them or they were recently rented out. These will not show up in search results. 
 
 To make the product show up in search results again, click on the "Relist/Edit listing" link under Actions Available.
 
