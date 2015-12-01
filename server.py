@@ -21,25 +21,26 @@ from search_helpers import calc_default_dates, convert_string_to_datetime
 
 app = Flask(__name__)
 
-# Required to use Flask sessions alongd the debug toolbar
+# For Flask sessions and debug toolbar
 app.secret_key = "ABC"
 
-# If you use an undefined variable in Jinja2, it will fails silently. Put this
-# in to instead raise an error.
+# To raise an error if you use an undefined variable (Jinja2).
 app.jinja_env.undefined = StrictUndefined
 
 
 ######################## User stuff ###################################
 @app.route('/')
 def index():
-    """Signed out homepage."""
+    """ Page shown when user not logged in. Gives user option to log in for
+        create an account.
+    """
 
     return render_template("signedout.html")
 
 
 @app.route('/logout')
 def handle_logout():
-    """Process logout"""
+    """Processes user logout."""
 
     session.clear()
     return redirect('/')
@@ -47,12 +48,12 @@ def handle_logout():
 
 @app.route('/handle-login', methods=['POST'])
 def handle_login():
-    """Process login form"""
+    """Processes user login."""
 
     username = request.form.get('email')
     password = request.form.get('password')
 
-    # http://docs.sqlalchemy.org/en/latest/orm/exceptions.html
+    # Try/except resource: http://docs.sqlalchemy.org/en/latest/orm/exceptions.html
     try:
         user = User.query.filter(User.email == username).one()
     except NoResultFound:
@@ -70,17 +71,16 @@ def handle_login():
 
 @app.route('/create-account')
 def create_account():
-    """Where new users create an account"""
+    """Create account form."""
 
     return render_template("create-account.html")
 
 
 @app.route('/handle-create-account', methods=['POST'])
 def handle_createaccount():
-    """Process create account form.
+    """ Process create account form.
 
-    Creates a User object using a helper function.
-
+        Creates a User object using a function in make_update_helpers.
     """
 
     password = request.form.get('pword')
@@ -103,7 +103,7 @@ def handle_createaccount():
 
 @app.route('/success')
 def enter_site():
-    """Signed in home page."""
+    """Page shown when user successfully logs in or creates an account."""
 
     customer = User.query.filter(User.email == session['user']).one()
     dates = calc_default_dates(7)
@@ -120,17 +120,33 @@ def enter_site():
 
 @app.route('/account-info')
 def show_account():
-    """Where users can check out their account details.
+    """ Where users can check out their account details.
 
-    They can also delete listings, rate stuff, get the emails of people
-    renting to or renting from.
+        This is where they manage their inventory, check our their rental history,
+        and rate other users and products.
     """
     customer = User.query.filter(User.email == session['user']).one()
+
+    # To display the state as a name, we need to get the name associated with
+    # the region ID.
     state_id = customer.region_id
     st = Region.query.get(state_id).full
 
-    today_date = datetime.today()
+    # Put parens and a dash in the phone number to display.
+    prettify_phone = format_phone_number(customer.phone)
 
+    # Get today's date to bold stuff in tables based on how soon in the future
+    # they are. We will bold two things: rental submissions for products within
+    # this user's inventory within the last thirty days and (2) stuff that this
+    # user is renting out within the next thirty days.
+    today_date = datetime.today()
+    last30 = today_date - timedelta(days=30)
+    next30 = today_date + timedelta(days=30)
+
+    # Get product inventory for this user, then split into those that are
+    # currently available (and will show up in search results) and not
+    # available (user has to actively relist if he or she wants it show up
+    # in search results).
     products_all = Product.query.filter(Product.owner_user_id == customer.user_id).all()
     products_avail = []
     products_out = []
@@ -138,6 +154,7 @@ def show_account():
     product_history_lists = []
     product_histories = []
 
+    # Separate inventory into those that are available and those that are not.
     for product in products_all:
         if product.histories:
             product_history_lists.append(product.histories)
@@ -146,26 +163,29 @@ def show_account():
         else:
             products_out.append(product)
 
+    # Pull out individual histories from the list of histories associated with
+    # each product.
     for history_list in product_history_lists:
         for history in history_list:
             product_histories.append(history)
 
+    # Use merge sort helper function from make_update_helpers so can list
+    # histories in descending order based on rental submission date. We want to
+    # show the most recently requested rental first.
     if len(product_histories) > 1:
         desc_date_histories = reverse_merge_sort_histories(product_histories)
     else:
         desc_date_histories = product_histories
 
+    # Moving on to user's history for renting stuff, get all the histories where
+    # this user is the renter.
     rentals = History.query.filter(History.renter_user_id == customer.user_id).all()
 
+    # Use the merge sort helper function to show the latest rental first.
     if len(rentals) > 1:
         desc_date_rentals = reverse_merge_sort_histories(rentals)
     else:
         desc_date_rentals = rentals
-
-    last30 = today_date - timedelta(days=30)
-    next30 = today_date + timedelta(days=30)
-
-    prettify_phone = format_phone_number(customer.phone)
 
     return render_template("account-info.html", user=customer, state=st,
                            products_available=products_avail,
@@ -177,14 +197,14 @@ def show_account():
 
 @app.route('/confirm-deactivate-account')
 def confirm_deactivate_account():
-    """Confirm the user wants to deactivate account"""
+    """Confirms the user wants to deactivate account."""
 
     return render_template("confirm-deactivate-account.html")
 
 
 @app.route('/handle-deactivate-account', methods=['POST'])
 def deactivate_account():
-    """Deactivate user account.
+    """ Deactivates user account.
 
         Sets availablility to each owner's product to false.
         Sets user active to false.
@@ -207,9 +227,11 @@ def deactivate_account():
 ######################## Listing stuff ###################################
 @app.route('/list-product/<int:category_id>')
 def list_product(category_id):
-    # Also changed value of "add new brand" to -1. Per Drew rec.
+    """Shows listing forms for various categories."""
 
+    # Get all brands in the database to show in the brand drop down.
     all_brands = Brand.query.all()
+    # Pre-populate available dates.
     dates = calc_default_dates(30)
 
     templates = {1: 'list-tent.html',
@@ -217,7 +239,7 @@ def list_product(category_id):
                  3: 'list-sleeping-pad.html',
                  }
 
-    # Tent
+    # If the user wants to list a tent, gets tent-specific spec requests.
     if category_id == 1:
         all_best_uses = BestUse.query.all()
         season_categories = {2: "2-season",
@@ -232,7 +254,8 @@ def list_product(category_id):
                                p_month=dates['future_string'],
                                best_uses=all_best_uses,
                                seasons=season_categories)
-    # Sleeping Bag
+    # Similarly, if user wants to list a sleeping bag, get info needed to request
+    # sleeping bag-specific specs.
     elif category_id == 2:
         all_fill_types = FillType.query.all()
         all_gender_types = Gender.query.all()
@@ -244,7 +267,9 @@ def list_product(category_id):
                                p_month=dates['future_string'],
                                fill_types=all_fill_types,
                                genders=all_gender_types)
-     # Sleeping Pad
+
+     # And same thing for sleeping pads. Get specific stuff like pad types to
+     # show in the template's drop down.
     elif category_id == 3:
         all_pad_types = PadType.query.all()
         all_best_uses = BestUse.query.all()
@@ -257,21 +282,16 @@ def list_product(category_id):
                                pad_types=all_pad_types,
                                best_uses=all_best_uses)
     else:
-        return "not yet implemented"
+        return "Not yet implemented"
 
 
 @app.route('/handle-listing/<int:category_id>', methods=['POST'])
 def handle_listing(category_id):
-    """Handle rental listing.
+    """Handles rental listing. """
 
-    First checks if it needs to make a new Brand. If so, makes a new Brand object.
-    Then makes parent Product object and then child category object.
-
-    Need to pass it the same primary key of the parent
-    Product object.
-    """
-
-    # Check if new brand. If so make new brand and add to database.
+    # Check if new brand (value -1). If so, make new brand using a helper
+    # fucntion from make_update_helpers and gets the brand_id so we can pass that
+    # along to make the Product object.
     brand_num = int(request.form.get("brand_id"))
     brand_num = check_brand(brand_num)
 
@@ -299,6 +319,7 @@ def handle_listing(category_id):
 ###################### Editing stuff ################################
 @app.route('/edit-listing/<int:prod_id>')
 def edit_listing(prod_id):
+    """Shows category-specific edit forms."""
 
     categories = {1: Tent.query.get(prod_id),
                   2: SleepingBag.query.get(prod_id),
@@ -347,6 +368,9 @@ def edit_listing(prod_id):
 
 @app.route('/handle-edit-listing/<int:prod_id>', methods=['POST'])
 def handle_edit_listing(prod_id):
+    """ Updates both the parent and subset objects based on the edit form
+        submitted in the route above.
+    """
 
     parent_product = Product.query.get(prod_id)
     category_id = parent_product.cat_id
@@ -374,10 +398,9 @@ def handle_edit_listing(prod_id):
 ######################## Searching stuff ###################################
 @app.route('/search-results')
 def show_results():
-    """Search results page.
-
-    Routes from Signed in Home Page.
-    Routes to Item Detail page.
+    """ Shows search results based on location and optional filters for
+        category and brand. Uses geolocation-python libary, which uses the
+        GoogleMaps API.
 
     """
 
@@ -403,14 +426,11 @@ def show_results():
     category_id = int(request.args.get("category_id"))
     brand_id = int(request.args.get("brand_id"))
 
+    # This is the number of rental days.
     days = (search_end_date - search_start_date).days + 1
 
-    # Future version: save this search to table so default to last search next
-    # time the user logs in.
-
-    # Now put all this search info into the session so we can refer to it in
-    # future pages.
-
+    # Puts this search info into the session so we can refer to it in
+    # future pages (the "return to your search results" link).
     session['search_start_date'] = search_start_date
     session['search_end_date'] = search_end_date
     session['num_days'] = days
@@ -424,38 +444,44 @@ def show_results():
     postalcodes = query.all()
 
     # Get zipcodes in the database that are within the search radius.
+    # This uses a helper function in search_helpers, which in turn uses
+    # the geolocation-python library.
+    # In future version of project, save these distance searches in the
+    # database.
     postal_codes = search_radius(search_center=search_area,
                                  postalcodes=postalcodes, radius=search_miles)
-    # Get users are in those zipcodes. Get logged in user so can take them out
-    # of results. Don't want to show his or her own products.
+    # We use list of zipcodes we get above and to then get users within in those
+    # zipcodes. We remove the logged in user so we don't show his or her own
+    # products.
     logged_in_user = User.query.filter(User.email == session['user']).one()
     users_in_area = get_users_in_area(postal_codes, logged_in_user.user_id)
 
-    # Get products those users have listed for rent and are currently available
-    # within the search dates.
+    # From the list of users we get above, get products those users have listed
+    # for rent and are currently available within the search dates.
     available_products = get_products_within_dates(start_date=search_start_date,
                                                    end_date=search_end_date,
                                                    users=users_in_area)
-    # Filter out products based on selected category and brand filters.
+    # Filter out products based on optional category and brand filters.
     filtered_products = filter_products(available_products, category_id=category_id,
                                         brand_id=brand_id)
-
-    # Get categories of interest
+    # Get categories of interest. If the vale is -1, the user is interested in
+    # all categories (can currently select only one or all.)
     if category_id < 0:
         search_categories = Category.query.all()
     else:
         search_categories = [Category.query.get(category_id)]
 
     # Make a dictionary of available products with categories as the keys of the
-    # dictionary).
+    # dictionary.
     products_by_category = categorize_products(categories=search_categories,
                                                products=filtered_products)
 
-    # Create a list of sorted category names to display categories on the page
-    # in some kind of consisent order.
+    # Create a list of sorted category names so we can display products by
+    # category in some kind of consistent order.
     sorted_category_names = sorted(products_by_category.keys())
 
-    # For the saerch filter on top of the page, we need all categories and brands.
+    # Get all categories and brands to show in the drop downs in the re-search
+    # form on top of the search results page.
     all_categories = Category.query.all()
     all_brands = Brand.query.all()
 
@@ -463,7 +489,6 @@ def show_results():
                            miles=search_miles,
                            search_categories=sorted_category_names,
                            products=products_by_category,
-                           # Below are for for search filter,
                            product_categories=all_categories,
                            product_brands=all_brands)
 
@@ -471,27 +496,18 @@ def show_results():
 ######################## Showing stuff ###################################
 @app.route('/product-detail/<int:prod_id>')
 def show_product(prod_id):
-    """Product detail page.
-
-    Routes either from Search Results page or List Item page.
-    If click on Borrow This, routes to Borrowed version of this page.
+    """ Shows details for product when the user clicks on the image on the
+        search results page.
     """
-    # Make a borrowed template version if available = False instead
-
+    # Use a different template based on category.
     categories = {1: Tent.query.get(prod_id),
                   2: SleepingBag.query.get(prod_id),
                   3: SleepingPad.query.get(prod_id),
-                  # 4: Pack.query.get(prod_id),
-                  # 5: Stove.query.get(prod_id),
-                  # 6: WaterFilter.query.get(prod_id),
                   }
 
     templates = {1: 'show-tent.html',
                  2: 'show-sleeping-bag.html',
                  3: 'show-sleeping-pad.html',
-                 # 4: 'show-pack.html',
-                 # 5: 'show-stove.html',
-                 # 6: 'show-water-filter.html',
                  }
 
     parent_product = Product.query.get(prod_id)
@@ -500,6 +516,7 @@ def show_product(prod_id):
 
     child_product = categories[category_id]
 
+    # We show different things if the user is the owner vs. not the owner.
     try:
         search_start_date = session['search_start_date']
     except KeyError:
@@ -512,9 +529,7 @@ def show_product(prod_id):
 ######################## Renting stuff ###################################
 @app.route('/rent-confirm/<int:prod_id>', methods=['POST'])
 def confirm_rental(prod_id):
-    """When a user clicks to rent on object, this page
-    confirms they actually meant to rent the item.
-    """
+    """Confirms the user really wants to rent the item."""
 
     prod = Product.query.get(prod_id)
     search_start_date_string = session['search_start_date'].date().isoformat()
@@ -527,7 +542,9 @@ def confirm_rental(prod_id):
 
 @app.route('/handle-rental/<int:prod_id>', methods=['POST'])
 def handle_rental(prod_id):
-    """Process a rental. Create associated History object.
+    """ Processes a rental. Create associated History object and marks the
+        product as unavailable so it doesn't show up in future search results
+        until the owner actively relists it.
 
     """
     user = User.query.filter(User.email == session['user']).one()
@@ -548,31 +565,18 @@ def handle_rental(prod_id):
     return redirect('/account-info')
 
 
-@app.route('/rental-finalized')
-def rent_item():
-    """Show rental confirmation page to user."""
-
-    return render_template("rent-final.html")
-
-
 ######################## Rating stuff ###################################
 @app.route('/show-owner-ratings/<int:user_id>')
 def show_owner_ratings(user_id):
-    """Show owner star ratings and any comments.
-
-    Routes from Product detail and Account Info page.
-    """
+    """Shows owner star ratings and any comments."""
 
     owner = User.query.get(user_id)
     products = owner.products
 
     owner_ratings = []
 
+    # Ratings are optional, so we have to check if there are any.
     for product in products:
-        # Can do something along lines of .filter(owner_rating.isnot(None))?
-        # Get error: AttributeError: type object 'History' has no attribute
-        # 'owner_ratings'
-
         for history in product.histories:
             if history.owner_rating:
                 owner_ratings.append(history.owner_rating)
@@ -585,10 +589,7 @@ def show_owner_ratings(user_id):
 
 @app.route('/show-renter-ratings/<int:renter_id>')
 def show_renter_ratings(renter_id):
-    """Show renter star ratings and any comments.
-
-    Routes from account info page.
-    """
+    """Shows renter star ratings and any comments."""
 
     histories = History.query.filter(History.renter_user_id == renter_id).all()
     renter = User.query.get(renter_id)
@@ -607,10 +608,7 @@ def show_renter_ratings(renter_id):
 
 @app.route('/show-product-ratings/<int:prod_id>')
 def show_product_ratings(prod_id):
-    """Show product star ratings and any comments.
-
-    Routes from product detail page.
-    """
+    """Shows product star ratings and any comments."""
 
     item = Product.query.get(prod_id)
     histories = History.query.filter(History.prod_id == prod_id).all()
@@ -629,29 +627,30 @@ def show_product_ratings(prod_id):
 
 @app.route('/rate-user-modal/<int:user_id>-<int:history_id>-<int:owner_is_true>')
 def rate_user(user_id, history_id, owner_is_true):
-    """Modal popup to rate owner or renter.
+    """ External HTML for modal that pops up to rate other users.
 
+        The owner_is_true variable is used to determine if we want to show the
+        modal to rate an owner or a renter. Value 0 is renter, 1 is owner.
     """
-    # owner_is_true used to determine if show rate owner or rate renter
-    # forms. 0 is renter, 1 is owner
+
+    # Show different star rating text based  on if the rating is for an owner or
+    # a renter.
     star_categories = [{1: "1: Awful. Would not rent to this person again.",
                         2: "2: Worse than expected, but not awful. Might rent to this person again.",
                         3: "3: As expected. Would rent to this person again.",
                         4: "4: Awesome! Would be happy to rent to this person again."
                         },
 
-                        {1: "1: Awful. Would not rent from this person again.",
-                         2: "2: Not as good as expected, but might rent from again.",
-                         3: "3: As expected. Would rent from again.",
-                         4: "4: Awesome! Would rent from again.",
-                         }]
+                       {1: "1: Awful. Would not rent from this person again.",
+                        2: "2: Not as good as expected, but might rent from again.",
+                        3: "3: As expected. Would rent from again.",
+                        4: "4: Awesome! Would rent from again.",
+                        }]
 
+    # Sort the star ratings so the most positive rating (value 4) is on top.
     star_keys_reversed = sorted(star_categories[0].keys(), reverse=True)
 
-
     user_to_rate = User.query.get(user_id)
-
-    print "\n\n User: %d \n\n" % user_id
 
     return render_template("rate-user-modal.html",
                            user=user_to_rate,
@@ -664,10 +663,8 @@ def rate_user(user_id, history_id, owner_is_true):
 
 @app.route('/handle-user-rating', methods=['POST'])
 def handle_owner_rating():
-    """Handle owner rating form submission.
-
-    Will (1) create rating object and (2)update associated history object's
-    owner_rating_id.
+    """ Handles owner rating form submission.
+        This is submitted to the database via ajax.
     """
 
     number_stars = int(request.form.get("num_stars"))
@@ -683,37 +680,29 @@ def handle_owner_rating():
 
     history = History.query.get(history_id)
 
-    print "\n\nhistory id is %d\n\n" % history.history_id
-
     if is_owner:
         history.owner_rating_id = rating.rating_id
-        print "\n\nOwner rating: updating history id %d with rating id %d\n\n" % (
-                                          history.history_id, rating.rating_id)
     else:
         history.renter_rating_id = rating.rating_id
-        print "\n\nRenter rating: updating history id %d with rating id %d\n\n" % (
-                                          history.history_id, rating.rating_id)
 
     db.session.commit()
 
+    # The form stays on the account-info page, so user does not see below.
     return "History id=%d, Rating id=%d" % (history_id, rating.rating_id)
 
 
 @app.route('/rate-product-modal/<int:prod_id>-<int:history_id>')
 def rate_product(prod_id, history_id):
-    """Page to rate product.
+    """External HTML for modal popup to rate product."""
 
-    """
-    star_rating_categories = {
-                                1: '1: Awful. Would not rent again',
-                                2: '2: Not as good as expected, but might rent again if in a pinch.',
-                                3: '3: As expected. Would not mind renting again if needed.',
-                                4: '4: Great! Even better than expected. Would be happy to rent again if needed.',
+    star_rating_categories = {1: '1: Awful. Would not rent again',
+                              2: '2: Not as good as expected, but might rent again if in a pinch.',
+                              3: '3: As expected. Would not mind renting again if needed.',
+                              4: '4: Great! Even better than expected. Would be happy to rent again if needed.',
                               }
 
     item = Product.query.get(prod_id)
     star_keys_reversed = sorted(star_rating_categories.keys(), reverse=True)
-
 
     return render_template("rate-product-modal.html",
                            product=item,
@@ -725,10 +714,11 @@ def rate_product(prod_id, history_id):
 
 @app.route('/handle-product-rating', methods=['POST'])
 def handle_product_rating():
-    """Handle product rating form submission.
+    """ Handles product rating form submission.
 
-    Will (1) create rating object and (2) update associated history object's
-    prod_rating_id.
+        Like the user ratings, database is updated via ajax so the user stays on
+        the account-info page.
+
     """
 
     history_id = int(request.form.get("hist_id"))
@@ -751,7 +741,7 @@ def handle_product_rating():
 ######################## Delisting stuff ###################################
 @app.route('/confirm-delist-product/<int:prod_id>')
 def confirm_delist_product(prod_id):
-    """Confirm the user wants to delist product"""
+    """Confirms the user wants to delist product."""
 
     item = Product.query.get(prod_id)
 
@@ -760,15 +750,15 @@ def confirm_delist_product(prod_id):
 
 @app.route('/handle-delist-product', methods=['POST'])
 def delist_product():
-    """Delist product"""
+    """ Delists product. Marks as unavailable so it doesn't show up in search_start_date
+        results.
+    """
 
     prod_id = int(request.form.get("prod_id"))
     product = Product.query.get(prod_id)
     product.available = 0
     db.session.commit()
 
-    # Change this to redirect to signedout honepage with flash message.
-    # Can then delete finalized-deactivate-account route.
     flash("This product has been delisted.")
 
     return redirect('/account-info')
@@ -778,7 +768,7 @@ def delist_product():
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the point
     # that we invoke the DebugToolbarExtension
-    app.debug = True
+    app.debug = False
 
     connect_to_db(app)
 

@@ -4,27 +4,28 @@ from geolocation.google_maps import GoogleMaps
 from geolocation.distance_matrix import const
 import os
 
- # Helper functions for server.py search-related routes
- # Seven function total
+""" Helper functions for server.py search-related routes.
+     Seven function total.
+"""
 
 def search_radius(search_center, postalcodes, radius):
     """ Finds zipcodes in the database that are within a search radius of a
         location.
-        These zipcodes are then returned so we can find users with those zipcodes
-        and display their products in search results.
 
         This uses the python library geolocation-python, which uses the
         GoogleMaps API.
 
         Takes in search center as a string, postalcodes as a list of tuples
         (because that is the format returned from the database), and search
-        radius in miles as an int. The function returns the list of
+        radius in miles as an integer. The function returns the list of
         postal codes in the given list that are within the given radius.
 
     """
-    # Put this in for now to prevent eof error from hitting Google Maps API too
-    # frequently and getting eof error. Later create table that stores
-    # distances searched.
+    # Future versions: make a table in the database to store distance search
+    # results.
+    # For now store frequest searches in a dictionary to prevent eof error,
+    # likely from hitting Google Maps API too frequently within a given
+    # amount of time.
     distances = {'94612': {'94109': 11.2468,
                            '94612': 0.0,
                            '94040': 45.4221,
@@ -44,7 +45,7 @@ def search_radius(search_center, postalcodes, radius):
                  }
 
     # SQLite returns the distinct postal codes as a list of tuples. Convert this
-    # to a list of the postal codes themselves.
+    # to a list of postal code strings.
     postalcodes_in_db = []
 
     for postalcode in postalcodes:
@@ -61,7 +62,7 @@ def search_radius(search_center, postalcodes, radius):
             if postalcode in distances[search_center]:
                 if distances[search_center][postalcode] <= radius:
                     postalcodes_within_radius.append(postalcode)
-                # Always add postalcode to list of postal codes to remove.
+                # Always add postalcode to the list of postal codes to remove.
                 postalcodes_to_remove.append(postalcode)
 
         # Check if there are still postal codes to check.
@@ -73,15 +74,15 @@ def search_radius(search_center, postalcodes, radius):
         google_maps = GoogleMaps(api_key=os.environ['GOOGLE_API_KEY'])
 
         # Put search center in a list because that is how the the geolocation
-        # distance module takes it as a parameter
+        # distance module takes it in as a parameter
         search_center = [search_center]
 
         # Now we can calculate distances.
         items = google_maps.distance(search_center, distinct_postalcodes).all()
 
-        # Items is list of distance matrix object thingies. Each has an origin (here,
-        # the search area), destination (here, the user zipcode), and distance
-        # between them. First we'll take out the matrix thingies within the search
+        # Items is list of distance matrix object thingies. Each has an origin,
+        # destination, and distance between the origin and destination.
+        # First we'll take out the matrix thingies within the search
         # radius of the given search center.
         matrixthingies = []
         for item in items:
@@ -95,7 +96,6 @@ def search_radius(search_center, postalcodes, radius):
             destinations.append(thingy.destination)
 
         # Now we pull out the zipcode from the list of destinations.
-
         for destination in destinations:
             line = destination.split()
             postalcode = line[-2].replace(",", "")
@@ -104,53 +104,13 @@ def search_radius(search_center, postalcodes, radius):
     return postalcodes_within_radius
 
 
-# def get_user_distances(zipcode, postalcodes):
-#     """ Gets distance a given zipcode of a particular user is from all other
-#         zipcodes in the database.
-
-#         Made this to prevent eof error getting from search, which may by due to
-#         hitting the GoogleMaps API too frequently wihin a given time period.
-#         Use this until add zipcode table to database to store distance searches
-#         in above search_radius.
-
-#         This is basically a version of the search_radius function above.
-
-#         Takes in zipcode as an integer and distinct postal code query result
-#         and returns a dictionary of zipcode as key and distance as value.
-#     """
-
-#     search_center = [zipcode]
-
-#     # query = db.session.query(User.postalcode).distinct()
-#     # postalcodes = query.all()
-#     distinct_postalcodes = []
-
-#     for postalcode in postalcodes:
-#         distinct_postalcodes.append(postalcode[0])
-
-#     google_maps = GoogleMaps(api_key=os.environ['GOOGLE_API_KEY'])
-#     matrixthingies = google_maps.distance(search_center, distinct_postalcodes).all()
-#     distances_from_user = {}
-
-#     for thingy in matrixthingies:
-#         print "Processing matrixthingy with destination: %r and miles: %r" % (thingy.destination, thingy.distance.miles)
-#         line = thingy.destination.split()
-#         postalcode = line[-2].replace(",", "")
-
-#         distances_from_user[postalcode] = thingy.distance.miles
-
-#     print "distances from user :", distances_from_user
-
-#     return distances_from_user
-
-
 def get_users_in_area(postal_codes, user_id):
-    """Finds users in the database that live in one of the given zipcodes.
+    """ Finds users in the database that live in one of the given zipcodes.
 
-        (Here I also passed in the use_id to make it easier to test. This was before
-        Jackie showed me how to set cookies in tests.)
+        (Here I passed in the use_id to make it easier to test. This was before
+        I learned how to set cookies in tests.)
 
-    t"""
+    """
 
     users_in_area = User.query.filter(User.postalcode.in_(postal_codes)).all()
     logged_in_user = User.query.get(user_id)
@@ -190,7 +150,7 @@ def filter_products(products, category_id, brand_id):
 
 
 def get_products_within_dates(start_date, end_date, users):
-    """Finds products that are available within a given date range.
+    """ Finds products that are available within a given date range.
 
         Takes in list of users and returns a list of products
         those users have available for rent within the specified start and
@@ -210,7 +170,7 @@ def get_products_within_dates(start_date, end_date, users):
 
 
 def categorize_products(categories, products):
-    """Organizes products by categories.
+    """ Organizes products by categories.
 
         Takes in lists of Category and Product objects and returns dictionary of
         Products objects with category names as keys.
@@ -228,7 +188,7 @@ def categorize_products(categories, products):
 
 
 def calc_default_dates(deltadays):
-    """Calculates default dates to pre-populate the search area.
+    """ Calculates default dates to pre-populate the search area.
 
         Takes an integer and returns two datetimes and two strings:
             today: datetime of today
@@ -251,7 +211,7 @@ def calc_default_dates(deltadays):
 
 
 def convert_string_to_datetime(date_string):
-    """Converts the date supplied as a string on an HTML form into a datetime.
+    """ Converts the date supplied as a string on an HTML form into a datetime.
 
         Takes in date as string in format "yyyy-mm-dd" (e.g. "2015-11-04"
         for November 4, 2015) and returns datetime object.

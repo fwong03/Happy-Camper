@@ -4,17 +4,24 @@ from model import SleepingBag, SleepingPad
 from model import db
 from datetime import datetime
 
-# Helper functions for server make and update routes.Also threw in one rating
-# helper function at end.
-# Twelve functions.
+""" Helper functions used in server.py to make and update products and users.
+    Fifteen functions total.
+
+    Also threw in two non-making or updating functions at the end:
+    (1) a merge sort helper function to display rental histories in descending
+        order based on rental submission date, and
+    (2) a formatting function for phone numbers so phone numbers display as
+        (xxx) xxx-xxxx on the user's account-info page.
+
+"""
 
 
 ######################## User stuff ###################################
 def make_user(password):
-    """Creates User object. Called by route /handle-create-account.
+    """ Creates User object when a user creates a new account.
 
-        Takes in a password as a string then grabs info from the create account
-        form to create and return a User.
+        Takes in a password as a string, grabs info from the create account
+        form, and returns a User object.
 
     """
 
@@ -45,7 +52,9 @@ def make_user(password):
 
 ######################## Listing stuff ###################################
 def check_brand(brand_id):
-    """Checks if a brand exists in the database, if not it creates it.
+    """ When a user lists an item, we first check if the brand of the item already
+        exists in the database. If not, we create it and add it to the
+        database's Brands table.
 
         Takes integer brand_id (which will be -1 if it is a new brand),
         and returns integer brand_id (which, for a new brand, will be the
@@ -64,7 +73,7 @@ def check_brand(brand_id):
 
 
 def make_brand(brandname):
-    """Adds a new brand to the database. This is called by the check_brand
+    """ Adds a new brand to the database. This is called by the check_brand
         function above if a new brand needs to be added to the database.
     """
 
@@ -75,18 +84,17 @@ def make_brand(brandname):
 
 
 def get_brand_id(brandname):
-    """Takes brand name as a string and returns brand_id as an integer"""
+    """Takes brand name as a string and returns brand_id as an integer."""
 
     brand = Brand.query.filter(Brand.brand_name == brandname).one()
     return brand.brand_id
 
 
 def make_parent_product(brand_id, category_id):
-    """Makes a parent Product object. Need to do this first before creating
-        child Tent, SleepingBag, or SleepingPad objects.
+    """ When a user lists an item, we first make a parent Product object.
 
         Takes two integers, brand_id and category_id, grabs info from the
-        listing form, and returns Product object.
+        listing form, and returns a Product object.
 
     """
 
@@ -104,10 +112,6 @@ def make_parent_product(brand_id, category_id):
     avail_start = datetime.strptime(avail_start, "%Y-%m-%d")
     avail_end = datetime.strptime(avail_end, "%Y-%m-%d")
 
-    # print "\n\nsession user: %s\n\n" % session['user']
-
-    # print "\n\nAll Users: %r \n\n" % User.query.all()
-
     user = User.query.filter(User.email == session['user']).one()
 
     product = Product(cat_id=category_id, brand_id=brand_id,
@@ -116,17 +120,17 @@ def make_parent_product(brand_id, category_id):
                       avail_start_date=avail_start, avail_end_date=avail_end,
                       price_per_day=pricing, image_url=image)
 
-    print "\n\nMake Parent Product model: %r" % product.model
-
     return product
 
 
 def make_tent(product_id):
-    """Makes a child Tent object given the corresponding parent Product ID.
+    """ Makes a subset Tent object given the corresponding parent Product
+        prod_id primary key.
 
-        Grabs info from the list-tent form.
-
+        Takes in prod_id as an integer, grabs info from the list-tent form,
+        and returns a Tent object.
     """
+
     best_use_id = int(request.form.get("bestuse"))
     sleep = int(request.form.get("sleep"))
     seasoncat = int(request.form.get("seasoncat"))
@@ -155,17 +159,17 @@ def make_tent(product_id):
                 floor_width=width, floor_length=length, num_doors=doors,
                 num_poles=poles)
 
-    print "\n\nMake Tent: %r" % tent
-
     return tent
 
 
 def make_sleeping_bag(product_id):
-    """Make child sleeping bag object given the corresponding parent Product ID.
+    """ Makes a subset SleepingBag object given the corresponding parent Product
+        prod_id primary key.
 
-        Grabs info from the list-sleeping-bag form.
-
+        Takes in prod_id as an integer, grabs info from the list-sleepingbag
+        form, and returns a SleepingBag object.
     """
+
     filltype = request.form.get("filltype")
     temp = int(request.form.get("temp"))
     bag_weight = int(request.form.get("bag_weight"))
@@ -188,11 +192,13 @@ def make_sleeping_bag(product_id):
 
 
 def make_sleeping_pad(product_id):
-    """Make child sleeping pad object given the corresponding parent Product ID.
+    """ Makes a subset SleepingPad object given the corresponding parent Product
+        prod_id primary key.
 
-        Grabs info from the list-sleeping-pad form.
-
+        Takes in prod_id as an integer, grabs info from the list-sleepingpad
+        form, and returns a SleepingPad object.
     """
+
     padtype = request.form.get("padtype")
     best_use_id = int(request.form.get("bestuse"))
     r_val = float(request.form.get("r_val"))
@@ -215,11 +221,10 @@ def make_sleeping_pad(product_id):
 
 ###################### Editing stuff ################################
 def update_parent_product(prod_id, brand_id):
-    """Updates parent Product attributes.
+    """ Updates parent Product attributes.
 
-    Takes integers brand_id and category_id, and uses info from the edit form
-    to update the parent Product.
-
+        Takes integers brand_id and category_id, and uses info from the edit form
+        to update the parent Product.
     """
 
     product = Product.query.get(prod_id)
@@ -243,14 +248,11 @@ def update_parent_product(prod_id, brand_id):
 
     db.session.commit()
 
-    print "\n\nProduct updated: id=%d name= %s %s\n\n" % (product.prod_id,
-                                                          product.brand.brand_name,
-                                                          product.model)
     return
 
 
 def update_tent(prod_id):
-    """Update tent object given parent Product id.
+    """ Updates tent object with the given prod_id.
 
         Grabs info from the category-specific area of the edit item form.
     """
@@ -285,19 +287,13 @@ def update_tent(prod_id):
 
     db.session.commit()
 
-    print "\n\nTent updated: id=%d capacity=%d seasons=%d weight=%d\n\n" % (
-                                                                    tent.prod_id,
-                                                                    tent.sleep_capacity,
-                                                                    tent.seasons,
-                                                                    tent.min_trail_weight)
     return
 
 
 def update_sleeping_bag(prod_id):
-    """Update sleeping bag object given parent Product id.
+    """ Updates sleeping bag object of given prod_id.
 
         Grabs info from the category-specific area of the edit item form.
-
     """
 
     sleeping_bag = SleepingBag.query.get(prod_id)
@@ -325,16 +321,14 @@ def update_sleeping_bag(prod_id):
 
     db.session.commit()
 
-    print "\n\nSleeping Bag updated: id=%d fill_type=%s temp=%d weight=%r\n\n" % (
-                                                   sleeping_bag.prod_id,
-                                                   sleeping_bag.fill_code,
-                                                   sleeping_bag.temp_rating,
-                                                   sleeping_bag.weight)
     return
 
 
 def update_sleeping_pad(prod_id):
-    """Update sleeping pad object given product id"""
+    """ Updates sleeping pad object of given prod_id.
+
+        Grabs info from the category-specific area of the edit item form.
+    """
 
     sleeping_pad = SleepingPad.query.get(prod_id)
 
@@ -352,17 +346,13 @@ def update_sleeping_pad(prod_id):
 
     db.session.commit()
 
-    print "\n\nSleeping Pad updated: id=%d type=%s use_id=%d r-val=%r\n\n" % (
-                                                   sleeping_pad.prod_id,
-                                                   sleeping_pad.type_code,
-                                                   sleeping_pad.use_id,
-                                                   sleeping_pad.r_value)
     return
 
 
-# These are not related to making or updating objects. Just threw them in here.
+# These are not related to making or updating objects. Just threw them in here
+# so I wouldn't have another helper function file.
 def calc_avg_star_rating(ratings):
-    """Calculates average star rating to one decimal point to display one
+    """ Calculates average star rating to one decimal point to display one
         show-user and show-product-ratings templates.
 
         Takes a list of ratings and returns average star rating as a
@@ -386,12 +376,10 @@ def calc_avg_star_rating(ratings):
 
 
 def reverse_merge_sort_histories(lst):
-    """Reverses histories by rental_sumbission date for display on a user's
-        acount-info page.
+    """ Sorts histories in descending order based on rental_sumbission_date
+        for display on a user's acount-info page.
 
-        Takes in list of more than one product histories (filtered in server.py)
-        and returns a list of ordered histories.
-
+        Takes in list of product histories and returns a list of sorted histories.
     """
 
     if len(lst) > 1:
@@ -404,10 +392,10 @@ def reverse_merge_sort_histories(lst):
         reverse_merge_sort_histories(lst1)
         reverse_merge_sort_histories(lst2)
 
-        # Function will continue here when the recrusive splits complete
+        # Function will continue here when the recrusive splits complete.
         lst1_index = 0
         lst2_index = 0
-        # Use below to write over the list passed in as a parameter
+        # Use below to write over the list passed in as a parameter.
         ordered_lst_index = 0
 
         # Loop through histories in each of the lists and compare which has a later
@@ -440,7 +428,8 @@ def reverse_merge_sort_histories(lst):
 
 
 def format_phone_number(phonenumber):
-    """Formats phone number in (xxx) yyy-zzzz format
+    """ Formats phone number in (xxx) xxx-xxxx format.
+
         Takes in int and returns string.
     """
     phonenumber = str(phonenumber)
@@ -460,5 +449,3 @@ def format_phone_number(phonenumber):
         pretty_phone_num += phonenumber[idx]
 
     return pretty_phone_num
-
-

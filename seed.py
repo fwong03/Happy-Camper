@@ -28,7 +28,6 @@ def load_users():
     """Load user data"""
 
     print "Users"
-    # Delete rows of existing table, if any
     User.query.delete()
 
     for row in open("data/customerdata"):
@@ -335,7 +334,6 @@ def load_ratings():
         db.session.add(a)
 
     db.session.commit()
-
 
 
 if __name__ == "__main__":

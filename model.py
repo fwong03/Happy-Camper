@@ -1,6 +1,5 @@
-# Models and database for Happy Camper project.
-# Version 1
-# October 27, 2015
+# Models and database for Happy Camper Hackbright project.
+# Version 1: October 27 to December 1st, 2015
 
 from flask_sqlalchemy import SQLAlchemy
 import datetime
@@ -33,34 +32,30 @@ class User(db.Model):
 
     user_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
 
-    # Per Bert rec: give user option to deactivate account.
+    # User has option to deactivate account (mentor Bert rec).
     active = db.Column(db.Boolean, default=True)
     fname = db.Column(db.String(32), nullable=False)
     lname = db.Column(db.String(32), nullable=False)
     street = db.Column(db.String(32), nullable=False)
     city = db.Column(db.String(32), nullable=False)
 
-    # Made this region_id instead of state since state so US-speicific. Per
-    # Drew rec. ENUM would also work but less flexible.
+    # Made this region_id instead of state_id in case want to expand internationally.
+    # ENUM would have also worked but less flexible (mentor Drew rec).
     region_id = db.Column(db.Integer, db.ForeignKey('regions.region_id'),
                           nullable=False)
 
-    # Changed from INT to string per Drew recommendation. If integer would
-    # have to deal with zip codes starting with zeroes. Make 10 long so have
-    # option to accept nine-digit zip codes.
+    # Make postalcode instead of zipcode to make it more international-friendly.
+    # Made string instead of integer in case begins with a zero (mentor Drew rec).
     postalcode = db.Column(db.String(10), nullable=False)
-
-    # Drew: phone presents another INT problem.
-    # Store as user inputs and then clean up when pull out to use?
-    # When make form strongly suggest input format with "()" and "-".
-    # Google JS phone checks.
+    # Leave phone as integer since that is how some API's like Twilio take (mentor
+    # Drew rec).
     phone = db.Column(db.Integer, nullable=False)
-
-    # Also check online for JS email check.
     email = db.Column(db.String(64), nullable=False, unique=True)
     password = db.Column(db.String(32), nullable=False)
     profile_pic_url = db.Column(db.String(128))
 
+    # Make a backref so we can easily access the renter associated with a
+    # rental history.
     renter = db.relationship('History', backref='renter')
 
     def __repr__(self):
@@ -76,7 +71,6 @@ class Category(db.Model):
 
     cat_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     cat_name = db.Column(db.String(16), nullable=False, unique=True)
-    # add display name attribute
 
     def __repr__(self):
 
@@ -84,7 +78,7 @@ class Category(db.Model):
 
 
 class BestUse(db.Model):
-    """Best uses for some categories (not all)"""
+    """Best uses for tents and sleeping pads."""
 
     __tablename__ = "bestuses"
 
@@ -99,7 +93,11 @@ class BestUse(db.Model):
 
 
 class Brand(db.Model):
-    """Brands"""
+    """ Brands.
+
+        Make a separate brand table (per mentor Bert rec) to give ourselves
+        the flexiblity to change how these are displayed later on.
+    """
 
     __tablename__ = "brands"
 
@@ -112,26 +110,19 @@ class Brand(db.Model):
 
 class Product(db.Model):
     """Product parent class."""
-    # CHANGE: pricing is some amount first day then another amount per day
-    # following not counting pickup or dropoff date (REI model)
 
     __tablename__ = 'products'
 
-    # Subset tables (e.g., tents) use this same PK so make subset table entry at
-    # same time as product entry!  Note PKs automatically get an index.
     prod_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     cat_id = db.Column(db.Integer, db.ForeignKey('categories.cat_id'),
                        nullable=False)
-
-    # Per Bert recommendation put brand name in separate table for more
-    # flexibility.
     brand_id = db.Column(db.Integer, db.ForeignKey('brands.brand_id'),
                          nullable=False)
     owner_user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'),
                               nullable=False)
 
-    # Per Bert rec: make available false when item is borrowed or when owner
-    # deactivates account.
+    # We use the available boolean to change the status to "unavailable" if
+    # the item is rented out or the owner delists it (mentor Bert rec).
     available = db.Column(db.Boolean, default=True)
     model = db.Column(db.String(16), nullable=False)
     condition = db.Column(db.String(356))
@@ -140,15 +131,19 @@ class Product(db.Model):
     avail_end_date = db.Column(db.DateTime, nullable=False)
     price_per_day = db.Column(db.Float, nullable=False)
 
-    # Do image url now since image upload sounds like it will be complicated.
+    # Do image url now since image upload sounds like it will take a while to
+    # figure out.
     image_url = db.Column(db.String(128))
 
-    # Put subset table backrefs here
+    # Put subset table backrefs here so we can easily access parent product info
+    # while on a subset object.
     tent = db.relationship('Tent', uselist=False, backref='product')
     sleepingbag = db.relationship('SleepingBag', uselist=False, backref='product')
     sleepingpad = db.relationship('SleepingPad', uselist=False, backref='product')
 
-    # Other backrefs
+    # Other backrefs. We want to be able to see which products an user has
+    # available for rent, which products we have of a certain brand or
+    # category, and the product associated with a history.
     owner = db.relationship('User', backref='products')
     brand = db.relationship('Brand', backref='products')
     category = db.relationship('Category', backref='products')
@@ -161,12 +156,10 @@ class Product(db.Model):
 
 
 class Tent(db.Model):
-    """Tent is one of the subset tables of Product"""
+    """Tent is one of the subset tables of Product."""
 
     __tablename__ = 'tents'
 
-    # Make sure you create the Tent at the same time you create the Product.
-    # They share primary keys.
     prod_id = db.Column(db.Integer, db.ForeignKey('products.prod_id'),
                         primary_key=True)
     use_id = db.Column(db.Integer, db.ForeignKey('bestuses.use_id'),
@@ -229,7 +222,6 @@ class SleepingBag(db.Model):
     # These are optional.
     weight = db.Column(db.Integer)
     length = db.Column(db.Integer)
-    # F, M, or U for female, male, unisex
     gender_code = db.Column(db.String(1), db.ForeignKey('genders.gender_code'))
 
     def __repr__(self):
@@ -278,9 +270,6 @@ class History(db.Model):
     __tablename__ = 'histories'
 
     history_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-
-    # Make this index if think will use a lot for search. Check, may already get
-    # index since it's a FK.
     prod_id = db.Column(db.Integer, db.ForeignKey('products.prod_id'),
                         nullable=False)
     renter_user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'),
@@ -295,16 +284,21 @@ class History(db.Model):
     renter_rating_id = db.Column(db.Integer, db.ForeignKey('ratings.rating_id'))
     prod_rating_id = db.Column(db.Integer, db.ForeignKey('ratings.rating_id'))
 
+    # Took a while to figure out how to be on a rating and find the associated product
+    # without annoyingly long queries.
+    # I used this so I can show owner and renter ratings across all products they've
+    # rented or rented out.
     # http://docs.sqlalchemy.org/en/latest/orm/join_conditions.html
     owner_rating = db.relationship('Rating', foreign_keys='History.owner_rating_id',
-                                    backref='ohistory',
-                                    order_by=rental_submission_date.desc())
+                                   backref='ohistory',
+                                   order_by=rental_submission_date.desc())
     renter_rating = db.relationship('Rating', foreign_keys='History.renter_rating_id',
-                                     backref='rhistory',
-                                     order_by=rental_submission_date.desc())
+                                    backref='rhistory',
+                                    order_by=rental_submission_date.desc())
+    # Didn't use below but I put it in just in case.
     product_rating = db.relationship('Rating', foreign_keys='History.prod_rating_id',
-                                      backref='phistory',
-                                      order_by=rental_submission_date.desc())
+                                     backref='phistory',
+                                     order_by=rental_submission_date.desc())
 
     def __repr__(self):
         return "<History history_id=%d, prod_id=%d, rental_submit_date= %r, renter_user_id=%r, owner_rating_id=%r, renter_rating_id=%r, prod_rating_id=%r>" % (
@@ -313,7 +307,7 @@ class History(db.Model):
 
 
 class Rating(db.Model):
-    """Renters can rate owner and products, Owners can rate renters."""
+    """Renters can rate owners and products, owners can rate renters."""
 
     __tablename__ = 'ratings'
 
@@ -323,7 +317,8 @@ class Rating(db.Model):
 
     def __repr__(self):
         return "<Rating rating_id=%d, stars=%d, comments=%s>" % (self.rating_id,
-                self.stars, self.comments)
+                                                                 self.stars,
+                                                                 self.comments)
 
 
 ##############################################################################
