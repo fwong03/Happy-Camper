@@ -84,9 +84,3 @@ The fourth and last table on your Account Info page shows your history as a rent
 Going back to listing stuff, if the brand of the item you want to list is not in the drop-down menu, select "Add a new brand" and type in the new brand name in the input box immediately below.
 
 
-Database Structure
-=================
-.. image:: /static/img/HappyCamper_database_structure.jpg
-
-Happy Camper uses the above database structure to store user, product, and rating info.
-
